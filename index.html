@@ -67,6 +67,10 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+        .image-loading-spinner {
+            border-color: #4b5563;
+            border-top-color: #3b82f6;
+        }
 
     </style>
 </head>
@@ -84,7 +88,7 @@
             </div>
             <div class="text-center">
                 <h1 class="text-4xl font-bold text-white">Trình tạo Prompt Phân cảnh & Kịch bản AI</h1>
-                <p class="text-lg text-gray-400 mt-2">Tạo prompt chi tiết cho hình ảnh, video và kịch bản từ ý tưởng của bạn.</p>
+                <p class="text-lg text-gray-400 mt-2">Tạo prompt, hình ảnh, video và kịch bản từ ý tưởng của bạn.</p>
             </div>
         </header>
         
@@ -120,10 +124,16 @@
                 <div class="lg:w-2/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
                     <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
                         <h2 class="text-2xl font-semibold text-white">Bảng phân cảnh (Storyboard)</h2>
-                        <button id="save-all-storyboard-prompts-btn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
-                            Lưu Prompts
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button id="generate-all-images-btn" class="hidden bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>
+                                Tạo tất cả ảnh
+                            </button>
+                            <button id="save-all-storyboard-prompts-btn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
+                                Lưu Prompts
+                            </button>
+                        </div>
                     </div>
                     <div id="storyboard-output" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
                            <div id="storyboard-placeholder" class="text-center text-gray-500 py-16">
@@ -174,10 +184,16 @@
                 <div class="lg:w-2/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
                      <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
                         <h2 class="text-2xl font-semibold text-white">Kịch bản được tạo</h2>
-                        <button id="copy-script-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3z"/></svg>
-                            Sao chép
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button id="send-script-to-analyzer-btn" class="hidden bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.5 1a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1h9.5zM10 4a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 10 4zM6 4a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 6 4zM3.5 14a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 1 0v9a.5.5 0 0 1-.5.5z"/></svg>
+                                Phân tích Kịch bản
+                            </button>
+                            <button id="copy-script-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3z"/></svg>
+                                Sao chép
+                            </button>
+                        </div>
                     </div>
                      <div id="script-output" class="space-y-4 h-full overflow-y-auto pr-2 max-h-[70vh]">
                          <div class="text-center text-gray-500 pt-16">
@@ -474,6 +490,7 @@
                              <p class="mt-1 text-sm text-gray-500">Nhập mô tả cảnh quay và nhấn nút để bắt đầu.</p>
                            </div>`;
                  document.getElementById('save-all-storyboard-prompts-btn').classList.add('hidden');
+                 document.getElementById('generate-all-images-btn').classList.add('hidden');
             });
 
             function renderStoryboard(data) {
@@ -494,13 +511,15 @@
                    `;
                 storyboardOutput.innerHTML = content;
                 document.getElementById('save-all-storyboard-prompts-btn').classList.remove('hidden');
+                document.getElementById('generate-all-images-btn').classList.remove('hidden');
                 
                 // Auto-save the generated storyboard
                 try {
+                    // *** FIX: Save only the sceneBreakdown object, not the whole response data ***
                     const newStoryboard = {
                         id: Date.now(),
                         title: (data.sceneInfo || 'Phân cảnh không tên').substring(0, 50) + (data.sceneInfo && data.sceneInfo.length > 50 ? '...' : ''),
-                        content: JSON.stringify(data)
+                        content: JSON.stringify(data) 
                     };
                     if (!memories.storyboard.items.some(item => item.content === newStoryboard.content)) {
                         memories.storyboard.items.unshift(newStoryboard);
@@ -511,8 +530,8 @@
                     console.error("Lỗi khi tự động sao lưu phân cảnh:", e);
                 }
 
-                storyboardOutput.querySelectorAll('.copy-btn, .translate-button').forEach(btn => {
-                   btn.addEventListener('click', () => {
+                storyboardOutput.querySelectorAll('.copy-btn, .translate-button, .generate-image-btn').forEach(btn => {
+                   btn.addEventListener('click', (e) => {
                        if (btn.classList.contains('copy-btn')) {
                             const textToCopy = btn.dataset.text;
                             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -525,6 +544,10 @@
                            enP.classList.toggle('hidden');
                            vnDiv.classList.toggle('hidden');
                            btn.textContent = enP.classList.contains('hidden') ? 'Gốc' : 'Dịch';
+                       } else if(btn.classList.contains('generate-image-btn')) {
+                            const prompt = btn.dataset.prompt;
+                            const card = btn.closest('.prompt-card');
+                            handleGenerateImage(prompt, card, btn);
                        }
                    });
                 });
@@ -562,16 +585,27 @@
 
             function createStoryboardCard(title, englishPrompt, vietnamesePrompt) {
                  return `<div class="prompt-card bg-gray-700 p-4 rounded-lg border border-gray-600 flex flex-col">
+                    <div class="image-container bg-gray-900 rounded-md h-48 flex items-center justify-center mb-3 border border-dashed border-gray-600 relative">
+                        <div class="image-placeholder text-center text-gray-500">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="mx-auto" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM15 5a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5z"/></svg>
+                           <p class="text-xs mt-1">Ảnh sẽ hiện ở đây</p>
+                        </div>
+                        <div class="image-loading-spinner absolute w-8 h-8 rounded-full border-4 animate-spin hidden"></div>
+                        <img class="generated-image hidden w-full h-full object-cover rounded-md" src="" alt="Generated Image">
+                    </div>
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-md font-semibold text-blue-400">${title}</h3>
-                        <div class="flex items-center gap-2 flex-wrap justify-end">
+                        <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                            <button class="generate-image-btn text-xs font-medium py-1 px-3 rounded-full transition bg-cyan-600 hover:bg-cyan-500" data-prompt="${escapeHtml(englishPrompt || '')}">Tạo ảnh</button>
                             <button class="translate-button text-xs font-medium py-1 px-3 rounded-full transition bg-gray-600 hover:bg-gray-500">Dịch</button>
-                            <button class="copy-btn bg-blue-600 hover:bg-blue-500 text-xs font-medium py-1 px-3 rounded-full transition" data-text="${escapeHtml(englishPrompt || '')}">Copy</button>
+                            <button class="copy-btn text-xs font-medium py-1 px-3 rounded-full transition bg-blue-600 hover:bg-blue-500" data-text="${escapeHtml(englishPrompt || '')}">Copy</button>
                         </div>
                     </div>
-                    <p class="prompt-en text-sm text-gray-300 flex-grow">${escapeHtml(englishPrompt || 'N/A')}</p>
-                    <div class="prompt-vn hidden">
-                        <p class="text-sm text-green-300">${escapeHtml(vietnamesePrompt || 'N/A')}</p>
+                    <div class="text-container flex-grow">
+                        <p class="prompt-en text-sm text-gray-300">${escapeHtml(englishPrompt || 'N/A')}</p>
+                        <div class="prompt-vn hidden">
+                            <p class="text-sm text-green-300">${escapeHtml(vietnamesePrompt || 'N/A')}</p>
+                        </div>
                     </div>
                 </div>`;
             }
@@ -580,6 +614,7 @@
             const generateScriptBtn = document.getElementById('generate-script-btn');
             const scriptOutput = document.getElementById('script-output');
             const copyScriptBtn = document.getElementById('copy-script-btn');
+            const sendScriptToAnalyzerBtn = document.getElementById('send-script-to-analyzer-btn');
             const taskSelector = document.getElementById('task-selector');
             const scriptTaskDescriptionTextarea = document.getElementById('script-characters');
 
@@ -650,6 +685,7 @@
                     const formattedResponse = escapeHtml(responseText).replace(/\n/g, '<br>');
                     scriptOutput.innerHTML = `<div class="bg-gray-900 p-4 rounded-lg text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono">${formattedResponse}</div>`;
                     copyScriptBtn.classList.remove('hidden');
+                    sendScriptToAnalyzerBtn.classList.remove('hidden');
                 } catch (error) {
                     handleApiError(error, scriptOutput);
                 } finally {
@@ -664,6 +700,20 @@
                 navigator.clipboard.writeText(scriptText).then(() => {
                     showToast('Đã sao chép kịch bản!');
                 });
+            });
+
+            sendScriptToAnalyzerBtn.addEventListener('click', () => {
+                const scriptText = scriptOutput.querySelector('div')?.innerText;
+                if (!scriptText) {
+                    showError("Không tìm thấy nội dung kịch bản để phân tích.");
+                    return;
+                }
+                const scriptInputForAnalysis = document.getElementById('script-input');
+                scriptInputForAnalysis.value = scriptText;
+                switchTab(tabScriptToPrompt, scriptToPromptPanel);
+                scriptInputForAnalysis.focus();
+                scriptInputForAnalysis.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast('Đã chuyển kịch bản qua để phân tích!');
             });
 
             // --- MEMORY HUB LOGIC ---
@@ -748,7 +798,8 @@
                         if (item && item.content) {
                             try {
                                 const storyboardData = JSON.parse(item.content);
-                                renderStoryboard(storyboardData);
+                                // *** FIX: Handle both old (nested) and new (direct) data structures ***
+                                renderStoryboard(storyboardData.sceneBreakdown || storyboardData);
                                 switchTab(tabStoryboard, storyboardPanel);
                                 showToast(`Đã tải phân cảnh "${item.title}"`);
                                 modal.classList.add('hidden');
@@ -805,7 +856,6 @@
                     const contentTextarea = editorEl.querySelector('textarea[name="content"]');
                     items[itemIndex].title = newTitle;
                     
-                    // For storyboard, content is JSON, don't update from editor
                     if(config.type !== 'storyboard') {
                         items[itemIndex].content = contentTextarea.value;
                     }
@@ -827,13 +877,11 @@
                 document.getElementById(config.triggerId).addEventListener('click', () => {
                     renderList();
                     const itemToEdit = memories[config.type].items.find(i => i.id === currentlyEditingMemory.id);
-                    // For storyboard, content is complex object, show read-only view or simplified view
-                    if (config.type === 'storyboard' && itemToEdit) {
-                        const contentArea = editorEl.querySelector('textarea[name="content"]');
+                    const contentArea = editorEl.querySelector('textarea[name="content"]');
+                    if (config.type === 'storyboard') {
                         contentArea.value = `Nội dung phân cảnh không thể chỉnh sửa trực tiếp tại đây. Vui lòng chọn từ danh sách để xem lại.`;
                         contentArea.readOnly = true;
                     } else if (itemToEdit){
-                        const contentArea = editorEl.querySelector('textarea[name="content"]');
                         contentArea.readOnly = false;
                     }
                     populateEditor(itemToEdit);
@@ -1041,11 +1089,6 @@
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     
-                    // NOTE: Default jsPDF fonts do not support Vietnamese characters well.
-                    // For full support, a custom font that includes Vietnamese glyphs needs to be embedded.
-                    // This process is complex and would increase the initial load time.
-                    // The following code proceeds with standard fonts.
-
                     doc.setFont('helvetica', 'bold');
                     doc.setFontSize(18);
                     doc.text(title, 105, 20, { align: 'center' });
@@ -1072,17 +1115,18 @@
                         if (type === 'storyboard') {
                             try {
                                 const data = JSON.parse(item.content);
+                                const storyboardData = data.sceneBreakdown || data;
                                 const tableBody = [
-                                    ['Thông tin cảnh', data.sceneInfo || 'N/A'],
-                                    ['Lời thoại', data.dialogue || 'Không có'],
-                                    ['Prompt Bối cảnh (EN)', data.backgroundPrompt || 'N/A'],
-                                    ['(Dịch) Prompt Bối cảnh', data.backgroundPromptVietnamese || 'N/A'],
-                                    ['Prompt Nhân vật (EN)', data.characterPrompt || 'N/A'],
-                                    ['(Dịch) Prompt Nhân vật', data.characterPromptVietnamese || 'N/A'],
-                                    ['Prompt Ảnh mồi (EN)', data.seedImagePrompt || 'N/A'],
-                                    ['(Dịch) Prompt Ảnh mồi', data.seedImagePromptVietnamese || 'N/A'],
-                                    ['Prompt Video (EN)', data.videoPrompt || 'N/A'],
-                                    ['(Dịch) Prompt Video', data.videoPromptVietnamese || 'N/A'],
+                                    ['Thông tin cảnh', storyboardData.sceneInfo || 'N/A'],
+                                    ['Lời thoại', storyboardData.dialogue || 'Không có'],
+                                    ['Prompt Bối cảnh (EN)', storyboardData.backgroundPrompt || 'N/A'],
+                                    ['(Dịch) Prompt Bối cảnh', storyboardData.backgroundPromptVietnamese || 'N/A'],
+                                    ['Prompt Nhân vật (EN)', storyboardData.characterPrompt || 'N/A'],
+                                    ['(Dịch) Prompt Nhân vật', storyboardData.characterPromptVietnamese || 'N/A'],
+                                    ['Prompt Ảnh mồi (EN)', storyboardData.seedImagePrompt || 'N/A'],
+                                    ['(Dịch) Prompt Ảnh mồi', storyboardData.seedImagePromptVietnamese || 'N/A'],
+                                    ['Prompt Video (EN)', storyboardData.videoPrompt || 'N/A'],
+                                    ['(Dịch) Prompt Video', storyboardData.videoPromptVietnamese || 'N/A'],
                                 ];
 
                                 doc.autoTable({
@@ -1128,7 +1172,10 @@
 
             function setupUIForLoading(button, outputContainer) {
                 outputContainer.innerHTML = `<div class="text-center text-gray-400 py-16"><div class="mx-auto h-8 w-8 rounded-full border-4 border-t-4 border-gray-600 border-t-blue-500 animate-spin"></div><p class="mt-4">AI đang xử lý...</p><p class="text-xs text-gray-500 mt-2">Quá trình phân tích phức tạp có thể mất đến 30 giây...</p></div>`;
-                if(copyScriptBtn) copyScriptBtn.classList.add('hidden');
+                if(copyScriptBtn) {
+                    copyScriptBtn.classList.add('hidden');
+                    sendScriptToAnalyzerBtn.classList.add('hidden');
+                }
                 button.disabled = true;
                 button.classList.add('action-button:disabled');
             }
@@ -1188,6 +1235,90 @@
                 }
             }
 
+            // *** NEW: Image Generation Functions ***
+            async function callImagenAPI(prompt, apiKey) {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+                const payload = {
+                    instances: [{ "prompt": prompt }],
+                    parameters: { "sampleCount": 1 }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const prediction = result.predictions?.[0];
+
+                if (prediction && prediction.bytesBase64Encoded) {
+                    return prediction.bytesBase64Encoded;
+                } else {
+                    throw new Error("Không nhận được dữ liệu hình ảnh từ API. Phản hồi có thể trống hoặc bị chặn.");
+                }
+            }
+            
+            async function handleGenerateImage(prompt, card, button) {
+                const apiKey = localStorage.getItem('gemini_api_key') || '';
+                if (!apiKey) {
+                    showError("Vui lòng nhập API Key trong phần Cài đặt để tạo ảnh.");
+                    setupModal.classList.remove('hidden');
+                    setupModal.classList.add('flex');
+                    return;
+                }
+                if (!prompt || prompt === 'N/A') {
+                    showToast("Prompt không hợp lệ để tạo ảnh.");
+                    return;
+                }
+
+                const imageContainer = card.querySelector('.image-container');
+                const placeholder = imageContainer.querySelector('.image-placeholder');
+                const spinner = imageContainer.querySelector('.image-loading-spinner');
+                const imgEl = imageContainer.querySelector('.generated-image');
+                
+                button.disabled = true;
+                button.textContent = 'Đang tạo...';
+                placeholder.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                imgEl.classList.add('hidden');
+
+                try {
+                    const base64Data = await callImagenAPI(prompt, apiKey);
+                    imgEl.src = `data:image/png;base64,${base64Data}`;
+                    imgEl.classList.remove('hidden');
+                } catch (error) {
+                    console.error("Lỗi tạo ảnh:", error);
+                    showError(`Không thể tạo ảnh: ${error.message}`);
+                    placeholder.classList.remove('hidden'); // Show placeholder again on error
+                } finally {
+                    spinner.classList.add('hidden');
+                    button.disabled = false;
+                    button.textContent = 'Tạo ảnh';
+                }
+            }
+
+            document.getElementById('generate-all-images-btn').addEventListener('click', () => {
+                const imageButtons = storyboardOutput.querySelectorAll('.generate-image-btn');
+                if (imageButtons.length > 0) {
+                    showToast(`Bắt đầu tạo ${imageButtons.length} hình ảnh...`);
+                    imageButtons.forEach((btn, index) => {
+                        // Delay each API call slightly to avoid rate limiting
+                        setTimeout(() => {
+                             if (!btn.disabled) {
+                                btn.click();
+                             }
+                        }, index * 1000); 
+                    });
+                }
+            });
+
+
             function showError(message) {
                 const errorModal = document.getElementById('error-modal');
                 document.getElementById('error-message').textContent = message;
@@ -1214,50 +1345,22 @@
             loadAllMemory();
             
             setupMemoryModal({
-                modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central',
-                getItems: () => memories.central.items, 
-                setItems: (items) => { memories.central.items = items; },
-                getActiveId: () => memories.central.activeId, 
-                setActiveId: (id) => { memories.central.activeId = id; },
-                save: saveAllMemory
+                modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central'
             });
             setupMemoryModal({
-                modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario',
-                getItems: () => memories.scenario.items, 
-                setItems: (items) => { memories.scenario.items = items; },
-                getActiveId: () => memories.scenario.activeId, 
-                setActiveId: (id) => { memories.scenario.activeId = id; },
-                save: saveAllMemory
+                modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario'
             });
             
             setupMemoryModal({
-                modalId: 'prompt-library-modal', triggerId: 'prompt-library-btn', title: 'Kho lưu trữ Prompt', type: 'prompt',
-                getItems: () => memories.prompt.items, 
-                setItems: (items) => { memories.prompt.items = items; },
-                getActiveId: () => memories.prompt.activeId, 
-                setActiveId: (id) => { memories.prompt.activeId = id; }, 
-                save: saveAllMemory
+                modalId: 'prompt-library-modal', triggerId: 'prompt-library-btn', title: 'Kho lưu trữ Prompt', type: 'prompt'
             });
             
              setupMemoryModal({
-                modalId: 'storyboard-hub-modal', triggerId: 'storyboard-hub-btn', title: 'Kho lưu trữ Phân Cảnh', type: 'storyboard',
-                getItems: () => memories.storyboard.items, 
-                setItems: (items) => { memories.storyboard.items = items; },
-                getActiveId: () => memories.storyboard.activeId, 
-                setActiveId: (id) => { memories.storyboard.activeId = id; },
-                save: saveAllMemory
+                modalId: 'storyboard-hub-modal', triggerId: 'storyboard-hub-btn', title: 'Kho lưu trữ Phân Cảnh', type: 'storyboard'
             });
             
             setupMemoryModal({
-                modalId: 'task-hub-modal',
-                triggerId: 'task-hub-btn',
-                title: 'Quản lý Bộ nhớ Giao việc',
-                type: 'task',
-                getItems: () => memories.task.items,
-                setItems: (items) => { memories.task.items = items; },
-                getActiveId: () => memories.task.activeId,
-                setActiveId: (id) => { memories.task.activeId = id; },
-                save: saveAllMemory
+                modalId: 'task-hub-modal', triggerId: 'task-hub-btn', title: 'Quản lý Bộ nhớ Giao việc', type: 'task'
             });
 
         });
@@ -1265,4 +1368,3 @@
 
 </body>
 </html>
-

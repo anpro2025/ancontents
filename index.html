@@ -108,7 +108,14 @@
                              <div class="flex justify-between items-center mb-2">
                                  <label for="refinement-prompt" class="block text-sm font-medium text-gray-300">Mô tả cảnh quay</label>
                              </div>
-                             <textarea id="refinement-prompt" rows="10" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Mô tả chi tiết cảnh quay của bạn tại đây..."></textarea>
+                             <textarea id="refinement-prompt" rows="8" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Mô tả chi tiết cảnh quay của bạn tại đây..."></textarea>
+                        </div>
+
+                        <div>
+                            <label for="storyboard-task-reference" class="block text-sm font-medium text-gray-300 mb-2">Tham chiếu Giao việc (Tùy chọn)</label>
+                            <select id="storyboard-task-reference" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Mặc định --</option>
+                            </select>
                         </div>
                         
                         <div>
@@ -240,7 +247,16 @@
                                 <label for="script-input" class="block text-sm font-medium text-gray-300">Dán hoặc chọn kịch bản của bạn:</label>
                                 <button id="select-script-from-memory-btn" class="text-sm text-blue-400 hover:underline">Chọn từ bộ nhớ</button>
                              </div>
-                             <textarea id="script-input" rows="15" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Dán toàn bộ nội dung kịch bản..."></textarea>
+                             <textarea id="script-input" rows="10" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Dán toàn bộ nội dung kịch bản..."></textarea>
+                        </div>
+                        <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg space-y-4 border border-gray-600">
+                             <h3 class="text-md font-semibold text-white">Tùy chọn Nâng cao</h3>
+                             <div>
+                                <label for="s2p-task-reference" class="block text-sm font-medium text-gray-300 mb-1">Tham chiếu Giao việc</label>
+                                <select id="s2p-task-reference" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="">-- Mặc định --</option>
+                                </select>
+                             </div>
                         </div>
                         <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg space-y-4 border border-gray-600">
                              <h3 class="text-md font-semibold text-white">Tùy chọn phân tách</h3>
@@ -521,6 +537,7 @@
             const storyboardOutput = document.getElementById('storyboard-output');
             const noTextCheckbox = document.getElementById('no-text-checkbox');
             const noMontageCheckbox = document.getElementById('no-montage-checkbox');
+            const storyboardTaskReference = document.getElementById('storyboard-task-reference');
 
             async function handleGenerateStoryboard() {
                 const description = refinementPrompt.value.trim();
@@ -542,7 +559,16 @@
                 if (noTextCheckbox.checked) negativeRules.push("no text");
                 if (noMontageCheckbox.checked) negativeRules.push("no montage");
                 
-                let userQuery = `Mô tả cảnh: """${description}"""`;
+                const taskRefId = storyboardTaskReference.value;
+                let taskRefContent = '';
+                if (taskRefId) {
+                    const task = memories.task.items.find(t => t.id == taskRefId);
+                    if (task) {
+                        taskRefContent = `QUAN TRỌNG: Hãy tuân thủ nghiêm ngặt các quy tắc và định dạng được mô tả trong phần giao việc sau đây khi tạo kết quả:\n---\n${task.content}\n---\n\n`;
+                    }
+                }
+
+                let userQuery = `${taskRefContent}Mô tả cảnh: """${description}"""`;
                 if(negativeRules.length > 0) {
                     userQuery += `\n\nQuy tắc không: ${negativeRules.join(', ')}`;
                 }
@@ -933,6 +959,9 @@
                         itemEl.innerHTML = `<span class="truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span><button class="delete-memory-item-btn text-gray-500 hover:text-red-400 text-xs flex-shrink-0 ml-2">&#x2715;</button>`;
                         listEl.appendChild(itemEl);
                     });
+                    if (config.type === 'task') {
+                        populateTaskReferenceDropdowns();
+                    }
                 };
                 
                 const populateEditor = (item) => {
@@ -1151,6 +1180,8 @@
             const selectScriptFromMemoryBtn = document.getElementById('select-script-from-memory-btn');
             const promptEstimateContainer = document.getElementById('prompt-estimate-container');
             const promptEstimateSpan = document.getElementById('prompt-estimate');
+            const s2pTaskReference = document.getElementById('s2p-task-reference');
+
 
             selectScriptFromMemoryBtn.addEventListener('click', () => {
                 isSelectingScriptForPrompt = true;
@@ -1197,11 +1228,20 @@
 
                 const systemPrompt = `Bạn là một trợ lý đạo diễn AI chuyên nghiệp. Nhiệm vụ của bạn là đọc một kịch bản và chia nó thành một chuỗi các prompt hình ảnh/video riêng biệt. Mỗi prompt phải là một mô tả hình ảnh rõ ràng, súc tích, nắm bắt được một hành động hoặc một khoảnh khắc quan trọng. Chỉ trả về một đối tượng JSON DUY NHẤT có dạng: {"prompts": ["prompt 1", "prompt 2", ...]}`;
                 
+                const taskRefId = s2pTaskReference.value;
+                let taskRefContent = '';
+                if (taskRefId) {
+                    const task = memories.task.items.find(t => t.id == taskRefId);
+                    if (task) {
+                        taskRefContent = `Hãy tuân thủ các quy tắc và phong cách được mô tả trong phần giao việc sau đây khi phân tách kịch bản:\n---\n${task.content}\n---\n\n`;
+                    }
+                }
+
                 let breakdownInstruction = (breakdownMode === 'auto')
                     ? "Hãy tự động phân tách kịch bản thành các prompt, ước tính mỗi prompt tương đương khoảng 8 giây video. Đảm bảo dòng chảy câu chuyện được liền mạch."
                     : `Hãy phân tách kịch bản thành chính xác ${promptCount} prompt. Phân bổ nội dung câu chuyện một cách hợp lý qua các prompt này.`;
 
-                const userQuery = `Kịch bản cần phân tích:\n"""\n${script}\n"""\n\n---\nYêu cầu phân tách:\n${breakdownInstruction}`;
+                const userQuery = `${taskRefContent}Kịch bản cần phân tích:\n"""\n${script}\n"""\n\n---\nYêu cầu phân tách:\n${breakdownInstruction}`;
 
                 try {
                     const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
@@ -1833,10 +1873,27 @@
                 return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
             }
 
+            function populateTaskReferenceDropdowns() {
+                const dropdowns = [storyboardTaskReference, s2pTaskReference];
+                dropdowns.forEach(dropdown => {
+                    if(!dropdown) return;
+                    const savedValue = dropdown.value;
+                    dropdown.innerHTML = '<option value="">-- Mặc định --</option>';
+                    memories.task.items.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.title;
+                        dropdown.appendChild(option);
+                    });
+                    dropdown.value = savedValue;
+                });
+            }
+
             // Initialize the app
             initSetupModal();
             loadAllMemory();
             populateVoices(); // Call this function to fill the dropdown
+            populateTaskReferenceDropdowns();
             
             setupMemoryModal({ modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central' });
             setupMemoryModal({ modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario' });

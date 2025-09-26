@@ -47,22 +47,6 @@
             color: white;
             border-bottom-color: #3b82f6;
         }
-        /* Style for details/summary accordion in prompt library */
-        .library-item summary {
-            list-style: none; /* Remove default marker */
-        }
-        .library-item summary::-webkit-details-marker {
-            display: none; /* Remove default marker for Chrome */
-        }
-        .library-item summary::after {
-            content: '▼';
-            font-size: 0.8em;
-            transition: transform 0.2s;
-            margin-left: 8px;
-        }
-        .library-item[open] summary::after {
-            transform: rotate(180deg);
-        }
         .action-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -71,7 +55,6 @@
             border-color: #4b5563;
             border-top-color: #3b82f6;
         }
-
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 antialiased">
@@ -87,7 +70,7 @@
                 </button>
             </div>
             <div class="text-center">
-                <h1 class="text-4xl font-bold text-white">Trình tạo Prompt Phân cảnh & Kịch bản AI</h1>
+                <h1 class="text-4xl font-bold text-white">Trình tạo Phim AI Toàn diện</h1>
                 <p class="text-lg text-gray-400 mt-2">Tạo prompt, hình ảnh, video và kịch bản từ ý tưởng của bạn.</p>
             </div>
         </header>
@@ -105,19 +88,35 @@
                     <h2 class="text-2xl font-semibold mb-6 text-white border-b border-gray-600 pb-3">Bảng điều khiển Phân Cảnh</h2>
                     <div class="space-y-6 flex-grow flex flex-col">
                         <div class="flex-grow flex flex-col">
-                            <div class="flex justify-between items-center mb-2">
+                             <div class="flex justify-between items-center mb-2">
                                  <label for="refinement-prompt" class="block text-sm font-medium text-gray-300">Mô tả cảnh quay</label>
-                                 <div class="flex items-center gap-2">
-                                     <button id="clear-btn" class="bg-gray-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-300" title="Xóa nội dung">
-                                         Xóa
-                                     </button>
-                                     <button id="generate-btn" class="action-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
-                                       Tạo phân cảnh
-                                     </button>
-                                 </div>
-                            </div>
-                            <textarea id="refinement-prompt" rows="12" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition flex-grow" placeholder="Mô tả chi tiết cảnh quay của bạn tại đây. AI sẽ phân tích mô tả này để tạo ra bảng phân cảnh."></textarea>
+                             </div>
+                             <textarea id="refinement-prompt" rows="10" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Mô tả chi tiết cảnh quay của bạn tại đây..."></textarea>
                         </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Quy tắc Không</label>
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center text-sm cursor-pointer">
+                                    <input type="checkbox" id="no-text-checkbox" class="form-checkbox bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 h-4 w-4 rounded">
+                                    <span class="ml-2">Không text</span>
+                                </label>
+                                <label class="flex items-center text-sm cursor-pointer">
+                                    <input type="checkbox" id="no-montage-checkbox" class="form-checkbox bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 h-4 w-4 rounded">
+                                    <span class="ml-2">Không montage</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex-grow"></div>
+                        <div class="flex items-center gap-2">
+                             <button id="clear-btn" class="w-1/3 bg-gray-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300" title="Xóa nội dung">
+                                 Xóa
+                             </button>
+                             <button id="generate-btn" class="action-button w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
+                               Tạo phân cảnh
+                             </button>
+                         </div>
                     </div>
                 </div>
 
@@ -185,9 +184,17 @@
                      <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
                         <h2 class="text-2xl font-semibold text-white">Kịch bản được tạo</h2>
                         <div class="flex items-center gap-2">
+                             <button id="save-script-btn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save" viewBox="0 0 16 16"><path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v4.5h2a.5.5 0 0 1 .354.854l-2.5 2.5a.5.5 0 0 1-.708 0l-2.5-2.5A.5.5 0 0 1 5.5 6.5h2V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/></svg>
+                                 Lưu Kịch bản
+                             </button>
+                              <button id="export-script-pdf-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16"><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1.5v2a.5.5 0 0 0 .5.5h2l-2.5-2.5z"/><path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.658-.877.37-.198.815-.143 1.175.08c.349.21.609.554.673.997.062.42.015.81-.059 1.172a.627.627 0 0 1-.094.215c-.046.072-.092.143-.138.213a7.224 7.224 0 0 1-.254.499c-.106.247-.234.54-.386.891a18.02 18.02 0 0 0-1.04 2.224c.344.058.69.164.995.315.309.15.554.354.716.59.162.238.248.527.226.82-.011.16-.044.315-.09.46a.71.71 0 0 1-.16.33c-.106.16-.25.295-.42.398a1.14 1.14 0 0 1-.16.09c-.202.09-.45.134-.738.112a2.38 2.38 0 0 1-.45-.082.64.64 0 0 1-.38-.238c-.126-.18-.19-.41-.173-.642.016-.22.08-.416.22-.56.134-.137.31-.21.524-.22.12-.008.238.012.354.05.116.035.22.086.314.152.093.065.17.15.23.255a.69.69 0 0 1 .015.625.65.65 0 0 1-.234.42c-.11.12-.25.21-.41.26-.16.05-.33.07-.5.06a1.18 1.18 0 0 1-.42-.082c-.16-.09-.28-.21-.38-.36a.656.656 0 0 1-.14-.413.656.656 0 0 1 .035-.285c.04-.12.1-.22.18-.3.085-.08.18-.14.28-.18.1-.04.21-.06.32-.06.24 0 .46.07.66.21.2.14.33.32.4.53.07.21.07.45.01.68-.06.23-.18.43-.35.59-.17.16-.39.27-.64.33-.25.06-.52.07-.8.02a1.86 1.86 0 0 1-.45-.16c-.2-.1-.36-.24-.49-.42a.99.99 0 0 1-.18-.54c0-.26.06-.51.18-.73a1.45 1.45 0 0 1 .43-.51c.2-.15.43-.25.67-.3.24-.05.48-.07.72-.07.24 0 .48.02.71.07.23.05.46.12.68.22.22.1.43.23.64.38.2.15.39.33.56.54.17.21.32.45.44.7.12.25.21.52.26.81.05.28.06.57.01.86s-.13.57-.27.84c-.14.27-.33.52-.56.73s-.51.37-.8.47c-.29.1-.59.14-.9.12a2.82 2.82 0 0 1-.52-.06c-.27-.06-.53-.16-.76-.28-.24-.12-.45-.28-.64-.46-.19-.18-.35-.4-.48-.65a1.64 1.64 0 0 1-.16-.8z"/></svg>
+                                 Xuất PDF
+                             </button>
                             <button id="send-script-to-analyzer-btn" class="hidden bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.5 1a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1h9.5zM10 4a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 10 4zM6 4a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 6 4zM3.5 14a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 1 0v9a.5.5 0 0 1-.5.5z"/></svg>
-                                Phân tích Kịch bản
+                                Phân tích
                             </button>
                             <button id="copy-script-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3z"/></svg>
@@ -220,6 +227,9 @@
                         </div>
                         <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg space-y-4 border border-gray-600">
                              <h3 class="text-md font-semibold text-white">Tùy chọn phân tách</h3>
+                             <div id="prompt-estimate-container" class="text-xs text-center text-cyan-300 bg-cyan-900 bg-opacity-50 p-2 rounded-md border border-cyan-700 hidden">
+                                 <p>Kịch bản này ước tính tạo ra khoảng <span id="prompt-estimate" class="font-bold">0</span> prompt.</p>
+                             </div>
                              <fieldset>
                                 <div class="space-y-2">
                                     <label class="flex items-center text-sm">
@@ -261,6 +271,12 @@
     
     <!-- Floating Action Buttons -->
     <div class="fixed bottom-6 right-6 flex flex-col gap-4 z-40">
+        <a href="https://aistudio.google.com/apps/drive/1YP-eclWct6_PCFOcarNEYGHHfs0vF2Se" target="_blank" class="bg-gray-700 hover:bg-red-600 text-white p-4 rounded-full shadow-lg transition-colors transform hover:scale-110" title="AI Studio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,110.34l-80-80a8,8,0,0,0-11.32,0l-80,80a8,8,0,0,0,0,11.32l80,80a8,8,0,0,0,11.32,0l80-80a8,8,0,0,0,0-11.32ZM128,198.67L59.31,128,128,59.31,196.69,128Z"></path></svg>
+        </a>
+        <a href="https://labs.google/fx/tools/whisk/project" target="_blank" class="bg-gray-700 hover:bg-orange-500 text-white p-4 rounded-full shadow-lg transition-colors transform hover:scale-110" title="Google FX">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm48-88a48,48,0,1,1-48-48A48.05,48.05,0,0,1,176,128Z"></path></svg>
+        </a>
         <button id="task-hub-btn" class="bg-gray-700 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Bộ nhớ Giao việc">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
@@ -397,8 +413,7 @@
                 [storyboardPanel, scriptPanel, scriptToPromptPanel].forEach(panel => panel.classList.add('hidden'));
                 activeTab.classList.add('active');
                 activePanel.classList.remove('hidden');
-                 // Populate character dropdown when switching to the script tab
-                if (activeTab === tabScript) {
+                 if (activeTab === tabScript) {
                     populateTaskDropdown();
                 }
             }
@@ -406,7 +421,6 @@
             tabStoryboard.addEventListener('click', () => switchTab(tabStoryboard, storyboardPanel));
             tabScript.addEventListener('click', () => switchTab(tabScript, scriptPanel));
             tabScriptToPrompt.addEventListener('click', () => switchTab(tabScriptToPrompt, scriptToPromptPanel));
-
 
             // --- SETUP MODAL LOGIC ---
             function initSetupModal() {
@@ -433,10 +447,8 @@
                     setupModal.classList.remove('flex');
                 });
 
-                // Load saved settings
                 const savedModel = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
                 setupModelSelector.value = savedModel;
-               
                 setupApiKeyInput.value = localStorage.getItem('gemini_api_key') || '';
             }
             
@@ -444,6 +456,8 @@
             const generateBtn = document.getElementById('generate-btn');
             const refinementPrompt = document.getElementById('refinement-prompt');
             const storyboardOutput = document.getElementById('storyboard-output');
+            const noTextCheckbox = document.getElementById('no-text-checkbox');
+            const noMontageCheckbox = document.getElementById('no-montage-checkbox');
 
             async function handleGenerateStoryboard() {
                 const description = refinementPrompt.value.trim();
@@ -460,20 +474,25 @@
                 setupUIForLoading(generateBtn, storyboardOutput);
 
                 const systemPrompt = "Bạn là một trợ lý sản xuất phim AI chuyên nghiệp. Dựa vào mô tả cảnh, hãy tạo ra một bảng phân cảnh chi tiết. Luôn trả về một đối tượng JSON DUY NHẤT chứa khóa 'sceneBreakdown' với các mục con sau: 'sceneInfo', 'backgroundPrompt', 'backgroundPromptVietnamese', 'characterPrompt', 'characterPromptVietnamese', 'seedImagePrompt', 'seedImagePromptVietnamese', 'videoPrompt', 'videoPromptVietnamese', 'dialogue'. Các prompt phải bằng tiếng Anh, và các bản dịch phải bằng tiếng Việt.";
-                const userQuery = `Mô tả cảnh: """${description}"""`;
+                
+                let negativeRules = [];
+                if (noTextCheckbox.checked) negativeRules.push("no text");
+                if (noMontageCheckbox.checked) negativeRules.push("no montage");
+                
+                let userQuery = `Mô tả cảnh: """${description}"""`;
+                if(negativeRules.length > 0) {
+                    userQuery += `\n\nQuy tắc không: ${negativeRules.join(', ')}`;
+                }
                 
                 try {
                     const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
                     const responseText = await callGeminiAPI(userQuery, systemPrompt, apiKey, model, true); // Force JSON
-                    
                     const data = JSON.parse(responseText);
 
                     if (!data.sceneBreakdown) {
                         throw new Error("Dữ liệu JSON từ AI không chứa khóa 'sceneBreakdown' cần thiết.");
                     }
-
                     renderStoryboard(data.sceneBreakdown);
-
                 } catch (error) {
                     handleApiError(error, storyboardOutput);
                 } finally {
@@ -513,9 +532,7 @@
                 document.getElementById('save-all-storyboard-prompts-btn').classList.remove('hidden');
                 document.getElementById('generate-all-images-btn').classList.remove('hidden');
                 
-                // Auto-save the generated storyboard
                 try {
-                    // *** FIX: Save only the sceneBreakdown object, not the whole response data ***
                     const newStoryboard = {
                         id: Date.now(),
                         title: (data.sceneInfo || 'Phân cảnh không tên').substring(0, 50) + (data.sceneInfo && data.sceneInfo.length > 50 ? '...' : ''),
@@ -615,6 +632,8 @@
             const scriptOutput = document.getElementById('script-output');
             const copyScriptBtn = document.getElementById('copy-script-btn');
             const sendScriptToAnalyzerBtn = document.getElementById('send-script-to-analyzer-btn');
+            const saveScriptBtn = document.getElementById('save-script-btn');
+            const exportScriptPdfBtn = document.getElementById('export-script-pdf-btn');
             const taskSelector = document.getElementById('task-selector');
             const scriptTaskDescriptionTextarea = document.getElementById('script-characters');
 
@@ -686,6 +705,8 @@
                     scriptOutput.innerHTML = `<div class="bg-gray-900 p-4 rounded-lg text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono">${formattedResponse}</div>`;
                     copyScriptBtn.classList.remove('hidden');
                     sendScriptToAnalyzerBtn.classList.remove('hidden');
+                    saveScriptBtn.classList.remove('hidden');
+                    exportScriptPdfBtn.classList.remove('hidden');
                 } catch (error) {
                     handleApiError(error, scriptOutput);
                 } finally {
@@ -714,6 +735,47 @@
                 scriptInputForAnalysis.focus();
                 scriptInputForAnalysis.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 showToast('Đã chuyển kịch bản qua để phân tích!');
+            });
+
+            saveScriptBtn.addEventListener('click', () => {
+                const scriptText = scriptOutput.querySelector('div')?.innerText;
+                const idea = document.getElementById('script-idea').value.trim();
+                if (!scriptText) {
+                    showError("Không có kịch bản để lưu.");
+                    return;
+                }
+                const newScenario = {
+                    id: Date.now(),
+                    title: (idea || "Kịch bản không tên").substring(0, 50),
+                    content: scriptText
+                };
+                memories.scenario.items.unshift(newScenario);
+                saveAllMemory();
+                showToast(`Đã lưu kịch bản "${newScenario.title}"!`);
+            });
+
+            exportScriptPdfBtn.addEventListener('click', () => {
+                const scriptText = scriptOutput.querySelector('div')?.innerText;
+                const idea = document.getElementById('script-idea').value.trim();
+                 if (!scriptText) {
+                    showError("Không có kịch bản để xuất PDF.");
+                    return;
+                }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const title = (idea || "Kịch bản không tên").substring(0, 50);
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(18);
+                doc.text(title, 105, 20, { align: 'center' });
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                const contentLines = doc.splitTextToSize(scriptText, 180);
+                doc.text(contentLines, 15, 35);
+
+                doc.save(`${title.replace(/ /g, "_")}.pdf`);
+                showToast('Đã xuất PDF thành công!');
             });
 
             // --- MEMORY HUB LOGIC ---
@@ -798,7 +860,6 @@
                         if (item && item.content) {
                             try {
                                 const storyboardData = JSON.parse(item.content);
-                                // *** FIX: Handle both old (nested) and new (direct) data structures ***
                                 renderStoryboard(storyboardData.sceneBreakdown || storyboardData);
                                 switchTab(tabStoryboard, storyboardPanel);
                                 showToast(`Đã tải phân cảnh "${item.title}"`);
@@ -928,6 +989,8 @@
             const promptCountInput = document.getElementById('prompt-count-input');
             const breakdownRadios = document.querySelectorAll('input[name="prompt-breakdown"]');
             const selectScriptFromMemoryBtn = document.getElementById('select-script-from-memory-btn');
+            const promptEstimateContainer = document.getElementById('prompt-estimate-container');
+            const promptEstimateSpan = document.getElementById('prompt-estimate');
 
             selectScriptFromMemoryBtn.addEventListener('click', () => {
                 isSelectingScriptForPrompt = true;
@@ -939,6 +1002,20 @@
                     promptCountInput.classList.toggle('hidden', radio.value !== 'manual');
                 });
             });
+            
+            scriptInput.addEventListener('input', () => {
+                const text = scriptInput.value.trim();
+                if (text.length > 0) {
+                    const wordCount = text.split(/\s+/).filter(Boolean).length;
+                    const estimatedSeconds = wordCount / 2.5; // Approx 150 WPM
+                    const estimatedPrompts = Math.ceil(estimatedSeconds / 8);
+                    promptEstimateSpan.textContent = estimatedPrompts;
+                    promptEstimateContainer.classList.remove('hidden');
+                } else {
+                    promptEstimateContainer.classList.add('hidden');
+                }
+            });
+
 
             async function handleGeneratePromptsFromScript() {
                 const script = scriptInput.value.trim();
@@ -1047,10 +1124,9 @@
                 let savedCount = 0;
                 allPromptElements.forEach((btn, index) => {
                     const promptText = btn.dataset.text;
-                    // Avoid duplicates
                     if (!memories.prompt.items.some(item => item.content === promptText)) {
                         const newPromptItem = {
-                            id: Date.now() + index, // Add index to avoid same timestamp on fast loops
+                            id: Date.now() + index,
                             title: promptText.substring(0, 40) + (promptText.length > 40 ? '...' : ''),
                             content: promptText
                         };
@@ -1073,7 +1149,6 @@
 
             // --- GENERIC HELPER FUNCTIONS ---
             
-            // New function to handle PDF export
             async function handleExportPdf(config) {
                 const { type, title } = config;
                 const items = memories[type].items;
@@ -1175,6 +1250,8 @@
                 if(copyScriptBtn) {
                     copyScriptBtn.classList.add('hidden');
                     sendScriptToAnalyzerBtn.classList.add('hidden');
+                    saveScriptBtn.classList.add('hidden');
+                    exportScriptPdfBtn.classList.add('hidden');
                 }
                 button.disabled = true;
                 button.classList.add('action-button:disabled');
@@ -1237,14 +1314,14 @@
 
             // *** UPDATED: Image Generation Functions ***
             async function callFlashImageAPI(prompt, apiKey) {
-                const modelName = 'gemini-2.5-flash-image-preview'; // Switched to a more accessible model
+                const modelName = 'gemini-2.5-flash-image-preview';
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
                 const payload = {
                     contents: [{
                         parts: [{ text: prompt }]
                     }],
                     generationConfig: {
-                        responseModalities: ['TEXT', 'IMAGE']
+                        responseModalities: ['IMAGE']
                     },
                 };
 
@@ -1299,13 +1376,13 @@
                 imgEl.classList.add('hidden');
 
                 try {
-                    const base64Data = await callFlashImageAPI(prompt, apiKey); // Use the new function
+                    const base64Data = await callFlashImageAPI(prompt, apiKey);
                     imgEl.src = `data:image/png;base64,${base64Data}`;
                     imgEl.classList.remove('hidden');
                 } catch (error) {
                     console.error("Lỗi tạo ảnh:", error);
                     showError(`Không thể tạo ảnh: ${error.message}`);
-                    placeholder.classList.remove('hidden'); // Show placeholder again on error
+                    placeholder.classList.remove('hidden'); 
                 } finally {
                     spinner.classList.add('hidden');
                     button.disabled = false;
@@ -1318,7 +1395,6 @@
                 if (imageButtons.length > 0) {
                     showToast(`Bắt đầu tạo ${imageButtons.length} hình ảnh...`);
                     imageButtons.forEach((btn, index) => {
-                        // Delay each API call slightly to avoid rate limiting
                         setTimeout(() => {
                              if (!btn.disabled) {
                                 btn.click();
@@ -1354,24 +1430,11 @@
             initSetupModal();
             loadAllMemory();
             
-            setupMemoryModal({
-                modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central'
-            });
-            setupMemoryModal({
-                modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario'
-            });
-            
-            setupMemoryModal({
-                modalId: 'prompt-library-modal', triggerId: 'prompt-library-btn', title: 'Kho lưu trữ Prompt', type: 'prompt'
-            });
-            
-             setupMemoryModal({
-                modalId: 'storyboard-hub-modal', triggerId: 'storyboard-hub-btn', title: 'Kho lưu trữ Phân Cảnh', type: 'storyboard'
-            });
-            
-            setupMemoryModal({
-                modalId: 'task-hub-modal', triggerId: 'task-hub-btn', title: 'Quản lý Bộ nhớ Giao việc', type: 'task'
-            });
+            setupMemoryModal({ modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central' });
+            setupMemoryModal({ modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario' });
+            setupMemoryModal({ modalId: 'prompt-library-modal', triggerId: 'prompt-library-btn', title: 'Kho lưu trữ Prompt', type: 'prompt' });
+            setupMemoryModal({ modalId: 'storyboard-hub-modal', triggerId: 'storyboard-hub-btn', title: 'Kho lưu trữ Phân Cảnh', type: 'storyboard' });
+            setupMemoryModal({ modalId: 'task-hub-modal', triggerId: 'task-hub-btn', title: 'Quản lý Bộ nhớ Giao việc', type: 'task' });
 
         });
     </script>

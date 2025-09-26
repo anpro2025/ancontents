@@ -51,7 +51,7 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
-        .image-loading-spinner {
+        .image-loading-spinner, .tts-loading-spinner {
             border-color: #4b5563;
             border-top-color: #3b82f6;
         }
@@ -66,6 +66,10 @@
         audio::-webkit-media-controls-current-time-display,
         audio::-webkit-media-controls-time-remaining-display {
             color: #d1d5db;
+        }
+        .voice-item.selected {
+            background-color: #374151;
+            border-color: #3b82f6;
         }
     </style>
 </head>
@@ -286,17 +290,25 @@
                 <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col gap-6">
                     <h2 class="text-2xl font-semibold text-white border-b border-gray-600 pb-3">Chuyển Văn bản thành Giọng nói</h2>
                     
+                    <div class="bg-gray-900 border border-dashed border-gray-600 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-400 mb-2">Hướng dẫn (Instruction)</h4>
+                        <p class="text-xs text-gray-400">Bạn có thể điều khiển giọng điệu bằng cách thêm chỉ dẫn vào trong văn bản. Ví dụ:</p>
+                        <code class="block bg-gray-700 p-2 rounded-md mt-2 text-xs text-gray-300 whitespace-pre-wrap">Nói một cách vui vẻ: Chào mừng bạn đến với thế giới AI!</code>
+                    </div>
+
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label for="tts-input" class="block text-sm font-medium text-gray-300">Nhập văn bản:</label>
                             <button id="select-script-for-tts-btn" class="text-sm text-blue-400 hover:underline">Chọn từ kịch bản đã lưu</button>
                         </div>
-                        <textarea id="tts-input" rows="10" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Nhập văn bản bạn muốn chuyển thành giọng nói ở đây. Bạn có thể chỉ định giọng điệu, ví dụ: 'Nói một cách vui vẻ: Chào mừng đến với thế giới AI!'"></textarea>
+                        <textarea id="tts-input" rows="8" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Nhập văn bản bạn muốn chuyển thành giọng nói ở đây..."></textarea>
                     </div>
 
                     <div>
-                        <label for="tts-voice-selector" class="block text-sm font-medium text-gray-300 mb-2">Chọn Giọng đọc</label>
-                        <select id="tts-voice-selector" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500"></select>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Chọn Giọng đọc</label>
+                        <div id="tts-voice-list" class="space-y-2 max-h-60 overflow-y-auto p-2 bg-gray-900 rounded-md">
+                            <!-- Voice items will be populated by JS -->
+                        </div>
                     </div>
                     
                     <button id="generate-voice-btn" class="action-button w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105">Tạo Âm thanh</button>
@@ -1296,7 +1308,7 @@
             
             // --- TEXT TO SPEECH (TTS) LOGIC (New Section) ---
             const ttsInput = document.getElementById('tts-input');
-            const ttsVoiceSelector = document.getElementById('tts-voice-selector');
+            const ttsVoiceList = document.getElementById('tts-voice-list');
             const generateVoiceBtn = document.getElementById('generate-voice-btn');
             const ttsOutput = document.getElementById('tts-output');
             const ttsAudioPlayer = document.getElementById('tts-audio-player');
@@ -1304,20 +1316,81 @@
             const selectScriptForTTSBtn = document.getElementById('select-script-for-tts-btn');
             
             const voices = [
-                'Zephyr', 'Puck', 'Charon', 'Kore', 'Fenrir', 'Leda', 'Orus', 'Aoede', 
-                'Callirrhoe', 'Autonoe', 'Enceladus', 'Iapetus', 'Umbriel', 'Algieba', 
-                'Despina', 'Erinome', 'Algenib', 'Rasalgethi', 'Laomedeia', 'Achernar', 
-                'Alnilam', 'Schedar', 'Gacrux', 'Pulcherrima', 'Achird', 'Zubenelgenubi', 
-                'Vindemiatrix', 'Sadachbia', 'Sadaltager', 'Sulafat'
+                { name: 'Zephyr', description: 'Tươi sáng' }, { name: 'Puck', description: 'Sôi nổi' },
+                { name: 'Charon', description: 'Truyền cảm' }, { name: 'Kore', description: 'Chắc chắn' },
+                { name: 'Fenrir', description: 'Hào hứng' }, { name: 'Leda', description: 'Trẻ trung' },
+                { name: 'Orus', description: 'Chắc chắn' }, { name: 'Aoede', description: 'Nhẹ nhàng' },
+                { name: 'Callirrhoe', description: 'Dễ gần' }, { name: 'Autonoe', description: 'Tươi sáng' },
+                { name: 'Enceladus', description: 'Thì thầm' }, { name: 'Iapetus', description: 'Rõ ràng' },
+                { name: 'Umbriel', description: 'Dễ gần' }, { name: 'Algieba', description: 'Mượt mà' },
+                { name: 'Despina', description: 'Mượt mà' }, { name: 'Erinome', description: 'Rõ ràng' },
+                { name: 'Algenib', description: 'Trầm' }, { name: 'Rasalgethi', description: 'Truyền cảm' },
+                { name: 'Laomedeia', description: 'Sôi nổi' }, { name: 'Achernar', description: 'Mềm mại' },
+                { name: 'Alnilam', description: 'Chắc chắn' }, { name: 'Schedar', description: 'Ổn định' },
+                { name: 'Gacrux', description: 'Trưởng thành' }, { name: 'Pulcherrima', description: 'Thẳng thắn' },
+                { name: 'Achird', description: 'Thân thiện' }, { name: 'Zubenelgenubi', description: 'Thân mật' },
+                { name: 'Vindemiatrix', description: 'Nhẹ nhàng' }, { name: 'Sadachbia', description: 'Sống động' },
+                { name: 'Sadaltager', description: 'Tri thức' }, { name: 'Sulafat', description: 'Ấm áp' }
             ];
 
             function populateVoices() {
-                voices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice;
-                    option.textContent = voice;
-                    ttsVoiceSelector.appendChild(option);
+                ttsVoiceList.innerHTML = '';
+                voices.forEach((voice, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'voice-item flex items-center justify-between p-3 border-2 border-gray-700 rounded-lg transition-colors cursor-pointer';
+                    if (index === 0) item.classList.add('selected');
+
+                    item.innerHTML = `
+                        <label for="voice-${voice.name}" class="flex items-center cursor-pointer w-full">
+                            <input type="radio" id="voice-${voice.name}" name="tts-voice" value="${voice.name}" class="form-radio bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 h-4 w-4" ${index === 0 ? 'checked' : ''}>
+                            <span class="ml-3 font-semibold">${voice.name}</span>
+                            <span class="ml-auto text-xs text-gray-400">${voice.description}</span>
+                        </label>
+                        <button class="preview-voice-btn ml-4 p-2 rounded-full hover:bg-gray-600 transition" data-voice="${voice.name}" title="Nghe thử giọng ${voice.name}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="play-icon" viewBox="0 0 16 16"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+                            <div class="tts-loading-spinner hidden w-4 h-4 rounded-full border-2 animate-spin"></div>
+                        </button>
+                    `;
+                    
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.preview-voice-btn')) return;
+                        document.querySelectorAll('.voice-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+                        item.querySelector('input[type="radio"]').checked = true;
+                    });
+
+                    item.querySelector('.preview-voice-btn').addEventListener('click', handlePreviewVoice);
+                    ttsVoiceList.appendChild(item);
                 });
+            }
+
+            async function handlePreviewVoice(event) {
+                const button = event.currentTarget;
+                const voiceName = button.dataset.voice;
+                
+                const apiKey = localStorage.getItem('gemini_api_key') || '';
+                if (!apiKey) {
+                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
+                    return;
+                }
+                
+                const playIcon = button.querySelector('.play-icon');
+                const spinner = button.querySelector('.tts-loading-spinner');
+
+                playIcon.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                button.disabled = true;
+
+                try {
+                    const audioData = await callTtsAPI("Đây là giọng đọc mẫu của trí tuệ nhân tạo.", voiceName, apiKey);
+                    await playAudioFromData(audioData);
+                } catch (error) {
+                    handleApiError(error);
+                } finally {
+                    playIcon.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    button.disabled = false;
+                }
             }
 
             selectScriptForTTSBtn.addEventListener('click', () => {
@@ -1327,7 +1400,10 @@
 
             async function handleGenerateVoice() {
                 const text = ttsInput.value.trim();
-                const voice = ttsVoiceSelector.value;
+                const selectedVoiceRadio = document.querySelector('input[name="tts-voice"]:checked');
+                if (!selectedVoiceRadio) return showError("Vui lòng chọn một giọng đọc.");
+                
+                const voice = selectedVoiceRadio.value;
                 if (!text) return showError("Vui lòng nhập văn bản để tạo giọng nói.");
 
                 const apiKey = localStorage.getItem('gemini_api_key') || '';
@@ -1344,15 +1420,10 @@
 
                 try {
                     const audioData = await callTtsAPI(text, voice, apiKey);
-                    const pcmData = base64ToArrayBuffer(audioData);
-                    const pcm16 = new Int16Array(pcmData);
-                    const wavBlob = pcmToWav(pcm16, 24000); // API returns 24kHz sample rate
-                    const audioUrl = URL.createObjectURL(wavBlob);
-                    
+                    const audioUrl = await convertAudioDataToUrl(audioData);
                     ttsAudioPlayer.src = audioUrl;
                     ttsAudioPlayer.classList.remove('hidden');
                     ttsPlaceholder.classList.add('hidden');
-
                 } catch (error) {
                     handleApiError(error, ttsPlaceholder);
                 } finally {
@@ -1457,6 +1528,19 @@
                 for (let i = 0; i < string.length; i++) {
                     view.setUint8(offset + i, string.charCodeAt(i));
                 }
+            }
+
+            async function convertAudioDataToUrl(base64Data) {
+                const pcmData = base64ToArrayBuffer(base64Data);
+                const pcm16 = new Int16Array(pcmData);
+                const wavBlob = pcmToWav(pcm16, 24000);
+                return URL.createObjectURL(wavBlob);
+            }
+
+            async function playAudioFromData(base64Data) {
+                const audioUrl = await convertAudioDataToUrl(base64Data);
+                const audio = new Audio(audioUrl);
+                audio.play();
             }
 
             // --- GENERIC HELPER FUNCTIONS ---

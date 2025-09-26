@@ -556,58 +556,53 @@
                         const card = currentBtn.closest('.prompt-card');
 
                        if (currentBtn.classList.contains('copy-btn')) {
-                            const textToCopy = currentBtn.dataset.text;
+                            const textToCopy = card.querySelector('.prompt-expanded.hidden') 
+                                ? card.querySelector('.prompt-en').textContent
+                                : card.querySelector('.prompt-expanded p').textContent;
                             navigator.clipboard.writeText(textToCopy).then(() => {
                                 showToast(`Đã sao chép: "${textToCopy.substring(0, 30)}..."`);
                             });
                        } else if (currentBtn.classList.contains('generate-image-btn')) {
-                            const prompt = currentBtn.dataset.prompt;
+                            const prompt = card.querySelector('.prompt-expanded.hidden') 
+                                ? card.querySelector('.prompt-en').textContent
+                                : card.querySelector('.prompt-expanded p').textContent;
                             handleGenerateImage(prompt, card, currentBtn);
                        } else if (currentBtn.classList.contains('expand-prompt-btn')) {
                             isSelectingExpander.card = card;
                             document.getElementById('expander-hub-btn').click();
                        } else if (currentBtn.classList.contains('revert-prompt-btn')) {
-                            const basePrompt = card.dataset.promptBase;
-                            const baseTranslation = card.dataset.translationBase;
-
-                            card.querySelector('.prompt-en').textContent = basePrompt;
-                            card.querySelector('.prompt-vn p').textContent = baseTranslation;
-                            card.querySelector('.copy-btn').dataset.text = basePrompt;
-                            card.querySelector('.generate-image-btn').dataset.prompt = basePrompt;
-
-                            card.querySelector('.prompt-vn').classList.add('hidden');
-                            card.querySelector('.translate-button').textContent = 'Dịch';
-                            card.querySelector('.translate-button').disabled = false;
-
-
+                            card.querySelector('.prompt-expanded').classList.add('hidden');
+                            card.querySelector('.prompt-en').classList.remove('hidden');
                             currentBtn.classList.add('hidden');
                             card.querySelector('.expand-prompt-btn').classList.remove('hidden');
-
                             showToast('Đã quay về prompt gốc.');
                         } else if(currentBtn.classList.contains('translate-button')) {
-                            const promptEn = card.querySelector('.prompt-en');
+                            const promptContent = card.querySelector('.prompt-expanded.hidden') 
+                                ? card.querySelector('.prompt-en').textContent
+                                : card.querySelector('.prompt-expanded p').textContent;
+                            const promptEnContainer = card.querySelector('.prompt-en').parentElement;
                             const promptVnContainer = card.querySelector('.prompt-vn');
                             const promptVnEl = promptVnContainer.querySelector('p');
                             
-                            if (!promptEn.classList.contains('hidden') && promptVnEl.textContent.trim() === 'Cần dịch lại...') {
+                            if (promptEnContainer.style.display !== 'none') { // Currently showing EN or Expanded
                                 try {
                                     currentBtn.textContent = 'Đang dịch...';
                                     currentBtn.disabled = true;
-                                    const translatedText = await getTranslation(promptEn.textContent);
+                                    const translatedText = await getTranslation(promptContent);
                                     promptVnEl.textContent = translatedText;
-                                } catch (err) {
-                                    showError("Lỗi dịch: " + err.message);
-                                    promptVnEl.textContent = 'Dịch lỗi.';
-                                } finally {
-                                    currentBtn.disabled = false;
-                                    promptEn.classList.add('hidden');
+                                    promptEnContainer.style.display = 'none';
                                     promptVnContainer.classList.remove('hidden');
                                     currentBtn.textContent = 'Gốc';
+                                } catch (err) {
+                                    showError("Lỗi dịch: " + err.message);
+                                    currentBtn.textContent = 'Dịch';
+                                } finally {
+                                    currentBtn.disabled = false;
                                 }
-                            } else { 
-                                promptEn.classList.toggle('hidden');
-                                promptVnContainer.classList.toggle('hidden');
-                                currentBtn.textContent = promptEn.classList.contains('hidden') ? 'Gốc' : 'Dịch';
+                            } else { // Currently showing VN
+                                promptVnContainer.classList.add('hidden');
+                                promptEnContainer.style.display = 'block';
+                                currentBtn.textContent = 'Dịch';
                             }
                        }
                    });
@@ -673,8 +668,13 @@
                             <button class="copy-btn text-xs font-medium py-1 px-3 rounded-full transition bg-blue-600 hover:bg-blue-500" data-text="${escapeHtml(englishPrompt || '')}">Copy</button>
                         </div>
                     </div>
-                    <div class="text-container flex-grow">
-                        <p class="prompt-en text-sm text-gray-300">${escapeHtml(englishPrompt || 'N/A')}</p>
+                    <div class="text-container flex-grow relative">
+                        <div style="display: block;">
+                            <p class="prompt-en text-sm text-gray-300">${escapeHtml(englishPrompt || 'N/A')}</p>
+                            <div class="prompt-expanded hidden mt-2 border-t border-purple-400 border-dashed pt-2">
+                                <p class="text-sm text-purple-300"></p>
+                            </div>
+                        </div>
                         <div class="prompt-vn hidden">
                             <p class="text-sm text-green-300">${escapeHtml(vietnamesePrompt || 'N/A')}</p>
                         </div>
@@ -908,29 +908,23 @@
                         const expanderItem = memories.expander.items.find(i => i.id === id);
                         if (expanderItem) {
                             const card = isSelectingExpander.card;
-                            const promptEnEl = card.querySelector('.prompt-en');
-                            const promptVnContainer = card.querySelector('.prompt-vn');
-                            const copyBtn = card.querySelector('.copy-btn');
-                            const generateImageBtn = card.querySelector('.generate-image-btn');
-                            const revertBtn = card.querySelector('.revert-prompt-btn');
-                            const expandBtn = card.querySelector('.expand-prompt-btn');
-                            const translateBtn = card.querySelector('.translate-button');
+                            const promptEnContainer = card.querySelector('.prompt-en').parentElement;
+                            const promptExpandedContainer = card.querySelector('.prompt-expanded');
+                            const promptExpandedEl = promptExpandedContainer.querySelector('p');
                             
                             const basePrompt = card.dataset.promptBase;
                             const newPrompt = basePrompt + (expanderItem.content.startsWith(',') ? '' : ', ') + expanderItem.content;
                             
-                            promptEnEl.textContent = newPrompt;
-                            copyBtn.dataset.text = newPrompt;
-                            generateImageBtn.dataset.prompt = newPrompt;
+                            promptExpandedEl.textContent = newPrompt;
 
-                            // Reset translation state
-                            promptVnContainer.classList.add('hidden');
-                            promptVnContainer.querySelector('p').textContent = 'Cần dịch lại...';
-                            translateBtn.textContent = 'Dịch';
-                            
-                            // Toggle button visibility
-                            revertBtn.classList.remove('hidden');
-                            expandBtn.classList.add('hidden');
+                            promptEnContainer.style.display = 'block';
+                            card.querySelector('.prompt-en').classList.add('hidden');
+                            promptExpandedContainer.classList.remove('hidden');
+
+                            card.querySelector('.revert-prompt-btn').classList.remove('hidden');
+                            card.querySelector('.expand-prompt-btn').classList.add('hidden');
+                            card.querySelector('.translate-button').textContent = 'Dịch';
+                            card.querySelector('.prompt-vn').classList.add('hidden');
 
                             showToast(`Đã áp dụng Mở rộng: "${expanderItem.title}"`);
                             modal.classList.add('hidden');
@@ -1547,4 +1541,3 @@
 
 </body>
 </html>
-

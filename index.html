@@ -1235,12 +1235,17 @@
                 }
             }
 
-            // *** NEW: Image Generation Functions ***
-            async function callImagenAPI(prompt, apiKey) {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+            // *** UPDATED: Image Generation Functions ***
+            async function callFlashImageAPI(prompt, apiKey) {
+                const modelName = 'gemini-2.5-flash-image-preview'; // Switched to a more accessible model
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
                 const payload = {
-                    instances: [{ "prompt": prompt }],
-                    parameters: { "sampleCount": 1 }
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ['TEXT', 'IMAGE']
+                    },
                 };
 
                 const response = await fetch(apiUrl, {
@@ -1255,12 +1260,17 @@
                 }
 
                 const result = await response.json();
-                const prediction = result.predictions?.[0];
-
-                if (prediction && prediction.bytesBase64Encoded) {
-                    return prediction.bytesBase64Encoded;
+                const imagePart = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                
+                if (imagePart && imagePart.inlineData?.data) {
+                    return imagePart.inlineData.data;
                 } else {
-                    throw new Error("Không nhận được dữ liệu hình ảnh từ API. Phản hồi có thể trống hoặc bị chặn.");
+                    const candidate = result.candidates?.[0];
+                    const finishReason = candidate?.finishReason;
+                     if (finishReason === "SAFETY") {
+                        throw new Error("Hình ảnh không thể tạo do vi phạm chính sách an toàn.");
+                    }
+                    throw new Error("Không nhận được dữ liệu hình ảnh từ API. Phản hồi không hợp lệ.");
                 }
             }
             
@@ -1289,7 +1299,7 @@
                 imgEl.classList.add('hidden');
 
                 try {
-                    const base64Data = await callImagenAPI(prompt, apiKey);
+                    const base64Data = await callFlashImageAPI(prompt, apiKey); // Use the new function
                     imgEl.src = `data:image/png;base64,${base64Data}`;
                     imgEl.classList.remove('hidden');
                 } catch (error) {
@@ -1368,3 +1378,4 @@
 
 </body>
 </html>
+

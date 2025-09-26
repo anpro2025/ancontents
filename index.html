@@ -1293,7 +1293,171 @@
 
 
             generatePromptsFromScriptBtn.addEventListener('click', handleGeneratePromptsFromScript);
+            
+            // --- TEXT TO SPEECH (TTS) LOGIC (New Section) ---
+            const ttsInput = document.getElementById('tts-input');
+            const ttsVoiceSelector = document.getElementById('tts-voice-selector');
+            const generateVoiceBtn = document.getElementById('generate-voice-btn');
+            const ttsOutput = document.getElementById('tts-output');
+            const ttsAudioPlayer = document.getElementById('tts-audio-player');
+            const ttsPlaceholder = document.getElementById('tts-placeholder');
+            const selectScriptForTTSBtn = document.getElementById('select-script-for-tts-btn');
+            
+            const voices = [
+                'Zephyr', 'Puck', 'Charon', 'Kore', 'Fenrir', 'Leda', 'Orus', 'Aoede', 
+                'Callirrhoe', 'Autonoe', 'Enceladus', 'Iapetus', 'Umbriel', 'Algieba', 
+                'Despina', 'Erinome', 'Algenib', 'Rasalgethi', 'Laomedeia', 'Achernar', 
+                'Alnilam', 'Schedar', 'Gacrux', 'Pulcherrima', 'Achird', 'Zubenelgenubi', 
+                'Vindemiatrix', 'Sadachbia', 'Sadaltager', 'Sulafat'
+            ];
 
+            function populateVoices() {
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice;
+                    option.textContent = voice;
+                    ttsVoiceSelector.appendChild(option);
+                });
+            }
+
+            selectScriptForTTSBtn.addEventListener('click', () => {
+                isSelectingScriptForTTS = true;
+                scenarioHubBtn.click();
+            });
+
+            async function handleGenerateVoice() {
+                const text = ttsInput.value.trim();
+                const voice = ttsVoiceSelector.value;
+                if (!text) return showError("Vui lòng nhập văn bản để tạo giọng nói.");
+
+                const apiKey = localStorage.getItem('gemini_api_key') || '';
+                if (!apiKey) {
+                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
+                    setupModal.classList.remove('hidden');
+                    return;
+                }
+
+                generateVoiceBtn.disabled = true;
+                generateVoiceBtn.textContent = 'Đang tạo âm thanh...';
+                ttsPlaceholder.innerHTML = `<div class="mx-auto h-8 w-8 rounded-full border-4 border-t-4 border-gray-600 border-t-green-500 animate-spin"></div><p class="mt-4">AI đang tổng hợp giọng nói...</p>`;
+                ttsAudioPlayer.classList.add('hidden');
+
+                try {
+                    const audioData = await callTtsAPI(text, voice, apiKey);
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, 24000); // API returns 24kHz sample rate
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    
+                    ttsAudioPlayer.src = audioUrl;
+                    ttsAudioPlayer.classList.remove('hidden');
+                    ttsPlaceholder.classList.add('hidden');
+
+                } catch (error) {
+                    handleApiError(error, ttsPlaceholder);
+                } finally {
+                    generateVoiceBtn.disabled = false;
+                    generateVoiceBtn.textContent = 'Tạo Âm thanh';
+                }
+            }
+            generateVoiceBtn.addEventListener('click', handleGenerateVoice);
+            
+            async function callTtsAPI(text, voice, apiKey) {
+                 const modelName = 'gemini-2.5-flash-preview-tts';
+                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                 const payload = {
+                     contents: [{ parts: [{ text: text }] }],
+                     generationConfig: {
+                         responseModalities: ["AUDIO"],
+                         speechConfig: {
+                             voiceConfig: {
+                                 prebuiltVoiceConfig: { voiceName: voice }
+                             }
+                         }
+                     },
+                     model: "gemini-2.5-flash-preview-tts"
+                 };
+                 
+                 const response = await fetch(apiUrl, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(payload)
+                 });
+                 if (!response.ok) {
+                     const errorData = await response.json().catch(() => ({}));
+                     throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
+                 }
+                 const result = await response.json();
+                 const part = result?.candidates?.[0]?.content?.parts?.[0];
+                 const audioData = part?.inlineData?.data;
+
+                 if (audioData) {
+                     return audioData;
+                 } else {
+                     throw new Error("Không nhận được dữ liệu âm thanh từ API.");
+                 }
+            }
+            
+            function base64ToArrayBuffer(base64) {
+                const binaryString = window.atob(base64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                return bytes.buffer;
+            }
+
+            function pcmToWav(pcmData, sampleRate) {
+                const numChannels = 1;
+                const bitsPerSample = 16;
+                const blockAlign = (numChannels * bitsPerSample) / 8;
+                const byteRate = sampleRate * blockAlign;
+                const dataSize = pcmData.length * (bitsPerSample / 8);
+                const buffer = new ArrayBuffer(44 + dataSize);
+                const view = new DataView(buffer);
+
+                /* RIFF identifier */
+                writeString(view, 0, 'RIFF');
+                /* file length */
+                view.setUint32(4, 36 + dataSize, true);
+                /* RIFF type */
+                writeString(view, 8, 'WAVE');
+                /* format chunk identifier */
+                writeString(view, 12, 'fmt ');
+                /* format chunk length */
+                view.setUint32(16, 16, true);
+                /* sample format (raw) */
+                view.setUint16(20, 1, true);
+                /* channel count */
+                view.setUint16(22, numChannels, true);
+                /* sample rate */
+                view.setUint32(24, sampleRate, true);
+                /* byte rate (sample rate * block align) */
+                view.setUint32(28, byteRate, true);
+                /* block align (channel count * bytes per sample) */
+                view.setUint16(32, blockAlign, true);
+                /* bits per sample */
+                view.setUint16(34, bitsPerSample, true);
+                /* data chunk identifier */
+                writeString(view, 36, 'data');
+                /* data chunk length */
+                view.setUint32(40, dataSize, true);
+
+                // Write PCM data
+                let offset = 44;
+                for (let i = 0; i < pcmData.length; i++, offset += 2) {
+                    view.setInt16(offset, pcmData[i], true);
+                }
+
+                return new Blob([view], { type: 'audio/wav' });
+            }
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
 
             // --- GENERIC HELPER FUNCTIONS ---
             
@@ -1588,6 +1752,7 @@
             // Initialize the app
             initSetupModal();
             loadAllMemory();
+            populateVoices(); // Call this function to fill the dropdown
             
             setupMemoryModal({ modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central' });
             setupMemoryModal({ modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario' });

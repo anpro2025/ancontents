@@ -277,6 +277,9 @@
         <a href="https://labs.google/fx/tools/whisk/project" target="_blank" class="bg-gray-700 hover:bg-orange-500 text-white p-4 rounded-full shadow-lg transition-colors transform hover:scale-110" title="Google FX">
              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm48-88a48,48,0,1,1-48-48A48.05,48.05,0,0,1,176,128Z"></path></svg>
         </a>
+        <button id="expander-hub-btn" class="bg-gray-700 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Kho Mở Rộng Prompt Video">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm.22-4.12a.5.5 0 0 1 .706 0l.707.707a.5.5 0 0 1 0 .708l-2.829 2.828a.5.5 0 0 1-.707 0L1.707 6.707a.5.5 0 0 1 0-.708l.707-.707a.5.5 0 0 1 .707 0zM12.293 1.293a.5.5 0 0 1 .707 0l2.293 2.293a.5.5 0 0 1 0 .707l-2.293 2.293a.5.5 0 0 1-.707-.707L13.586 4 12.293 2.707a.5.5 0 0 1 0-.707zM11.5 6a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-2.293 4.293a.5.5 0 0 1 .707 0L12.207 12l-1.293 1.293a.5.5 0 0 1-.707-.707L11.207 12l-1-1a.5.5 0 0 1 0-.707z"/></svg>
+        </button>
         <button id="task-hub-btn" class="bg-gray-700 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Bộ nhớ Giao việc">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
@@ -547,24 +550,29 @@
                     console.error("Lỗi khi tự động sao lưu phân cảnh:", e);
                 }
 
-                storyboardOutput.querySelectorAll('.copy-btn, .translate-button, .generate-image-btn').forEach(btn => {
+                storyboardOutput.querySelectorAll('.copy-btn, .translate-button, .generate-image-btn, .expand-prompt-btn').forEach(btn => {
                    btn.addEventListener('click', (e) => {
-                       if (btn.classList.contains('copy-btn')) {
-                            const textToCopy = btn.dataset.text;
+                        const currentBtn = e.currentTarget;
+                       if (currentBtn.classList.contains('copy-btn')) {
+                            const textToCopy = currentBtn.dataset.text;
                             navigator.clipboard.writeText(textToCopy).then(() => {
                                 showToast(`Đã sao chép: "${textToCopy.substring(0, 30)}..."`);
                             });
-                       } else if(btn.classList.contains('translate-button')) {
-                           const card = btn.closest('.prompt-card');
+                       } else if(currentBtn.classList.contains('translate-button')) {
+                           const card = currentBtn.closest('.prompt-card');
                            const enP = card.querySelector('.prompt-en');
                            const vnDiv = card.querySelector('.prompt-vn');
                            enP.classList.toggle('hidden');
                            vnDiv.classList.toggle('hidden');
-                           btn.textContent = enP.classList.contains('hidden') ? 'Gốc' : 'Dịch';
-                       } else if(btn.classList.contains('generate-image-btn')) {
-                            const prompt = btn.dataset.prompt;
-                            const card = btn.closest('.prompt-card');
-                            handleGenerateImage(prompt, card, btn);
+                           currentBtn.textContent = enP.classList.contains('hidden') ? 'Gốc' : 'Dịch';
+                       } else if(currentBtn.classList.contains('generate-image-btn')) {
+                            const prompt = currentBtn.dataset.prompt;
+                            const card = currentBtn.closest('.prompt-card');
+                            handleGenerateImage(prompt, card, currentBtn);
+                       } else if (currentBtn.classList.contains('expand-prompt-btn')) {
+                            const card = currentBtn.closest('.prompt-card');
+                            isSelectingExpander.card = card;
+                            document.getElementById('expander-hub-btn').click();
                        }
                    });
                 });
@@ -601,7 +609,12 @@
 
 
             function createStoryboardCard(title, englishPrompt, vietnamesePrompt) {
-                 return `<div class="prompt-card bg-gray-700 p-4 rounded-lg border border-gray-600 flex flex-col">
+                 const isVideoCard = title === 'Video 8s';
+                 const expanderButton = isVideoCard 
+                    ? `<button class="expand-prompt-btn text-xs font-medium py-1 px-3 rounded-full transition bg-purple-600 hover:bg-purple-500" title="Mở rộng prompt video">Mở rộng</button>` 
+                    : '';
+
+                 return `<div class="prompt-card bg-gray-700 p-4 rounded-lg border border-gray-600 flex flex-col" data-prompt-base="${escapeHtml(englishPrompt || '')}">
                     <div class="image-container bg-gray-900 rounded-md h-48 flex items-center justify-center mb-3 border border-dashed border-gray-600 relative">
                         <div class="image-placeholder text-center text-gray-500">
                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="mx-auto" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM15 5a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5z"/></svg>
@@ -613,6 +626,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-md font-semibold text-blue-400">${title}</h3>
                         <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                            ${expanderButton}
                             <button class="generate-image-btn text-xs font-medium py-1 px-3 rounded-full transition bg-cyan-600 hover:bg-cyan-500" data-prompt="${escapeHtml(englishPrompt || '')}">Tạo ảnh</button>
                             <button class="translate-button text-xs font-medium py-1 px-3 rounded-full transition bg-gray-600 hover:bg-gray-500">Dịch</button>
                             <button class="copy-btn text-xs font-medium py-1 px-3 rounded-full transition bg-blue-600 hover:bg-blue-500" data-text="${escapeHtml(englishPrompt || '')}">Copy</button>
@@ -785,6 +799,7 @@
             
             let currentlyEditingMemory = { type: null, id: null };
             let isSelectingScriptForPrompt = false;
+            let isSelectingExpander = { card: null };
 
             function setupMemoryModal(config) {
                 const modal = memoryModalTemplate.cloneNode(true);
@@ -811,7 +826,7 @@
                         const itemEl = document.createElement('div');
                         itemEl.className = 'memory-item flex justify-between items-center p-2 rounded-md cursor-pointer transition-colors text-sm';
                         itemEl.dataset.id = item.id;
-                        if(item.id === memories[config.type].activeId) itemEl.classList.add('active');
+                        if(item.id === memories[config.type].activeId && config.type !== 'expander') itemEl.classList.add('active');
                         itemEl.innerHTML = `<span class="truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span><button class="delete-memory-item-btn text-gray-500 hover:text-red-400 text-xs flex-shrink-0 ml-2">&#x2715;</button>`;
                         listEl.appendChild(itemEl);
                     });
@@ -845,6 +860,29 @@
                         if(currentlyEditingMemory.id === id) populateEditor(null);
                         saveAllMemory();
                         renderList();
+                        return;
+                    }
+
+                    if (config.type === 'expander' && isSelectingExpander.card) {
+                        const expanderItem = memories.expander.items.find(i => i.id === id);
+                        if (expanderItem) {
+                            const promptEnEl = isSelectingExpander.card.querySelector('.prompt-en');
+                            const copyBtn = isSelectingExpander.card.querySelector('.copy-btn');
+                            const generateImageBtn = isSelectingExpander.card.querySelector('.generate-image-btn');
+                            
+                            const basePrompt = isSelectingExpander.card.dataset.promptBase;
+                            const newPrompt = basePrompt + (expanderItem.content.startsWith(',') ? '' : ', ') + expanderItem.content;
+                            
+                            promptEnEl.textContent = newPrompt;
+                            copyBtn.dataset.text = newPrompt;
+                            if (generateImageBtn) {
+                                generateImageBtn.dataset.prompt = newPrompt;
+                            }
+
+                            showToast(`Đã áp dụng Mở rộng: "${expanderItem.title}"`);
+                            modal.classList.add('hidden');
+                            isSelectingExpander = { card: null };
+                        }
                         return;
                     }
                     
@@ -952,18 +990,20 @@
                 closeBtn.addEventListener('click', () => {
                     modal.classList.add('hidden');
                     isSelectingScriptForPrompt = false;
+                    isSelectingExpander = { card: null };
                 });
                 modal.addEventListener('click', (e) => { 
                     if (e.target === modal) {
                          modal.classList.add('hidden');
                          isSelectingScriptForPrompt = false;
+                         isSelectingExpander = { card: null };
                     }
                 });
             }
 
             // --- ALL MEMORY DATA ---
             const memories = {};
-            const memoryTypes = ['central', 'scenario', 'prompt', 'storyboard', 'task'];
+            const memoryTypes = ['central', 'scenario', 'prompt', 'storyboard', 'task', 'expander'];
 
             function loadAllMemory() {
                 memoryTypes.forEach(type => {
@@ -1435,10 +1475,12 @@
             setupMemoryModal({ modalId: 'prompt-library-modal', triggerId: 'prompt-library-btn', title: 'Kho lưu trữ Prompt', type: 'prompt' });
             setupMemoryModal({ modalId: 'storyboard-hub-modal', triggerId: 'storyboard-hub-btn', title: 'Kho lưu trữ Phân Cảnh', type: 'storyboard' });
             setupMemoryModal({ modalId: 'task-hub-modal', triggerId: 'task-hub-btn', title: 'Quản lý Bộ nhớ Giao việc', type: 'task' });
+            setupMemoryModal({ modalId: 'expander-hub-modal', triggerId: 'expander-hub-btn', title: 'Kho Mở Rộng Prompt Video', type: 'expander' });
 
         });
     </script>
 
 </body>
 </html>
+" selected.
 

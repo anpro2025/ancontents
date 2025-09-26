@@ -550,29 +550,65 @@
                     console.error("Lỗi khi tự động sao lưu phân cảnh:", e);
                 }
 
-                storyboardOutput.querySelectorAll('.copy-btn, .translate-button, .generate-image-btn, .expand-prompt-btn').forEach(btn => {
-                   btn.addEventListener('click', (e) => {
+                storyboardOutput.querySelectorAll('.copy-btn, .translate-button, .generate-image-btn, .expand-prompt-btn, .revert-prompt-btn').forEach(btn => {
+                   btn.addEventListener('click', async (e) => {
                         const currentBtn = e.currentTarget;
+                        const card = currentBtn.closest('.prompt-card');
+
                        if (currentBtn.classList.contains('copy-btn')) {
                             const textToCopy = currentBtn.dataset.text;
                             navigator.clipboard.writeText(textToCopy).then(() => {
                                 showToast(`Đã sao chép: "${textToCopy.substring(0, 30)}..."`);
                             });
-                       } else if(currentBtn.classList.contains('translate-button')) {
-                           const card = currentBtn.closest('.prompt-card');
-                           const enP = card.querySelector('.prompt-en');
-                           const vnDiv = card.querySelector('.prompt-vn');
-                           enP.classList.toggle('hidden');
-                           vnDiv.classList.toggle('hidden');
-                           currentBtn.textContent = enP.classList.contains('hidden') ? 'Gốc' : 'Dịch';
-                       } else if(currentBtn.classList.contains('generate-image-btn')) {
+                       } else if (currentBtn.classList.contains('generate-image-btn')) {
                             const prompt = currentBtn.dataset.prompt;
-                            const card = currentBtn.closest('.prompt-card');
                             handleGenerateImage(prompt, card, currentBtn);
                        } else if (currentBtn.classList.contains('expand-prompt-btn')) {
-                            const card = currentBtn.closest('.prompt-card');
                             isSelectingExpander.card = card;
                             document.getElementById('expander-hub-btn').click();
+                       } else if (currentBtn.classList.contains('revert-prompt-btn')) {
+                            const basePrompt = card.dataset.promptBase;
+                            const baseTranslation = card.dataset.translationBase;
+
+                            card.querySelector('.prompt-en').textContent = basePrompt;
+                            card.querySelector('.prompt-vn p').textContent = baseTranslation;
+                            card.querySelector('.copy-btn').dataset.text = basePrompt;
+                            card.querySelector('.generate-image-btn').dataset.prompt = basePrompt;
+
+                            card.querySelector('.prompt-vn').classList.add('hidden');
+                            card.querySelector('.translate-button').textContent = 'Dịch';
+                            card.querySelector('.translate-button').disabled = false;
+
+
+                            currentBtn.classList.add('hidden');
+                            card.querySelector('.expand-prompt-btn').classList.remove('hidden');
+
+                            showToast('Đã quay về prompt gốc.');
+                        } else if(currentBtn.classList.contains('translate-button')) {
+                            const promptEn = card.querySelector('.prompt-en');
+                            const promptVnContainer = card.querySelector('.prompt-vn');
+                            const promptVnEl = promptVnContainer.querySelector('p');
+                            
+                            if (!promptEn.classList.contains('hidden') && promptVnEl.textContent.trim() === 'Cần dịch lại...') {
+                                try {
+                                    currentBtn.textContent = 'Đang dịch...';
+                                    currentBtn.disabled = true;
+                                    const translatedText = await getTranslation(promptEn.textContent);
+                                    promptVnEl.textContent = translatedText;
+                                } catch (err) {
+                                    showError("Lỗi dịch: " + err.message);
+                                    promptVnEl.textContent = 'Dịch lỗi.';
+                                } finally {
+                                    currentBtn.disabled = false;
+                                    promptEn.classList.add('hidden');
+                                    promptVnContainer.classList.remove('hidden');
+                                    currentBtn.textContent = 'Gốc';
+                                }
+                            } else { 
+                                promptEn.classList.toggle('hidden');
+                                promptVnContainer.classList.toggle('hidden');
+                                currentBtn.textContent = promptEn.classList.contains('hidden') ? 'Gốc' : 'Dịch';
+                            }
                        }
                    });
                 });
@@ -610,11 +646,16 @@
 
             function createStoryboardCard(title, englishPrompt, vietnamesePrompt) {
                  const isVideoCard = title === 'Video 8s';
-                 const expanderButton = isVideoCard 
-                    ? `<button class="expand-prompt-btn text-xs font-medium py-1 px-3 rounded-full transition bg-purple-600 hover:bg-purple-500" title="Mở rộng prompt video">Mở rộng</button>` 
+                 const expanderButtons = isVideoCard 
+                    ? `<div class="video-card-actions flex items-center gap-1.5">
+                         <button class="expand-prompt-btn text-xs font-medium py-1 px-3 rounded-full transition bg-purple-600 hover:bg-purple-500" title="Mở rộng prompt video">Mở rộng</button>
+                         <button class="revert-prompt-btn hidden text-xs font-medium py-1 px-3 rounded-full transition bg-orange-600 hover:bg-orange-500" title="Quay về prompt gốc">Về gốc</button>
+                       </div>` 
                     : '';
 
-                 return `<div class="prompt-card bg-gray-700 p-4 rounded-lg border border-gray-600 flex flex-col" data-prompt-base="${escapeHtml(englishPrompt || '')}">
+                 return `<div class="prompt-card bg-gray-700 p-4 rounded-lg border border-gray-600 flex flex-col" 
+                              data-prompt-base="${escapeHtml(englishPrompt || '')}" 
+                              data-translation-base="${escapeHtml(vietnamesePrompt || '')}">
                     <div class="image-container bg-gray-900 rounded-md h-48 flex items-center justify-center mb-3 border border-dashed border-gray-600 relative">
                         <div class="image-placeholder text-center text-gray-500">
                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="mx-auto" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM15 5a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5z"/></svg>
@@ -626,7 +667,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-md font-semibold text-blue-400">${title}</h3>
                         <div class="flex items-center gap-1.5 flex-wrap justify-end">
-                            ${expanderButton}
+                            ${expanderButtons}
                             <button class="generate-image-btn text-xs font-medium py-1 px-3 rounded-full transition bg-cyan-600 hover:bg-cyan-500" data-prompt="${escapeHtml(englishPrompt || '')}">Tạo ảnh</button>
                             <button class="translate-button text-xs font-medium py-1 px-3 rounded-full transition bg-gray-600 hover:bg-gray-500">Dịch</button>
                             <button class="copy-btn text-xs font-medium py-1 px-3 rounded-full transition bg-blue-600 hover:bg-blue-500" data-text="${escapeHtml(englishPrompt || '')}">Copy</button>
@@ -866,18 +907,30 @@
                     if (config.type === 'expander' && isSelectingExpander.card) {
                         const expanderItem = memories.expander.items.find(i => i.id === id);
                         if (expanderItem) {
-                            const promptEnEl = isSelectingExpander.card.querySelector('.prompt-en');
-                            const copyBtn = isSelectingExpander.card.querySelector('.copy-btn');
-                            const generateImageBtn = isSelectingExpander.card.querySelector('.generate-image-btn');
+                            const card = isSelectingExpander.card;
+                            const promptEnEl = card.querySelector('.prompt-en');
+                            const promptVnContainer = card.querySelector('.prompt-vn');
+                            const copyBtn = card.querySelector('.copy-btn');
+                            const generateImageBtn = card.querySelector('.generate-image-btn');
+                            const revertBtn = card.querySelector('.revert-prompt-btn');
+                            const expandBtn = card.querySelector('.expand-prompt-btn');
+                            const translateBtn = card.querySelector('.translate-button');
                             
-                            const basePrompt = isSelectingExpander.card.dataset.promptBase;
+                            const basePrompt = card.dataset.promptBase;
                             const newPrompt = basePrompt + (expanderItem.content.startsWith(',') ? '' : ', ') + expanderItem.content;
                             
                             promptEnEl.textContent = newPrompt;
                             copyBtn.dataset.text = newPrompt;
-                            if (generateImageBtn) {
-                                generateImageBtn.dataset.prompt = newPrompt;
-                            }
+                            generateImageBtn.dataset.prompt = newPrompt;
+
+                            // Reset translation state
+                            promptVnContainer.classList.add('hidden');
+                            promptVnContainer.querySelector('p').textContent = 'Cần dịch lại...';
+                            translateBtn.textContent = 'Dịch';
+                            
+                            // Toggle button visibility
+                            revertBtn.classList.remove('hidden');
+                            expandBtn.classList.add('hidden');
 
                             showToast(`Đã áp dụng Mở rộng: "${expanderItem.title}"`);
                             modal.classList.add('hidden');
@@ -890,6 +943,7 @@
                         const item = memories[config.type].items.find(i => i.id === id);
                         if (item) {
                             document.getElementById('script-input').value = item.content;
+                            scriptInput.dispatchEvent(new Event('input')); // Trigger estimate
                         }
                         modal.classList.add('hidden');
                         isSelectingScriptForPrompt = false;
@@ -1189,6 +1243,17 @@
 
             // --- GENERIC HELPER FUNCTIONS ---
             
+            async function getTranslation(textToTranslate) {
+                const apiKey = localStorage.getItem('gemini_api_key') || '';
+                if (!apiKey) throw new Error("Chưa có API key.");
+                
+                const systemPrompt = "Bạn là một dịch giả chuyên nghiệp. Dịch đoạn văn bản sau từ tiếng Anh sang tiếng Việt. Chỉ trả về phần văn bản đã dịch, không thêm bất kỳ lời giải thích nào.";
+                const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
+                
+                const translatedText = await callGeminiAPI(textToTranslate, systemPrompt, apiKey, model);
+                return translatedText;
+            }
+
             async function handleExportPdf(config) {
                 const { type, title } = config;
                 const items = memories[type].items;
@@ -1482,5 +1547,4 @@
 
 </body>
 </html>
-" selected.
 

@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>Thư viện PROMPTS & EXPANDER</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +14,14 @@
         }
         .hidden {
             display: none;
+        }
+        .prompt-card.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+        .drop-zone.drag-over {
+            background-color: #374151; /* bg-gray-700 */
+            border: 2px dashed #4b5563;
         }
     </style>
 </head>
@@ -43,14 +51,6 @@
                     <button id="expander-storage-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
                         Lưu trữ EXPANDER
                     </button>
-                </div>
-                <div class="mt-auto pt-4"> <!-- This will push the back button to the bottom -->
-                     <a href="https://anproduction2025.github.io/ancontents/" class="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Quay lại
-                    </a>
                 </div>
             </div>
         </div>
@@ -114,19 +114,8 @@
             <!-- Vùng lưu trữ PROMPT, ẩn mặc định -->
             <div id="storage-container" class="hidden">
                 <h2 class="text-2xl font-bold mb-6">Danh bạ lưu trữ</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-gray-800 p-4 rounded-lg">
-                        <h3 class="font-bold text-lg mb-4 text-center">Góc máy</h3>
-                        <div id="category-goc-may" class="space-y-3"></div>
-                    </div>
-                    <div class="bg-gray-800 p-4 rounded-lg">
-                        <h3 class="font-bold text-lg mb-4 text-center">Kiến Trúc</h3>
-                        <div id="category-kien-truc" class="space-y-3"></div>
-                    </div>
-                    <div class="bg-gray-800 p-4 rounded-lg">
-                        <h3 class="font-bold text-lg mb-4 text-center">Trending</h3>
-                        <div id="category-trending" class="space-y-3"></div>
-                    </div>
+                <div id="prompt-storage-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Prompt columns will be rendered here -->
                 </div>
             </div>
 
@@ -204,18 +193,29 @@
 
             // --- Rendering ---
             function renderPromptStorage() {
-                const containers = {
-                    'Góc máy': document.getElementById('category-goc-may'),
-                    'Kiến Trúc': document.getElementById('category-kien-truc'),
-                    'Trending': document.getElementById('category-trending')
-                };
-                Object.values(containers).forEach(c => c.innerHTML = '');
+                const promptGrid = document.getElementById('prompt-storage-grid');
+                promptGrid.innerHTML = '';
                 
-                prompts.forEach(prompt => {
-                    const card = createCardElement(prompt, 'prompt');
-                    if (containers[prompt.category]) {
-                        containers[prompt.category].appendChild(card);
-                    }
+                const categories = ['Góc máy', 'Kiến Trúc', 'Trending'];
+
+                categories.forEach(category => {
+                    const columnEl = document.createElement('div');
+                    columnEl.className = 'bg-gray-800 p-4 rounded-lg drop-zone transition-colors';
+                    columnEl.dataset.category = category;
+
+                    columnEl.innerHTML = `<h3 class="font-bold text-lg mb-4 text-center pointer-events-none">${category}</h3>`;
+
+                    const cardsContainer = document.createElement('div');
+                    cardsContainer.className = 'space-y-3 min-h-[100px]';
+
+                    prompts.filter(p => p.category === category).forEach(prompt => {
+                        const card = createCardElement(prompt, 'prompt');
+                        card.draggable = true;
+                        cardsContainer.appendChild(card);
+                    });
+                    
+                    columnEl.appendChild(cardsContainer);
+                    promptGrid.appendChild(columnEl);
                 });
             }
 
@@ -237,22 +237,16 @@
 
             function createCardElement(item, type) {
                 const card = document.createElement('div');
-                card.className = 'bg-gray-700 p-3 rounded cursor-pointer hover:bg-gray-600 transition-colors';
+                card.className = `${type}-card bg-gray-700 p-3 rounded cursor-pointer hover:bg-gray-600 transition-colors`;
                 card.dataset.id = item.id;
                 card.dataset.type = type;
-                let categoryHTML = '';
-                if(item.category) {
-                     categoryHTML = `<span class="inline-block ${type === 'prompt' ? 'bg-blue-600/50 text-blue-300' : 'bg-purple-600/50 text-purple-300'} text-xs font-semibold px-2 py-0.5 rounded-full mb-2">${item.category}</span>`;
-                }
 
                 card.innerHTML = `
-                    ${categoryHTML}
                     <h4 class="font-semibold pointer-events-none">${item.title}</h4>
                     <p class="text-sm text-gray-400 truncate pointer-events-none">${item.content}</p>
                 `;
                 return card;
             }
-
 
             // --- Modal Logic ---
             function showItemDetails(itemId, type) {
@@ -267,7 +261,7 @@
             }
 
             // --- Download and Copy ---
-             function downloadAsTxt(title, content) {
+            function downloadAsTxt(title, content) {
                 const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -332,14 +326,63 @@
                 }
             });
 
-            storageContainer.addEventListener('click', (e) => {
+            // Click listener for viewing details
+            document.body.addEventListener('click', (e) => {
                 const card = e.target.closest('[data-id]');
-                if (card) showItemDetails(card.dataset.id, card.dataset.type);
+                 if (card && (card.classList.contains('prompt-card') || card.classList.contains('expander-card'))) {
+                    showItemDetails(card.dataset.id, card.dataset.type);
+                }
             });
-            expanderStorageContainer.addEventListener('click', (e) => {
-                const card = e.target.closest('[data-id]');
-                if (card) showItemDetails(card.dataset.id, card.dataset.type);
+            
+            // --- Drag and Drop Logic for PROMPTS ---
+            let draggedItem = null;
+
+            storageContainer.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('prompt-card')) {
+                    draggedItem = e.target;
+                    setTimeout(() => e.target.classList.add('dragging'), 0);
+                }
             });
+
+            storageContainer.addEventListener('dragend', (e) => {
+                if (draggedItem) {
+                    draggedItem.classList.remove('dragging');
+                    draggedItem = null;
+                }
+            });
+            
+            storageContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dropZone = e.target.closest('.drop-zone');
+                if (dropZone) {
+                    dropZone.classList.add('drag-over');
+                }
+            });
+
+            storageContainer.addEventListener('dragleave', (e) => {
+                const dropZone = e.target.closest('.drop-zone');
+                if (dropZone) {
+                    dropZone.classList.remove('drag-over');
+                }
+            });
+
+             storageContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const dropZone = e.target.closest('.drop-zone');
+                if (dropZone && draggedItem) {
+                    dropZone.classList.remove('drag-over');
+                    const promptId = draggedItem.dataset.id;
+                    const newCategory = dropZone.dataset.category;
+
+                    const promptToMove = prompts.find(p => p.id == promptId);
+                    if (promptToMove) {
+                        promptToMove.category = newCategory;
+                        savePrompts();
+                        renderPromptStorage();
+                    }
+                }
+            });
+
 
             promptForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -374,4 +417,3 @@
     </script>
 </body>
 </html>
-

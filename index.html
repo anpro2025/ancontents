@@ -3,1908 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trình tạo Phim AI Toàn diện</title>
+    <title>AN PRODUCTION AI FILMS - STORY BROAD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Thư viện jsPDF để xuất file PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
-        .prompt-card {
-            transition: all 0.2s ease-in-out;
+        .hidden {
+            display: none;
         }
-        .prompt-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .script-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
-        }
-        .memory-item:hover, .history-item:hover, .library-item summary:hover {
-            background-color: #374151;
-        }
-        .memory-item.active {
+        .script-item.active {
             background-color: #3b82f6;
-            color: white;
         }
-        .tab-btn.active {
-            color: white;
-            border-bottom-color: #3b82f6;
+        .delete-script-btn {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
         }
-        .action-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .image-loading-spinner, .tts-loading-spinner {
-            border-color: #4b5563;
-            border-top-color: #3b82f6;
-        }
-        audio::-webkit-media-controls-panel {
-            background-color: #374151;
-        }
-        audio::-webkit-media-controls-play-button,
-        audio::-webkit-media-controls-mute-button {
-            background-color: #9ca3af;
-            border-radius: 50%;
-        }
-        audio::-webkit-media-controls-current-time-display,
-        audio::-webkit-media-controls-time-remaining-display {
-            color: #d1d5db;
-        }
-        .voice-item.selected {
-            background-color: #374151;
-            border-color: #3b82f6;
+        .script-item:hover .delete-script-btn {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 antialiased">
-
-    <div class="container mx-auto p-4 md:p-8">
-        <header class="relative mb-8">
-            <div class="absolute top-0 right-0">
-                <button id="setup-btn" class="bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-full p-3 text-sm focus:ring-2 focus:ring-blue-500 flex items-center justify-center" title="Cài đặt API Key & Model">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" class="text-gray-300">
-                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c-1.79-.527-1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="text-center">
-                <h1 class="text-4xl font-bold text-white">Trình tạo Phim AI Toàn diện</h1>
-                <p class="text-lg text-gray-400 mt-2">Tạo prompt, hình ảnh, video và kịch bản từ ý tưởng của bạn.</p>
-            </div>
-        </header>
-        
-        <div class="mb-8 flex justify-center border-b border-gray-700">
-            <button id="tab-storyboard" class="tab-btn px-6 py-3 text-lg font-semibold text-gray-400 border-b-2 border-transparent hover:text-white transition active">Tạo Phân Cảnh</button>
-            <button id="tab-script" class="tab-btn px-6 py-3 text-lg font-semibold text-gray-400 border-b-2 border-transparent hover:text-white transition">Tạo Kịch Bản</button>
-            <button id="tab-script-to-prompt" class="tab-btn px-6 py-3 text-lg font-semibold text-gray-400 border-b-2 border-transparent hover:text-white transition">Kịch Bản thành Prompt</button>
-            <button id="tab-text-to-voice" class="tab-btn px-6 py-3 text-lg font-semibold text-gray-400 border-b-2 border-transparent hover:text-white transition">Tạo Giọng Nói</button>
-        </div>
-
-        <!-- Panels -->
-        <div id="storyboard-generator-panel">
-            <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-1/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col">
-                    <h2 class="text-2xl font-semibold mb-6 text-white border-b border-gray-600 pb-3">Bảng điều khiển Phân Cảnh</h2>
-                    <div class="space-y-6 flex-grow flex flex-col">
-                        <div class="flex-grow flex flex-col">
-                             <div class="flex justify-between items-center mb-2">
-                                 <label for="refinement-prompt" class="block text-sm font-medium text-gray-300">Mô tả cảnh quay</label>
-                             </div>
-                             <textarea id="refinement-prompt" rows="8" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Mô tả chi tiết cảnh quay của bạn tại đây..."></textarea>
-                        </div>
-
-                        <div>
-                            <label for="storyboard-task-reference" class="block text-sm font-medium text-gray-300 mb-2">Tham chiếu Giao việc (Tùy chọn)</label>
-                            <select id="storyboard-task-reference" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500">
-                                <option value="">-- Mặc định --</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Quy tắc Không</label>
-                            <div class="flex items-center gap-4">
-                                <label class="flex items-center text-sm cursor-pointer">
-                                    <input type="checkbox" id="no-text-checkbox" class="form-checkbox bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 h-4 w-4 rounded">
-                                    <span class="ml-2">Không text</span>
-                                </label>
-                                <label class="flex items-center text-sm cursor-pointer">
-                                    <input type="checkbox" id="no-montage-checkbox" class="form-checkbox bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 h-4 w-4 rounded">
-                                    <span class="ml-2">Không montage</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="flex-grow"></div>
-                        <div class="flex items-center gap-2">
-                             <button id="clear-btn" class="w-1/3 bg-gray-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300" title="Xóa nội dung">
-                                 Xóa
-                             </button>
-                             <button id="generate-btn" class="action-button w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
-                               Tạo phân cảnh
-                             </button>
-                         </div>
-                    </div>
-                </div>
-
-                <div class="lg:w-2/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
-                        <h2 class="text-2xl font-semibold text-white">Bảng phân cảnh (Storyboard)</h2>
-                        <div class="flex items-center gap-2">
-                            <button id="generate-all-images-btn" class="hidden bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>
-                                Tạo tất cả ảnh
-                            </button>
-                            <button id="save-all-storyboard-prompts-btn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
-                                Lưu Prompts
-                            </button>
-                        </div>
-                    </div>
-                    <div id="storyboard-output" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                           <div id="storyboard-placeholder" class="text-center text-gray-500 py-16">
-                             <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2z" /></svg>
-                             <h3 class="mt-2 text-sm font-semibold text-gray-400">Chưa có phân cảnh</h3>
-                             <p class="mt-1 text-sm text-gray-500">Nhập mô tả cảnh quay và nhấn nút để bắt đầu.</p>
-                           </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="script-generator-panel" class="hidden">
-             <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-1/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col">
-                    <h2 class="text-2xl font-semibold mb-6 text-white border-b border-gray-600 pb-3">Thông tin Kịch bản</h2>
-                    <div class="space-y-4 flex-grow flex flex-col">
-                        <div>
-                             <label for="script-idea" class="block text-sm font-medium text-gray-300 mb-1">Ý tưởng chính / Tóm tắt</label>
-                             <textarea id="script-idea" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: Một nhà khoa học vô tình du hành thời gian đến tương lai và phải tìm cách quay về."></textarea>
-                        </div>
-                        <div>
-                             <label for="task-selector" class="block text-sm font-medium text-gray-300 mb-1">Đầu vào công việc</label>
-                             <select id="task-selector" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500">
-                                 <option value="">-- Chọn công việc --</option>
-                             </select>
-                        </div>
-                         <div>
-                             <label for="script-characters" class="block text-sm font-medium text-gray-300 mb-1">Mô tả công việc</label>
-                             <textarea id="script-characters" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Mô tả chi tiết công việc cần AI thực hiện."></textarea>
-                        </div>
-                        <div>
-                             <label for="script-style" class="block text-sm font-medium text-gray-300 mb-1">Phong cách</label>
-                             <select id="script-style" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500">
-                                 <option value="Storytelling">Storytelling</option>
-                                 <option value="Cinematic">Cinematic</option>
-                             </select>
-                        </div>
-                         <div>
-                             <label for="script-notes" class="block text-sm font-medium text-gray-300 mb-1">Thời lượng</label>
-                             <textarea id="script-notes" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: 30 giây, 1 phút, v.v."></textarea>
-                        </div>
-                        <div class="flex-grow"></div>
-                        <button id="generate-script-btn" class="action-button w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105">Tạo Kịch Bản</button>
-                    </div>
-                </div>
-
-                <div class="lg:w-2/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
-                     <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
-                        <h2 class="text-2xl font-semibold text-white">Kịch bản được tạo</h2>
-                        <div class="flex items-center gap-2">
-                             <button id="save-script-btn" class="hidden bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save" viewBox="0 0 16 16"><path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v4.5h2a.5.5 0 0 1 .354.854l-2.5 2.5a.5.5 0 0 1-.708 0l-2.5-2.5A.5.5 0 0 1 5.5 6.5h2V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/></svg>
-                                 Lưu Kịch bản
-                             </button>
-                              <button id="export-script-pdf-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16"><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1.5v2a.5.5 0 0 0 .5.5h2l-2.5-2.5z"/><path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.658-.877.37-.198.815-.143 1.175.08c.349.21.609.554.673.997.062.42.015.81-.059 1.172a.627.627 0 0 1-.094.215c-.046.072-.092.143-.138.213a7.224 7.224 0 0 1-.254.499c-.106.247-.234.54-.386.891a18.02 18.02 0 0 0-1.04 2.224c.344.058.69.164.995.315.309.15.554.354.716.59.162.238.248.527.226.82-.011.16-.044.315-.09.46a.71.71 0 0 1-.16.33c-.106.16-.25.295-.42.398a1.14 1.14 0 0 1-.16.09c-.202.09-.45.134-.738.112a2.38 2.38 0 0 1-.45-.082.64.64 0 0 1-.38-.238c-.126-.18-.19-.41-.173-.642.016-.22.08-.416.22-.56.134-.137.31-.21.524-.22.12-.008.238.012.354.05.116.035.22.086.314.152.093.065.17.15.23.255a.69.69 0 0 1 .015.625.65.65 0 0 1-.234.42c-.11.12-.25.21-.41.26-.16.05-.33.07-.5.06a1.18 1.18 0 0 1-.42-.082c-.16-.09-.28-.21-.38-.36a.656.656 0 0 1-.14-.413.656.656 0 0 1 .035-.285c.04-.12.1-.22.18-.3.085-.08.18-.14.28-.18.1-.04.21-.06.32-.06.24 0 .46.07.66.21.2.14.33.32.4.53.07.21.07.45.01.68-.06.23-.18.43-.35.59-.17.16-.39.27-.64.33-.25.06-.52.07-.8.02a1.86 1.86 0 0 1-.45-.16c-.2-.1-.36-.24-.49-.42a.99.99 0 0 1-.18-.54c0-.26.06-.51.18-.73a1.45 1.45 0 0 1 .43-.51c.2-.15.43-.25.67-.3.24-.05.48-.07.72-.07.24 0 .48.02.71.07.23.05.46.12.68.22.22.1.43.23.64.38.2.15.39.33.56.54.17.21.32.45.44.7.12.25.21.52.26.81.05.28.06.57.01.86s-.13.57-.27.84c-.14.27-.33.52-.56.73s-.51.37-.8.47c-.29.1-.59.14-.9.12a2.82 2.82 0 0 1-.52-.06c-.27-.06-.53-.16-.76-.28-.24-.12-.45-.28-.64-.46-.19-.18-.35-.4-.48-.65a1.64 1.64 0 0 1-.16-.8z"/></svg>
-                                 Xuất PDF
-                             </button>
-                            <button id="send-script-to-analyzer-btn" class="hidden bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.5 1a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1h9.5zM10 4a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 10 4zM6 4a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 6 4zM3.5 14a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 1 0v9a.5.5 0 0 1-.5.5z"/></svg>
-                                Phân tích
-                            </button>
-                            <button id="copy-script-btn" class="hidden bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3z"/></svg>
-                                Sao chép
-                            </button>
-                        </div>
-                    </div>
-                     <div id="script-output" class="space-y-4 h-full overflow-y-auto pr-2 max-h-[70vh]">
-                         <div class="text-center text-gray-500 pt-16">
-                            <svg class="mx-auto h-12 w-12 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                             <h3 class="mt-2 text-sm font-semibold text-gray-400">Chưa có kịch bản</h3>
-                             <p class="mt-1 text-sm text-gray-500">Nhập thông tin và nhấn nút để bắt đầu.</p>
-                           </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="script-to-prompt-panel" class="hidden">
-             <div class="flex flex-col lg:flex-row gap-8">
-                <div class="lg:w-1/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col">
-                    <h2 class="text-2xl font-semibold mb-6 text-white border-b border-gray-600 pb-3">Phân tích Kịch bản</h2>
-                    <div class="space-y-4 flex-grow flex flex-col">
-                        <div>
-                             <div class="flex justify-between items-center mb-1">
-                                <label for="script-input" class="block text-sm font-medium text-gray-300">Dán hoặc chọn kịch bản của bạn:</label>
-                                <button id="select-script-from-memory-btn" class="text-sm text-blue-400 hover:underline">Chọn từ bộ nhớ</button>
-                             </div>
-                             <textarea id="script-input" rows="10" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Dán toàn bộ nội dung kịch bản..."></textarea>
-                        </div>
-                        <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg space-y-4 border border-gray-600">
-                             <h3 class="text-md font-semibold text-white">Tùy chọn Nâng cao</h3>
-                             <div>
-                                <label for="s2p-task-reference" class="block text-sm font-medium text-gray-300 mb-1">Tham chiếu Giao việc</label>
-                                <select id="s2p-task-reference" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500">
-                                    <option value="">-- Mặc định --</option>
-                                </select>
-                             </div>
-                        </div>
-                        <div class="bg-gray-700 bg-opacity-50 p-4 rounded-lg space-y-4 border border-gray-600">
-                             <h3 class="text-md font-semibold text-white">Tùy chọn phân tách</h3>
-                             <div id="prompt-estimate-container" class="text-xs text-center text-cyan-300 bg-cyan-900 bg-opacity-50 p-2 rounded-md border border-cyan-700 hidden">
-                                 <p>Kịch bản này ước tính tạo ra khoảng <span id="prompt-estimate" class="font-bold">0</span> prompt.</p>
-                             </div>
-                             <fieldset>
-                                <div class="space-y-2">
-                                    <label class="flex items-center text-sm">
-                                        <input type="radio" name="prompt-breakdown" value="auto" class="form-radio bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500" checked>
-                                        <span class="ml-2">Tự động (8 giây / prompt)</span>
-                                    </label>
-                                    <label class="flex items-center text-sm">
-                                        <input type="radio" name="prompt-breakdown" value="manual" class="form-radio bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500">
-                                        <span class="ml-2">Theo số lượng cụ thể:</span>
-                                    </label>
-                                </div>
-                             </fieldset>
-                             <input type="number" id="prompt-count-input" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 hidden" placeholder="Nhập số lượng prompt">
-                        </div>
-                        <div class="flex-grow"></div>
-                        <button id="generate-prompts-from-script-btn" class="action-button w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105">Phân tích & Tạo Prompts</button>
-                    </div>
-                </div>
-
-                <div class="lg:w-2/3 bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700">
-                     <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-3">
-                        <h2 class="text-2xl font-semibold text-white">Prompts được tạo</h2>
-                         <button id="save-all-prompts-btn" class="hidden bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-300 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
-                            Lưu tất cả
-                        </button>
-                    </div>
-                     <div id="prompts-from-script-output" class="space-y-3 h-full overflow-y-auto pr-2 max-h-[70vh]">
-                         <div class="text-center text-gray-500 pt-16">
-                            <svg class="mx-auto h-12 w-12 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0h9.75"></path></svg>
-                             <h3 class="mt-2 text-sm font-semibold text-gray-400">Chưa có prompt</h3>
-                             <p class="mt-1 text-sm text-gray-500">Dán kịch bản và nhấn nút để bắt đầu phân tích.</p>
-                           </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="text-to-voice-panel" class="hidden">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col gap-6">
-                    <h2 class="text-2xl font-semibold text-white border-b border-gray-600 pb-3">Chuyển Văn bản thành Giọng nói</h2>
-                    
-                    <div class="bg-gray-900 border border-dashed border-gray-600 p-4 rounded-lg">
-                        <h4 class="font-semibold text-blue-400 mb-2">Hướng dẫn (Instruction)</h4>
-                        <p class="text-xs text-gray-400">Bạn có thể điều khiển giọng điệu bằng cách thêm chỉ dẫn vào trong văn bản. Ví dụ:</p>
-                        <code class="block bg-gray-700 p-2 rounded-md mt-2 text-xs text-gray-300 whitespace-pre-wrap">Nói một cách vui vẻ: Chào mừng bạn đến với thế giới AI!</code>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label for="tts-input" class="block text-sm font-medium text-gray-300">Nhập văn bản:</label>
-                            <button id="select-script-for-tts-btn" class="text-sm text-blue-400 hover:underline">Chọn từ kịch bản đã lưu</button>
-                        </div>
-                        <textarea id="tts-input" rows="8" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Nhập văn bản bạn muốn chuyển thành giọng nói ở đây..."></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Chọn Giọng đọc</label>
-                        <div id="tts-voice-list" class="space-y-2 max-h-60 overflow-y-auto p-2 bg-gray-900 rounded-md">
-                            <!-- Voice items will be populated by JS -->
-                        </div>
-                    </div>
-                    
-                    <button id="generate-voice-btn" class="action-button w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-sm transition duration-300 transform hover:scale-105">Tạo Âm thanh</button>
-
-                    <div id="tts-output" class="mt-4">
-                        <div id="tts-placeholder" class="text-center text-gray-500 py-8">
-                            <svg class="mx-auto h-12 w-12 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
-                            <p class="mt-2 text-sm text-gray-500">Âm thanh sẽ xuất hiện ở đây.</p>
-                        </div>
-                        <audio id="tts-audio-player" controls class="w-full hidden"></audio>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Floating Action Buttons -->
-    <div class="fixed bottom-6 right-6 flex flex-col gap-4 z-40">
-        <a href="https://aistudio.google.com/apps/drive/1YP-eclWct6_PCFOcarNEYGHHfs0vF2Se" target="_blank" class="bg-gray-700 hover:bg-red-600 text-white p-4 rounded-full shadow-lg transition-colors transform hover:scale-110" title="AI Studio">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,110.34l-80-80a8,8,0,0,0-11.32,0l-80,80a8,8,0,0,0,0,11.32l80,80a8,8,0,0,0,11.32,0l80-80a8,8,0,0,0,0-11.32ZM128,198.67L59.31,128,128,59.31,196.69,128Z"></path></svg>
-        </a>
-        <a href="https://labs.google/fx/tools/whisk/project" target="_blank" class="bg-gray-700 hover:bg-orange-500 text-white p-4 rounded-full shadow-lg transition-colors transform hover:scale-110" title="Google FX">
-             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm48-88a48,48,0,1,1-48-48A48.05,48.05,0,0,1,176,128Z"></path></svg>
-        </a>
-        <button id="expander-hub-btn" class="bg-gray-700 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Kho Mở Rộng Prompt Video">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm.22-4.12a.5.5 0 0 1 .706 0l.707.707a.5.5 0 0 1 0 .708l-2.829 2.828a.5.5 0 0 1-.707 0L1.707 6.707a.5.5 0 0 1 0-.708l.707-.707a.5.5 0 0 1 .707 0zM12.293 1.293a.5.5 0 0 1 .707 0l2.293 2.293a.5.5 0 0 1 0 .707l-2.293 2.293a.5.5 0 0 1-.707-.707L13.586 4 12.293 2.707a.5.5 0 0 1 0-.707zM11.5 6a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-2.293 4.293a.5.5 0 0 1 .707 0L12.207 12l-1.293 1.293a.5.5 0 0 1-.707-.707L11.207 12l-1-1a.5.5 0 0 1 0-.707z"/></svg>
-        </button>
-        <button id="task-hub-btn" class="bg-gray-700 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Bộ nhớ Giao việc">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+<body class="bg-gray-900 text-white p-8">
+    <!-- Nút điều khiển ở góc trên bên phải -->
+    <div class="fixed top-8 right-8 z-20 flex flex-col space-y-2">
+        <button id="api-key-btn" title="Cài đặt" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734 1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38 1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
         </button>
-        <button id="storyboard-hub-btn" class="bg-gray-700 hover:bg-green-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Kho Phân Cảnh">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M16 3.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1 0-1h13a.5.5 0 0 1 .5.5zM.5 7a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1H.5zm0 4a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1H.5z"></path><path d="M4.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 1 0v-13a.5.5 0 0 0-.5-.5zm5 0a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 1 0v-13a.5.5 0 0 0-.5-.5z"></path></svg>
-        </button>
-        <button id="prompt-library-btn" class="bg-gray-700 hover:bg-yellow-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Kho lưu trữ Prompt">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path></svg>
-        </button>
-        <button id="memory-hub-btn" class="bg-gray-700 hover:bg-indigo-600 text-white p-4 rounded-full shadow-lg transition-colors transform hover:scale-110" title="Bộ nhớ Trung tâm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 5.627A4.49 4.49 0 0 1 4.965 1.132a.5.5 0 0 1 .07.992A3.49 3.49 0 0 0 1.5 5.7a.5.5 0 0 1-.992-.073zm15 0a.5.5 0 0 1-.992.073A3.49 3.49 0 0 0 11.035 2.124a.5.5 0 0 1 .07-.992A4.49 4.49 0 0 1 15.5 5.627zM12.94 6.06a.5.5 0 0 1 .68.143A6.49 6.49 0 0 1 16 11.5a.5.5 0 0 1-1 0A5.49 5.49 0 0 0 12.44 6.2a.5.5 0 0 1 .5-.14zM3.06 6.06a.5.5 0 0 1 .5.14A5.49 5.49 0 0 0 1 11.5a.5.5 0 1 1-1 0A6.49 6.49 0 0 1 2.38 6.2a.5.5 0 0 1 .68-.14zM8 1.49a1 1 0 0 1 1 1V3a1 1 0 0 1-2 0V2.49a1 1 0 0 1 1-1zM4.002 4.4a1 1 0 0 1 1.393-.26l.5.25a1 1 0 0 1 .555 1.254l-.25.5a1 1 0 0 1-1.254.555l-.5-.25a1 1 0 0 1-.26-1.393l.261-.523zm7.996 0a1 1 0 0 1 .26 1.393l-.25.5a1 1 0 0 1-1.254-.555l-.5-.25a1 1 0 0 1 .555-1.254l.5-.25a1 1 0 0 1 1.393.26z"/><path d="M12.5 11.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path></svg>
-        </button>
-        <button id="scenario-hub-btn" class="bg-gray-700 hover:bg-purple-600 text-white p-4 rounded-full shadow-lg z-50 transition-colors transform hover:scale-110" title="Bộ nhớ Kịch bản">
-             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-film" viewBox="0 0 16 16"><path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm4 0v6h8V1H4zm8 8H4v6h8V9zM1 1v2h2V1H1zm2 3H1v2h2V4zm-2 3H1v2h2V7zm2 3H1v2h2v-2zm-2 3H1v2h2v-2zM15 1h-2v2h2V1zm-2 3h2v2h-2V4zm2 3h-2v2h2V7zm-2 3h2v2h-2v-2zm2 3h-2v2h2v-2z"></path></svg>
+        <button id="prompts-library-btn" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+               <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" />
+            </svg>
         </button>
     </div>
 
-    <!-- Memory Modal Template -->
-    <div id="memory-modal-template" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl border border-gray-600 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center p-4 border-b border-gray-700 flex-shrink-0">
-                <h3 class="memory-modal-title text-lg font-bold text-white">Quản lý Bộ nhớ</h3>
-                <button class="memory-modal-close-btn text-gray-400 hover:text-white">&times;</button>
-            </div>
-            <div class="flex-grow flex min-h-0">
-                <div class="w-1/3 border-r border-gray-700 flex flex-col">
-                    <div class="memory-modal-list p-2 flex-grow overflow-y-auto"></div>
-                    <div class="p-2 border-t border-gray-700 flex gap-2">
-                        <button class="memory-modal-add-btn w-full p-2 text-sm bg-gray-700 hover:bg-green-600 transition rounded-md">Thêm mới</button>
-                        <button class="memory-modal-export-pdf-btn w-full p-2 text-sm bg-gray-700 hover:bg-blue-600 transition rounded-md">Xuất PDF</button>
-                    </div>
-                </div>
-                <div class="memory-modal-editor w-2/3 p-4 overflow-y-auto space-y-3">
-                    <div class="space-y-2 flex flex-col h-full">
-                        <div>
-                            <label class="text-xs font-bold">Tiêu đề</label>
-                            <input type="text" name="title" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-sm mt-1">
-                        </div>
-                        <div class="flex-grow flex flex-col">
-                            <label class="text-xs font-bold">Nội dung</label>
-                            <textarea name="content" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-sm mt-1 flex-grow" placeholder="Nhập hoặc dán nội dung tại đây..."></textarea>
-                        </div>
-                    </div>
-                    <p class="memory-item-status text-xs text-green-400 mt-2 h-4"></p>
-                    <button class="save-memory-item-btn mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition" disabled>Lưu thay đổi</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <header class="text-center my-8">
+        <h1 class="text-4xl font-bold tracking-wider uppercase">AN PRODUCTION AI FILMS - STORY BROAD</h1>
+    </header>
     
-    <!-- Setup Modal -->
-    <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full border border-gray-700">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
-                <h3 class="text-xl font-bold text-white">Cài đặt</h3>
-                <button id="close-setup-modal" class="text-gray-400 hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                    </svg>
+    <div class="flex space-x-8">
+        <!-- Left Sidebar with Buttons -->
+        <aside class="w-64 flex-shrink-0">
+            <div class="flex flex-col space-y-4">
+                <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
+                    Tạo kịch bản
+                </button>
+                <button id="create-segment-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
+                    Tạo phân đoạn
+                </button>
+                <button id="create-prompts-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
+                    Tạo PROMPTS
                 </button>
             </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow">
+            <!-- Script Creation Form (Hidden by default) -->
+            <div id="script-form-container" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-6">Tạo kịch bản mới</h2>
+                <form id="script-form" class="space-y-4">
+                    <div>
+                        <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt</label>
+                        <textarea id="script-idea" rows="5" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="script-input-type" class="block text-sm font-medium text-gray-300">Đầu vào kịch bản (từ bộ nhớ)</label>
+                            <select id="script-input-type" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="script-style" class="block text-sm font-medium text-gray-300">Phong cách</label>
+                            <select id="script-style" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                                <option value="" disabled selected>Chọn phong cách</option>
+                                <option>Hài hước</option>
+                                <option>Chính kịch</option>
+                                <option>Hành động</option>
+                                <option>Kinh dị</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="script-duration" class="block text-sm font-medium text-gray-300">Thời lượng</label>
+                             <select id="script-duration" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                                <option value="1">1 phút</option>
+                                <option value="10">10 phút</option>
+                                <option value="60">60 phút</option>
+                                <option value="custom">Tùy chỉnh...</option>
+                            </select>
+                            <input type="number" id="script-duration-custom" placeholder="Nhập số phút" class="hidden mt-2 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Tạo</button>
+                    </div>
+                </form>
+            </div>
             
-            <div class="space-y-4">
-                <div>
-                    <label for="setup-model-selector" class="block text-sm font-medium text-gray-300 mb-2">Model AI mặc định</label>
-                    <select id="setup-model-selector" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="gemini-2.5-pro-preview-05-20">Gemini 2.5 Pro (Mới & Mạnh nhất)</option>
-                        <option value="gemini-2.5-flash-preview-05-20">Gemini 2.5 Flash (Mới & Nhanh)</option>
-                        <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro</option>
-                        <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label for="setup-api-key" class="block text-sm font-medium text-gray-300 mb-2">
-                        API Key (Gemini) 
-                        <a href="https://aistudio.google.com/apikey" target="_blank" class="text-blue-400 hover:text-blue-300 ml-1 text-xs">
-                            (Lấy API key tại đây)
-                        </a>
-                    </label>
-                    <div class="relative">
-                        <input type="password" id="setup-api-key" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Nhập API key của bạn">
-                        <button id="toggle-api-key" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="eye-icon" viewBox="0 0 16 16">
-                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                            </svg>
-                        </button>
+            <!-- Script Memory Container (Hidden by default) -->
+            <div id="script-memory-container" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-6">Đầu vào kịch bản</h2>
+                <div class="flex space-x-6">
+                    <!-- Script List -->
+                    <div class="w-1/3 border-r border-gray-700 pr-6">
+                        <button id="new-script-btn" class="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Kịch bản mới</button>
+                        <div id="script-list" class="space-y-2 overflow-y-auto max-h-[60vh]">
+                            <!-- Saved scripts will be listed here -->
+                        </div>
+                    </div>
+                    <!-- Script Editor -->
+                    <div class="w-2/3">
+                        <form id="script-memory-form" class="space-y-4">
+                            <input type="hidden" id="script-memory-id">
+                            <div>
+                                <label for="script-memory-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                                <input type="text" id="script-memory-title" placeholder="Nhập tiêu đề cho kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label for="script-memory-input" class="block text-sm font-medium text-gray-300">Nội dung kịch bản</label>
+                                <textarea id="script-memory-input" rows="10" placeholder="Dán hoặc nhập kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500"></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-3 pt-2">
+                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                                <button type="button" id="copy-script-memory-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
+                                <button type="button" id="export-script-memory-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                
-                <div class="pt-4 flex justify-end">
-                    <button id="save-setup" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
-                        Lưu cài đặt
-                    </button>
-                </div>
             </div>
+
+            <!-- API Key Container (Hidden by default) -->
+            <div id="api-key-container" class="hidden bg-gray-800 p-6 rounded-lg max-w-lg mx-auto">
+                <h2 class="text-2xl font-bold mb-6">Cài đặt</h2>
+                <form id="api-key-form" class="space-y-4">
+                    <div>
+                        <label for="api-key-input" class="block text-sm font-medium text-gray-300">
+                            API Key của bạn
+                             <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a>
+                        </label>
+                        <div class="relative mt-1">
+                            <input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10">
+                            <button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white">
+                                <!-- Eye Icon SVG will be injected here -->
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
+                        <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                            <option value="gemini-2.5-flash">gemini Flash 2.5</option>
+                            <option value="gpt-4">GPT-4</option>
+                            <option value="claude-3">Claude 3</option>
+                        </select>
+                    </div>
+                     <div class="flex justify-end space-x-4 pt-4">
+                        <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button>
+                    </div>
+                </form>
+            </div>
+            
+             <!-- Prompts Library Container (Hidden by default) -->
+             <div id="prompts-library-container" class="hidden bg-gray-800 p-6 rounded-lg">
+                 <h2 class="text-2xl font-bold mb-6">Thư viện PROMPTS</h2>
+                 <p class="text-center text-gray-400">Khu vực này sẽ chứa Thư viện PROMPTS.</p>
+             </div>
+
+
+             <!-- Other containers will go here -->
+        </main>
+    </div>
+
+    <!-- Nút bộ nhớ ở góc dưới bên trái -->
+    <div class="fixed bottom-8 left-8">
+        <div class="flex flex-col space-y-4">
+            <button id="script-memory-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg">
+                Đầu vào kịch bản
+            </button>
+            <button id="segment-memory-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg">
+                Bộ nhớ phân đoạn
+            </button>
         </div>
     </div>
 
-    <div id="toast-notification" class="fixed bottom-8 right-8 bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg z-50 transition-transform duration-300 transform translate-y-20 opacity-0">
-        <!-- Toast message -->
-    </div>
-
-    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm border border-red-500">
-            <h3 class="text-lg font-bold text-red-400">Lỗi</h3>
-            <p id="error-message" class="text-gray-300 mt-2 text-sm"></p>
-            <button onclick="document.getElementById('error-modal').classList.add('hidden')" class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Đóng</button>
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Xác nhận xóa</h2>
+            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa kịch bản này không? Hành động này không thể hoàn tác.</p>
+            <div class="flex justify-end space-x-4">
+                <button type="button" id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
+                <button type="button" id="confirm-delete-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md">Xóa</button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Elements ---
-            const setupBtn = document.getElementById('setup-btn');
-            const setupModal = document.getElementById('setup-modal');
-            const saveSetupBtn = document.getElementById('save-setup');
-            const setupModelSelector = document.getElementById('setup-model-selector');
-            const setupApiKeyInput = document.getElementById('setup-api-key');
+            const createScriptBtn = document.getElementById('create-script-btn');
+            const scriptFormContainer = document.getElementById('script-form-container');
+            const scriptMemoryBtn = document.getElementById('script-memory-btn');
+            const scriptMemoryContainer = document.getElementById('script-memory-container');
+            const apiKeyBtn = document.getElementById('api-key-btn');
+            const apiKeyContainer = document.getElementById('api-key-container');
+            const promptsLibraryBtn = document.getElementById('prompts-library-btn');
+            const promptsLibraryContainer = document.getElementById('prompts-library-container');
 
-            // --- TAB SWITCHING (Updated) ---
-            const tabStoryboard = document.getElementById('tab-storyboard');
-            const tabScript = document.getElementById('tab-script');
-            const tabScriptToPrompt = document.getElementById('tab-script-to-prompt');
-            const tabTextToVoice = document.getElementById('tab-text-to-voice'); // New tab button
 
-            const storyboardPanel = document.getElementById('storyboard-generator-panel');
-            const scriptPanel = document.getElementById('script-generator-panel');
-            const scriptToPromptPanel = document.getElementById('script-to-prompt-panel');
-            const textToVoicePanel = document.getElementById('text-to-voice-panel'); // New panel
-
-            function switchTab(activeTab, activePanel) {
-                [tabStoryboard, tabScript, tabScriptToPrompt, tabTextToVoice].forEach(tab => tab.classList.remove('active'));
-                [storyboardPanel, scriptPanel, scriptToPromptPanel, textToVoicePanel].forEach(panel => panel.classList.add('hidden'));
-                activeTab.classList.add('active');
-                activePanel.classList.remove('hidden');
-                 if (activeTab === tabScript) {
-                    populateTaskDropdown();
-                }
-            }
-
-            tabStoryboard.addEventListener('click', () => switchTab(tabStoryboard, storyboardPanel));
-            tabScript.addEventListener('click', () => switchTab(tabScript, scriptPanel));
-            tabScriptToPrompt.addEventListener('click', () => switchTab(tabScriptToPrompt, scriptToPromptPanel));
-            tabTextToVoice.addEventListener('click', () => switchTab(tabTextToVoice, textToVoicePanel)); // Event for new tab
-
-            // --- SETUP MODAL LOGIC ---
-            function initSetupModal() {
-                setupBtn.addEventListener('click', () => {
-                    setupModal.classList.remove('hidden');
-                    setupModal.classList.add('flex');
-                });
-                document.getElementById('close-setup-modal').addEventListener('click', () => {
-                    setupModal.classList.add('hidden');
-                    setupModal.classList.remove('flex');
-                });
-                 document.getElementById('toggle-api-key').addEventListener('click', () => {
-                    const apiKeyInput = document.getElementById('setup-api-key');
-                    apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
-                });
-
-                saveSetupBtn.addEventListener('click', () => {
-                    const selectedModel = setupModelSelector.value;
-                    localStorage.setItem('gemini_model', selectedModel);
-                    localStorage.setItem('gemini_api_key', setupApiKeyInput.value.trim());
-                    
-                    showToast('Đã lưu cài đặt thành công!');
-                    setupModal.classList.add('hidden');
-                    setupModal.classList.remove('flex');
-                });
-
-                const savedModel = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
-                setupModelSelector.value = savedModel;
-                setupApiKeyInput.value = localStorage.getItem('gemini_api_key') || '';
-            }
+            const scriptForm = document.getElementById('script-form');
+            const scriptInputType = document.getElementById('script-input-type');
+            const scriptIdea = document.getElementById('script-idea');
+            const scriptDuration = document.getElementById('script-duration');
+            const scriptDurationCustom = document.getElementById('script-duration-custom');
             
-            // --- STORYBOARD GENERATOR LOGIC ---
-            const generateBtn = document.getElementById('generate-btn');
-            const refinementPrompt = document.getElementById('refinement-prompt');
-            const storyboardOutput = document.getElementById('storyboard-output');
-            const noTextCheckbox = document.getElementById('no-text-checkbox');
-            const noMontageCheckbox = document.getElementById('no-montage-checkbox');
-            const storyboardTaskReference = document.getElementById('storyboard-task-reference');
+            // --- Script Memory Elements ---
+            const scriptList = document.getElementById('script-list');
+            const newScriptBtn = document.getElementById('new-script-btn');
+            const scriptMemoryForm = document.getElementById('script-memory-form');
+            const scriptMemoryId = document.getElementById('script-memory-id');
+            const scriptMemoryTitle = document.getElementById('script-memory-title');
+            const scriptMemoryInput = document.getElementById('script-memory-input');
+            const copyScriptMemoryBtn = document.getElementById('copy-script-memory-btn');
+            const exportScriptMemoryBtn = document.getElementById('export-script-memory-btn');
 
-            async function handleGenerateStoryboard() {
-                const description = refinementPrompt.value.trim();
-                if (!description) return showError("Vui lòng nhập mô tả cảnh quay.");
+            // --- API Key Elements ---
+            const apiKeyForm = document.getElementById('api-key-form');
+            const apiKeyInput = document.getElementById('api-key-input');
+            const toggleApiKeyVisibilityBtn = document.getElementById('toggle-api-key-visibility');
+            const aiModelSelect = document.getElementById('ai-model-select');
+            const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C3.732 4.943 7.523 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-7.523 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`;
+            const eyeOffIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 8.517 16.635 7.412 14.722 6.708l-1.414-1.414A10.009 10.009 0 0010 3C7.523 3 5.268 4.943 2.458 10a11.97 11.97 0 003.876 3.655l-2.227-2.228a1 1 0 00-1.414-1.414L.293 8.293a1 1 0 000 1.414l2 2a1 1 0 001.414 0l1.293-1.293A8.003 8.003 0 0110 7a8 8 0 012.828.532l1.432-1.432A9.98 9.98 0 0010 5c-2.477 0-4.732 1.943-7.542 7 .57 1.1 1.254 2.063 2.07 2.912l-1.42-1.42a1 1 0 00-1.414-1.414L.293 15.707a1 1 0 001.414 1.414l14-14a1 1 0 00-1.414-1.414L3.707 2.293z" clip-rule="evenodd" /><path d="M10.707 10.293a1 1 0 10-1.414-1.414 1 1 0 001.414 1.414z" /></svg>`;
 
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                if (!apiKey) {
-                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
-                    setupModal.classList.remove('hidden');
-                    setupModal.classList.add('flex');
-                    return;
-                }
-                
-                setupUIForLoading(generateBtn, storyboardOutput);
-
-                const systemPrompt = "Bạn là một trợ lý sản xuất phim AI chuyên nghiệp. Dựa vào mô tả cảnh, hãy tạo ra một bảng phân cảnh chi tiết. Luôn trả về một đối tượng JSON DUY NHẤT chứa khóa 'sceneBreakdown' với các mục con sau: 'sceneInfo', 'backgroundPrompt', 'backgroundPromptVietnamese', 'characterPrompt', 'characterPromptVietnamese', 'seedImagePrompt', 'seedImagePromptVietnamese', 'videoPrompt', 'videoPromptVietnamese', 'dialogue'. Các prompt phải bằng tiếng Anh, và các bản dịch phải bằng tiếng Việt.";
-                
-                let negativeRules = [];
-                if (noTextCheckbox.checked) negativeRules.push("no text");
-                if (noMontageCheckbox.checked) negativeRules.push("no montage");
-                
-                const taskRefId = storyboardTaskReference.value;
-                let taskRefContent = '';
-                if (taskRefId) {
-                    const task = memories.task.items.find(t => t.id == taskRefId);
-                    if (task) {
-                        taskRefContent = `QUAN TRỌNG: Hãy tuân thủ nghiêm ngặt các quy tắc và định dạng được mô tả trong phần giao việc sau đây khi tạo kết quả:\n---\n${task.content}\n---\n\n`;
-                    }
-                }
-
-                let userQuery = `${taskRefContent}Mô tả cảnh: """${description}"""`;
-                if(negativeRules.length > 0) {
-                    userQuery += `\n\nQuy tắc không: ${negativeRules.join(', ')}`;
-                }
-                
-                try {
-                    const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
-                    const responseText = await callGeminiAPI(userQuery, systemPrompt, apiKey, model, true); // Force JSON
-                    const data = JSON.parse(responseText);
-
-                    if (!data.sceneBreakdown) {
-                        throw new Error("Dữ liệu JSON từ AI không chứa khóa 'sceneBreakdown' cần thiết.");
-                    }
-                    renderStoryboard(data.sceneBreakdown);
-                } catch (error) {
-                    handleApiError(error, storyboardOutput);
-                } finally {
-                    tearDownUIAfterLoading(generateBtn);
-                }
-            }
-
-            generateBtn.addEventListener('click', handleGenerateStoryboard);
-            document.getElementById('clear-btn').addEventListener('click', () => { 
-                refinementPrompt.value = ''; 
-                storyboardOutput.innerHTML = `<div id="storyboard-placeholder" class="text-center text-gray-500 py-16">
-                             <svg class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2z" /></svg>
-                             <h3 class="mt-2 text-sm font-semibold text-gray-400">Chưa có phân cảnh</h3>
-                             <p class="mt-1 text-sm text-gray-500">Nhập mô tả cảnh quay và nhấn nút để bắt đầu.</p>
-                           </div>`;
-                 document.getElementById('save-all-storyboard-prompts-btn').classList.add('hidden');
-                 document.getElementById('generate-all-images-btn').classList.add('hidden');
-            });
-
-            function renderStoryboard(data) {
-                const placeholder = document.getElementById('storyboard-placeholder');
-                if(placeholder) placeholder.classList.add('hidden');
-                
-                const content = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div class="bg-gray-700 p-4 rounded-lg border border-gray-600"><h3 class="text-md font-semibold text-blue-400 mb-2">Thông tin cảnh</h3><p class="text-sm text-gray-300 font-mono">${escapeHtml(data.sceneInfo)}</p></div>
-                         <div class="bg-gray-700 p-4 rounded-lg border border-gray-600"><h3 class="text-md font-semibold text-blue-400 mb-2">Lời thoại</h3><p class="text-sm text-gray-300 italic">"${escapeHtml(data.dialogue)}"</p></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${createStoryboardCard('Bối cảnh (Background)', data.backgroundPrompt, data.backgroundPromptVietnamese)}
-                        ${createStoryboardCard('Nhân vật (Character)', data.characterPrompt, data.characterPromptVietnamese)}
-                        ${createStoryboardCard('Ảnh mồi (Seed Image)', data.seedImagePrompt, data.seedImagePromptVietnamese)}
-                        ${createStoryboardCard('Video 8s', data.videoPrompt, data.videoPromptVietnamese)}
-                    </div>
-                   `;
-                storyboardOutput.innerHTML = content;
-                document.getElementById('save-all-storyboard-prompts-btn').classList.remove('hidden');
-                document.getElementById('generate-all-images-btn').classList.remove('hidden');
-                
-                try {
-                    const newStoryboard = {
-                        id: Date.now(),
-                        title: (data.sceneInfo || 'Phân cảnh không tên').substring(0, 50) + (data.sceneInfo && data.sceneInfo.length > 50 ? '...' : ''),
-                        content: JSON.stringify(data) 
-                    };
-                    if (!memories.storyboard.items.some(item => item.content === newStoryboard.content)) {
-                        memories.storyboard.items.unshift(newStoryboard);
-                        saveAllMemory();
-                        showToast('Đã tự động sao lưu phân cảnh vào kho!');
-                    }
-                } catch (e) {
-                    console.error("Lỗi khi tự động sao lưu phân cảnh:", e);
-                }
-
-                storyboardOutput.querySelectorAll('.copy-btn, .translate-button, .generate-image-btn, .expand-prompt-btn, .revert-prompt-btn').forEach(btn => {
-                   btn.addEventListener('click', async (e) => {
-                        const currentBtn = e.currentTarget;
-                        const card = currentBtn.closest('.prompt-card');
-
-                       if (currentBtn.classList.contains('copy-btn')) {
-                            const textToCopy = card.querySelector('.prompt-expanded.hidden') 
-                                ? card.querySelector('.prompt-en').textContent
-                                : card.querySelector('.prompt-expanded p').textContent;
-                            navigator.clipboard.writeText(textToCopy).then(() => {
-                                showToast(`Đã sao chép: "${textToCopy.substring(0, 30)}..."`);
-                            });
-                       } else if (currentBtn.classList.contains('generate-image-btn')) {
-                            const prompt = card.querySelector('.prompt-expanded.hidden') 
-                                ? card.querySelector('.prompt-en').textContent
-                                : card.querySelector('.prompt-expanded p').textContent;
-                            handleGenerateImage(prompt, card, currentBtn);
-                       } else if (currentBtn.classList.contains('expand-prompt-btn')) {
-                            isSelectingExpander.card = card;
-                            document.getElementById('expander-hub-btn').click();
-                       } else if (currentBtn.classList.contains('revert-prompt-btn')) {
-                            card.querySelector('.prompt-expanded').classList.add('hidden');
-                            card.querySelector('.prompt-en').classList.remove('hidden');
-                            currentBtn.classList.add('hidden');
-                            card.querySelector('.expand-prompt-btn').classList.remove('hidden');
-                            showToast('Đã quay về prompt gốc.');
-                        } else if(currentBtn.classList.contains('translate-button')) {
-                            const promptContent = card.querySelector('.prompt-expanded.hidden') 
-                                ? card.querySelector('.prompt-en').textContent
-                                : card.querySelector('.prompt-expanded p').textContent;
-                            const promptEnContainer = card.querySelector('.prompt-en').parentElement;
-                            const promptVnContainer = card.querySelector('.prompt-vn');
-                            const promptVnEl = promptVnContainer.querySelector('p');
-                            
-                            if (promptEnContainer.style.display !== 'none') { // Currently showing EN or Expanded
-                                try {
-                                    currentBtn.textContent = 'Đang dịch...';
-                                    currentBtn.disabled = true;
-                                    const translatedText = await getTranslation(promptContent);
-                                    promptVnEl.textContent = translatedText;
-                                    promptEnContainer.style.display = 'none';
-                                    promptVnContainer.classList.remove('hidden');
-                                    currentBtn.textContent = 'Gốc';
-                                } catch (err) {
-                                    showError("Lỗi dịch: " + err.message);
-                                    currentBtn.textContent = 'Dịch';
-                                } finally {
-                                    currentBtn.disabled = false;
-                                }
-                            } else { // Currently showing VN
-                                promptVnContainer.classList.add('hidden');
-                                promptEnContainer.style.display = 'block';
-                                currentBtn.textContent = 'Dịch';
-                            }
-                       }
-                   });
-                });
-            }
+            // --- Delete Modal Elements ---
+            const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             
-            const saveAllStoryboardPromptsBtn = document.getElementById('save-all-storyboard-prompts-btn');
-            saveAllStoryboardPromptsBtn.addEventListener('click', () => {
-                const allPromptElements = storyboardOutput.querySelectorAll('.prompt-en');
-                 if(allPromptElements.length === 0) {
-                    showToast('Không có prompt nào để lưu.');
-                    return;
-                }
-                let savedCount = 0;
-                allPromptElements.forEach((el, index) => {
-                    const promptText = el.textContent;
-                    if (promptText && promptText !== 'N/A' && !memories.prompt.items.some(item => item.content === promptText)) {
-                         const newPromptItem = {
-                            id: Date.now() + index, 
-                            title: promptText.substring(0, 40) + (promptText.length > 40 ? '...' : ''),
-                            content: promptText
-                        };
-                        memories.prompt.items.unshift(newPromptItem);
-                        savedCount++;
-                    }
-                });
+            let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+            let apiKey = localStorage.getItem('apiKey') || '';
+            let aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash';
+            let scriptIdToDelete = null;
 
-                if (savedCount > 0) {
-                    saveAllMemory();
-                    showToast(`Đã lưu ${savedCount} prompt mới từ phân cảnh vào kho!`);
-                } else {
-                    showToast('Tất cả các prompt từ phân cảnh này đã có trong kho.');
-                }
-            });
-
-
-            function createStoryboardCard(title, englishPrompt, vietnamesePrompt) {
-                 const isVideoCard = title === 'Video 8s';
-                 const expanderButtons = isVideoCard 
-                    ? `<div class="video-card-actions flex items-center gap-1.5">
-                         <button class="expand-prompt-btn text-xs font-medium py-1 px-3 rounded-full transition bg-purple-600 hover:bg-purple-500" title="Mở rộng prompt video">Mở rộng</button>
-                         <button class="revert-prompt-btn hidden text-xs font-medium py-1 px-3 rounded-full transition bg-orange-600 hover:bg-orange-500" title="Quay về prompt gốc">Về gốc</button>
-                       </div>` 
-                    : '';
-
-                 return `<div class="prompt-card bg-gray-700 p-4 rounded-lg border border-gray-600 flex flex-col" 
-                              data-prompt-base="${escapeHtml(englishPrompt || '')}" 
-                              data-translation-base="${escapeHtml(vietnamesePrompt || '')}">
-                    <div class="image-container bg-gray-900 rounded-md h-48 flex items-center justify-center mb-3 border border-dashed border-gray-600 relative">
-                        <div class="image-placeholder text-center text-gray-500">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="mx-auto" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM15 5a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5z"/></svg>
-                           <p class="text-xs mt-1">Ảnh sẽ hiện ở đây</p>
-                        </div>
-                        <div class="image-loading-spinner absolute w-8 h-8 rounded-full border-4 animate-spin hidden"></div>
-                        <img class="generated-image hidden w-full h-full object-cover rounded-md" src="" alt="Generated Image">
-                    </div>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-md font-semibold text-blue-400">${title}</h3>
-                        <div class="flex items-center gap-1.5 flex-wrap justify-end">
-                            ${expanderButtons}
-                            <button class="generate-image-btn text-xs font-medium py-1 px-3 rounded-full transition bg-cyan-600 hover:bg-cyan-500" data-prompt="${escapeHtml(englishPrompt || '')}">Tạo ảnh</button>
-                            <button class="translate-button text-xs font-medium py-1 px-3 rounded-full transition bg-gray-600 hover:bg-gray-500">Dịch</button>
-                            <button class="copy-btn text-xs font-medium py-1 px-3 rounded-full transition bg-blue-600 hover:bg-blue-500" data-text="${escapeHtml(englishPrompt || '')}">Copy</button>
-                        </div>
-                    </div>
-                    <div class="text-container flex-grow relative">
-                        <div style="display: block;">
-                            <p class="prompt-en text-sm text-gray-300">${escapeHtml(englishPrompt || 'N/A')}</p>
-                            <div class="prompt-expanded hidden mt-2 border-t border-purple-400 border-dashed pt-2">
-                                <p class="text-sm text-purple-300"></p>
-                            </div>
-                        </div>
-                        <div class="prompt-vn hidden">
-                            <p class="text-sm text-green-300">${escapeHtml(vietnamesePrompt || 'N/A')}</p>
-                        </div>
-                    </div>
-                </div>`;
+            function hideAllContainers() {
+                scriptFormContainer.classList.add('hidden');
+                scriptMemoryContainer.classList.add('hidden');
+                apiKeyContainer.classList.add('hidden');
+                promptsLibraryContainer.classList.add('hidden');
+                // Add other containers here in the future
             }
 
-            // --- SCRIPT GENERATOR LOGIC ---
-            const generateScriptBtn = document.getElementById('generate-script-btn');
-            const scriptOutput = document.getElementById('script-output');
-            const copyScriptBtn = document.getElementById('copy-script-btn');
-            const sendScriptToAnalyzerBtn = document.getElementById('send-script-to-analyzer-btn');
-            const saveScriptBtn = document.getElementById('save-script-btn');
-            const exportScriptPdfBtn = document.getElementById('export-script-pdf-btn');
-            const taskSelector = document.getElementById('task-selector');
-            const scriptTaskDescriptionTextarea = document.getElementById('script-characters');
-
-            function populateTaskDropdown() {
-                const savedValue = taskSelector.value;
-                taskSelector.innerHTML = '<option value="">-- Chọn công việc --</option>';
-                memories.task.items.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.title;
-                    taskSelector.appendChild(option);
-                });
-                taskSelector.value = savedValue;
+            // --- Settings Functions ---
+            function saveSettings() {
+                localStorage.setItem('apiKey', apiKey);
+                localStorage.setItem('aiModel', aiModel);
             }
 
-            taskSelector.addEventListener('change', () => {
-                const selectedId = parseInt(taskSelector.value);
-                if (!selectedId) return;
-
-                const task = memories.task.items.find(item => item.id === selectedId);
-                if (task) {
-                    scriptTaskDescriptionTextarea.value += (scriptTaskDescriptionTextarea.value ? '\n\n' : '') + task.content;
-                    taskSelector.value = ''; // Reset dropdown after selection
-                    showToast(`Đã thêm công việc: ${task.title}`);
-                }
-            });
-            
-            async function handleGenerateScript() {
-                const idea = document.getElementById('script-idea').value.trim();
-                if (!idea) return showError("Vui lòng nhập ít nhất ý tưởng chính cho kịch bản.");
-
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                 if (!apiKey) {
-                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
-                    setupModal.classList.remove('hidden');
-                    setupModal.classList.add('flex');
-                    return;
-                }
-
-                setupUIForLoading(generateScriptBtn, scriptOutput);
-                
-                const taskDescription = scriptTaskDescriptionTextarea.value.trim();
-                const style = document.getElementById('script-style').value.trim();
-                const duration = document.getElementById('script-notes').value.trim();
-                const activeMemory = memories.central.items.find(item => item.id === memories.central.activeId);
-                const activeScenario = memories.scenario.items.find(item => item.id === memories.scenario.activeId);
-
-
-                const systemPrompt = "Bạn là một nhà biên kịch AI tài năng. Dựa vào thông tin người dùng cung cấp, hãy viết một kịch bản theo định dạng tiêu chuẩn (INT./EXT., TÊN NHÂN VẬT, HÀNH ĐỘNG, LỜI THOẠI).";
-                let userQuery = `
-                    Hãy viết một kịch bản hoàn chỉnh dựa trên các thông tin sau:
-                    - Ý tưởng chính / Tóm tắt: ${idea}
-                    - Mô tả công việc: ${taskDescription || "Không có mô tả cụ thể"}
-                    - Phong cách: ${style || "Không có mô tả cụ thể"}
-                    - Thời lượng: ${duration || 'Không có'}`;
-                
-                if (activeMemory && activeMemory.content) {
-                    userQuery = `Sử dụng bối cảnh trung tâm sau đây làm nền tảng cho câu chuyện:\n---\n${activeMemory.content}\n---\n\n` + userQuery;
-                }
-                 if (activeScenario && activeScenario.content) {
-                    userQuery = `Học hỏi phong cách và cấu trúc từ kịch bản tham chiếu sau:\n---\n${activeScenario.content}\n---\n\n` + userQuery;
-                }
-                
-                try {
-                    const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
-                    const responseText = await callGeminiAPI(userQuery, systemPrompt, apiKey, model);
-                    
-                    const formattedResponse = escapeHtml(responseText).replace(/\n/g, '<br>');
-                    scriptOutput.innerHTML = `<div class="bg-gray-900 p-4 rounded-lg text-gray-300 text-sm leading-relaxed whitespace-pre-wrap font-mono">${formattedResponse}</div>`;
-                    copyScriptBtn.classList.remove('hidden');
-                    sendScriptToAnalyzerBtn.classList.remove('hidden');
-                    saveScriptBtn.classList.remove('hidden');
-                    exportScriptPdfBtn.classList.remove('hidden');
-                } catch (error) {
-                    handleApiError(error, scriptOutput);
-                } finally {
-                    tearDownUIAfterLoading(generateScriptBtn);
-                }
+            function renderSettingsDisplay() {
+                apiKeyInput.value = apiKey;
+                apiKeyInput.type = 'password';
+                toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
+                aiModelSelect.value = aiModel;
             }
 
-            generateScriptBtn.addEventListener('click', handleGenerateScript);
-            
-            copyScriptBtn.addEventListener('click', () => {
-                const scriptText = scriptOutput.querySelector('div').innerText;
-                navigator.clipboard.writeText(scriptText).then(() => {
-                    showToast('Đã sao chép kịch bản!');
-                });
-            });
-
-            sendScriptToAnalyzerBtn.addEventListener('click', () => {
-                const scriptText = scriptOutput.querySelector('div')?.innerText;
-                if (!scriptText) {
-                    showError("Không tìm thấy nội dung kịch bản để phân tích.");
-                    return;
-                }
-                const scriptInputForAnalysis = document.getElementById('script-input');
-                scriptInputForAnalysis.value = scriptText;
-                switchTab(tabScriptToPrompt, scriptToPromptPanel);
-                scriptInputForAnalysis.focus();
-                scriptInputForAnalysis.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                showToast('Đã chuyển kịch bản qua để phân tích!');
-            });
-
-            saveScriptBtn.addEventListener('click', () => {
-                const scriptText = scriptOutput.querySelector('div')?.innerText;
-                const idea = document.getElementById('script-idea').value.trim();
-                if (!scriptText) {
-                    showError("Không có kịch bản để lưu.");
-                    return;
-                }
-                const newScenario = {
-                    id: Date.now(),
-                    title: (idea || "Kịch bản không tên").substring(0, 50),
-                    content: scriptText
-                };
-                memories.scenario.items.unshift(newScenario);
-                saveAllMemory();
-                showToast(`Đã lưu kịch bản "${newScenario.title}"!`);
-            });
-
-            exportScriptPdfBtn.addEventListener('click', () => {
-                const scriptText = scriptOutput.querySelector('div')?.innerText;
-                const idea = document.getElementById('script-idea').value.trim();
-                 if (!scriptText) {
-                    showError("Không có kịch bản để xuất PDF.");
-                    return;
-                }
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const title = (idea || "Kịch bản không tên").substring(0, 50);
-                
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(18);
-                doc.text(title, 105, 20, { align: 'center' });
-                
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(10);
-                const contentLines = doc.splitTextToSize(scriptText, 180);
-                doc.text(contentLines, 15, 35);
-
-                doc.save(`${title.replace(/ /g, "_")}.pdf`);
-                showToast('Đã xuất PDF thành công!');
-            });
-
-            // --- MEMORY HUB LOGIC ---
-            const memoryHubBtn = document.getElementById('memory-hub-btn');
-            const scenarioHubBtn = document.getElementById('scenario-hub-btn');
-            const memoryModalTemplate = document.getElementById('memory-modal-template');
-            
-            let currentlyEditingMemory = { type: null, id: null };
-            let isSelectingScriptForPrompt = false;
-            let isSelectingExpander = { card: null };
-            let isSelectingScriptForTTS = false;
-
-
-            function setupMemoryModal(config) {
-                const modal = memoryModalTemplate.cloneNode(true);
-                modal.id = config.modalId;
-                document.body.appendChild(modal);
-
-                const titleEl = modal.querySelector('.memory-modal-title');
-                const listEl = modal.querySelector('.memory-modal-list');
-                const editorEl = modal.querySelector('.memory-modal-editor');
-                const addBtn = modal.querySelector('.memory-modal-add-btn');
-                const exportPdfBtn = modal.querySelector('.memory-modal-export-pdf-btn');
-                const closeBtn = modal.querySelector('.memory-modal-close-btn');
-                const saveBtn = editorEl.querySelector('.save-memory-item-btn');
-
-                titleEl.textContent = config.title;
-
-                const renderList = () => {
-                    listEl.innerHTML = '';
-                    const items = memories[config.type].items;
-                    if (items.length === 0) {
-                        listEl.innerHTML = `<p class="p-4 text-xs text-center text-gray-500">Chưa có mục nào.</p>`;
-                    }
-                    items.forEach(item => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'memory-item flex justify-between items-center p-2 rounded-md cursor-pointer transition-colors text-sm';
-                        itemEl.dataset.id = item.id;
-                        if(item.id === memories[config.type].activeId && config.type !== 'expander') itemEl.classList.add('active');
-                        itemEl.innerHTML = `<span class="truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span><button class="delete-memory-item-btn text-gray-500 hover:text-red-400 text-xs flex-shrink-0 ml-2">&#x2715;</button>`;
-                        listEl.appendChild(itemEl);
-                    });
-                    if (config.type === 'task') {
-                        populateTaskReferenceDropdowns();
-                    }
-                };
-                
-                const populateEditor = (item) => {
-                    const titleInput = editorEl.querySelector('input[name="title"]');
-                    const contentTextarea = editorEl.querySelector('textarea[name="content"]');
-                    if (!item) {
-                        titleInput.value = '';
-                        contentTextarea.value = '';
-                        currentlyEditingMemory = { type: null, id: null };
-                        saveBtn.disabled = true;
-                        return;
-                    }
-                    saveBtn.disabled = false;
-                    currentlyEditingMemory = { type: config.type, id: item.id };
-                    titleInput.value = item.title;
-                    contentTextarea.value = item.content;
-                };
-                
-                listEl.addEventListener('click', e => {
-                    const itemEl = e.target.closest('.memory-item');
-                    if (!itemEl) return;
-                    
-                    const id = parseInt(itemEl.dataset.id);
-
-                    if (e.target.closest('.delete-memory-item-btn')) {
-                        memories[config.type].items = memories[config.type].items.filter(i => i.id !== id);
-                        if(memories[config.type].activeId === id) memories[config.type].activeId = null;
-                        if(currentlyEditingMemory.id === id) populateEditor(null);
-                        saveAllMemory();
-                        renderList();
-                        return;
-                    }
-
-                    if (config.type === 'expander' && isSelectingExpander.card) {
-                        const expanderItem = memories.expander.items.find(i => i.id === id);
-                        if (expanderItem) {
-                            const card = isSelectingExpander.card;
-                            const promptEnContainer = card.querySelector('.prompt-en').parentElement;
-                            const promptExpandedContainer = card.querySelector('.prompt-expanded');
-                            const promptExpandedEl = promptExpandedContainer.querySelector('p');
-                            
-                            const basePrompt = card.dataset.promptBase;
-                            const newPrompt = basePrompt + (expanderItem.content.startsWith(',') ? '' : ', ') + expanderItem.content;
-                            
-                            promptExpandedEl.textContent = newPrompt;
-
-                            promptEnContainer.style.display = 'block';
-                            card.querySelector('.prompt-en').classList.add('hidden');
-                            promptExpandedContainer.classList.remove('hidden');
-
-                            card.querySelector('.revert-prompt-btn').classList.remove('hidden');
-                            card.querySelector('.expand-prompt-btn').classList.add('hidden');
-                            card.querySelector('.translate-button').textContent = 'Dịch';
-                            card.querySelector('.prompt-vn').classList.add('hidden');
-
-                            showToast(`Đã áp dụng Mở rộng: "${expanderItem.title}"`);
-                            modal.classList.add('hidden');
-                            isSelectingExpander = { card: null };
-                        }
-                        return;
-                    }
-                    
-                    if (config.type === 'scenario' && (isSelectingScriptForPrompt || isSelectingScriptForTTS)) {
-                        const item = memories[config.type].items.find(i => i.id === id);
-                        if (item) {
-                            if (isSelectingScriptForPrompt) {
-                                document.getElementById('script-input').value = item.content;
-                                scriptInput.dispatchEvent(new Event('input')); // Trigger estimate
-                                switchTab(tabScriptToPrompt, scriptToPromptPanel);
-                            }
-                            if (isSelectingScriptForTTS) {
-                                document.getElementById('tts-input').value = item.content;
-                                switchTab(tabTextToVoice, textToVoicePanel);
-                            }
-                        }
-                        modal.classList.add('hidden');
-                        isSelectingScriptForPrompt = false;
-                        isSelectingScriptForTTS = false;
-                    } else if (config.type === 'storyboard') {
-                         const item = memories[config.type].items.find(i => i.id === id);
-                        if (item && item.content) {
-                            try {
-                                const storyboardData = JSON.parse(item.content);
-                                renderStoryboard(storyboardData.sceneBreakdown || storyboardData);
-                                switchTab(tabStoryboard, storyboardPanel);
-                                showToast(`Đã tải phân cảnh "${item.title}"`);
-                                modal.classList.add('hidden');
-                            } catch (err) {
-                                showError("Không thể tải dữ liệu phân cảnh. Dữ liệu có thể đã bị hỏng.");
-                                console.error("Lỗi parse JSON phân cảnh:", err);
-                            }
-                        }
-                    } else {
-                        memories[config.type].activeId = id;
-                        saveAllMemory();
-                        document.querySelectorAll(`#${config.modalId} .memory-item.active`).forEach(el => el.classList.remove('active'));
-                        itemEl.classList.add('active');
-                        populateEditor(memories[config.type].items.find(i => i.id === id));
-                    }
-                });
-
-                addBtn.addEventListener('click', () => {
-                    const newItem = { id: Date.now(), title: `Mục mới #${memories[config.type].items.length + 1}`, content: '' };
-                    memories[config.type].items.unshift(newItem);
-                    populateEditor(newItem);
-                    saveAllMemory();
-                    renderList();
-                    const titleInput = editorEl.querySelector('input[name="title"]');
-                    if (titleInput) {
-                        titleInput.focus();
-                        titleInput.select();
-                    }
-                });
-
-                exportPdfBtn.addEventListener('click', () => handleExportPdf(config));
-                
-                saveBtn.addEventListener('click', () => {
-                    if(!currentlyEditingMemory.id || currentlyEditingMemory.type !== config.type) return;
-                    
-                    const items = memories[config.type].items;
-                    const itemIndex = items.findIndex(i => i.id === currentlyEditingMemory.id);
-                    if(itemIndex === -1) return;
-                    
-                    const titleInput = editorEl.querySelector('input[name="title"]');
-                    const newTitle = titleInput.value.trim();
-
-                    if(newTitle === '') {
-                        const statusEl = editorEl.querySelector('.memory-item-status');
-                        statusEl.textContent = 'Tiêu đề không được để trống!';
-                        statusEl.className = 'memory-item-status text-xs text-red-400 mt-2 h-4';
-                        setTimeout(() => {
-                           statusEl.textContent = '';
-                           statusEl.className = 'memory-item-status text-xs text-green-400 mt-2 h-4';
-                        }, 2000);
-                        return;
-                    }
-
-                    const contentTextarea = editorEl.querySelector('textarea[name="content"]');
-                    items[itemIndex].title = newTitle;
-                    
-                    if(config.type !== 'storyboard') {
-                        items[itemIndex].content = contentTextarea.value;
-                    }
-                    
-                    saveAllMemory();
-                    
-                    const itemEl = listEl.querySelector(`.memory-item[data-id="${currentlyEditingMemory.id}"] span`);
-                    if (itemEl) {
-                        itemEl.textContent = newTitle;
-                        itemEl.title = newTitle;
-                    }
-
-                    const statusEl = editorEl.querySelector('.memory-item-status');
-                    statusEl.textContent = 'Đã lưu!';
-                    statusEl.className = 'memory-item-status text-xs text-green-400 mt-2 h-4';
-                    setTimeout(() => statusEl.textContent = '', 2000);
-                });
-
-                document.getElementById(config.triggerId).addEventListener('click', () => {
-                    renderList();
-                    const itemToEdit = memories[config.type].items.find(i => i.id === currentlyEditingMemory.id);
-                    const contentArea = editorEl.querySelector('textarea[name="content"]');
-                    if (config.type === 'storyboard') {
-                        contentArea.value = `Nội dung phân cảnh không thể chỉnh sửa trực tiếp tại đây. Vui lòng chọn từ danh sách để xem lại.`;
-                        contentArea.readOnly = true;
-                    } else if (itemToEdit){
-                        contentArea.readOnly = false;
-                    }
-                    populateEditor(itemToEdit);
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                });
-                closeBtn.addEventListener('click', () => {
-                    modal.classList.add('hidden');
-                    isSelectingScriptForPrompt = false;
-                    isSelectingExpander = { card: null };
-                    isSelectingScriptForTTS = false;
-                });
-                modal.addEventListener('click', (e) => { 
-                    if (e.target === modal) {
-                         modal.classList.add('hidden');
-                         isSelectingScriptForPrompt = false;
-                         isSelectingExpander = { card: null };
-                         isSelectingScriptForTTS = false;
-                    }
-                });
+            // --- Script Memory Functions ---
+            function saveScriptsToStorage() {
+                localStorage.setItem('scripts', JSON.stringify(scripts));
             }
 
-            // --- ALL MEMORY DATA ---
-            const memories = {};
-            const memoryTypes = ['central', 'scenario', 'prompt', 'storyboard', 'task', 'expander'];
-
-            function loadAllMemory() {
-                memoryTypes.forEach(type => {
-                    memories[type] = {
-                        items: JSON.parse(localStorage.getItem(`${type}_memory_items`) || '[]'),
-                        activeId: JSON.parse(localStorage.getItem(`active_${type}_memory_id`) || 'null')
-                    };
-                });
-            }
-
-            function saveAllMemory() {
-                 memoryTypes.forEach(type => {
-                    localStorage.setItem(`${type}_memory_items`, JSON.stringify(memories[type].items));
-                    localStorage.setItem(`active_${type}_memory_id`, JSON.stringify(memories[type].activeId));
-                });
-            }
-
-
-            // SCRIPT TO PROMPT LOGIC
-            const generatePromptsFromScriptBtn = document.getElementById('generate-prompts-from-script-btn');
-            const scriptInput = document.getElementById('script-input');
-            const promptsFromScriptOutput = document.getElementById('prompts-from-script-output');
-            const promptCountInput = document.getElementById('prompt-count-input');
-            const breakdownRadios = document.querySelectorAll('input[name="prompt-breakdown"]');
-            const selectScriptFromMemoryBtn = document.getElementById('select-script-from-memory-btn');
-            const promptEstimateContainer = document.getElementById('prompt-estimate-container');
-            const promptEstimateSpan = document.getElementById('prompt-estimate');
-            const s2pTaskReference = document.getElementById('s2p-task-reference');
-
-
-            selectScriptFromMemoryBtn.addEventListener('click', () => {
-                isSelectingScriptForPrompt = true;
-                scenarioHubBtn.click();
-            });
-
-            breakdownRadios.forEach(radio => {
-                radio.addEventListener('change', () => {
-                    promptCountInput.classList.toggle('hidden', radio.value !== 'manual');
-                });
-            });
-            
-            scriptInput.addEventListener('input', () => {
-                const text = scriptInput.value.trim();
-                if (text.length > 0) {
-                    const wordCount = text.split(/\s+/).filter(Boolean).length;
-                    const estimatedSeconds = wordCount / 2.5; // Approx 150 WPM
-                    const estimatedPrompts = Math.ceil(estimatedSeconds / 8);
-                    promptEstimateSpan.textContent = estimatedPrompts;
-                    promptEstimateContainer.classList.remove('hidden');
-                } else {
-                    promptEstimateContainer.classList.add('hidden');
-                }
-            });
-
-
-            async function handleGeneratePromptsFromScript() {
-                const script = scriptInput.value.trim();
-                const breakdownMode = document.querySelector('input[name="prompt-breakdown"]:checked').value;
-                const promptCount = promptCountInput.value.trim();
-
-                if (!script) return showError("Vui lòng dán kịch bản vào ô nhập liệu.");
-                if (breakdownMode === 'manual' && !promptCount) return showError("Vui lòng nhập số lượng prompt mong muốn.");
-
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                if (!apiKey) {
-                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
-                    setupModal.classList.remove('hidden');
-                    setupModal.classList.add('flex');
-                    return;
-                }
-
-                setupUIForLoading(generatePromptsFromScriptBtn, promptsFromScriptOutput);
-
-                const systemPrompt = `Bạn là một trợ lý đạo diễn AI chuyên nghiệp. Nhiệm vụ của bạn là đọc một kịch bản và chia nó thành một chuỗi các prompt hình ảnh/video riêng biệt. Mỗi prompt phải là một mô tả hình ảnh rõ ràng, súc tích, nắm bắt được một hành động hoặc một khoảnh khắc quan trọng. Chỉ trả về một đối tượng JSON DUY NHẤT có dạng: {"prompts": ["prompt 1", "prompt 2", ...]}`;
-                
-                const taskRefId = s2pTaskReference.value;
-                let taskRefContent = '';
-                if (taskRefId) {
-                    const task = memories.task.items.find(t => t.id == taskRefId);
-                    if (task) {
-                        taskRefContent = `Hãy tuân thủ các quy tắc và phong cách được mô tả trong phần giao việc sau đây khi phân tách kịch bản:\n---\n${task.content}\n---\n\n`;
-                    }
-                }
-
-                let breakdownInstruction = (breakdownMode === 'auto')
-                    ? "Hãy tự động phân tách kịch bản thành các prompt, ước tính mỗi prompt tương đương khoảng 8 giây video. Đảm bảo dòng chảy câu chuyện được liền mạch."
-                    : `Hãy phân tách kịch bản thành chính xác ${promptCount} prompt. Phân bổ nội dung câu chuyện một cách hợp lý qua các prompt này.`;
-
-                const userQuery = `${taskRefContent}Kịch bản cần phân tích:\n"""\n${script}\n"""\n\n---\nYêu cầu phân tách:\n${breakdownInstruction}`;
-
-                try {
-                    const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
-                    const responseText = await callGeminiAPI(userQuery, systemPrompt, apiKey, model, true);
-                    const data = JSON.parse(responseText);
-
-                    renderPromptsFromScript(data.prompts);
-                } catch (error) {
-                    handleApiError(error, promptsFromScriptOutput);
-                } finally {
-                    tearDownUIAfterLoading(generatePromptsFromScriptBtn);
-                }
-            }
-            
-            function renderPromptsFromScript(prompts) {
-                const saveAllBtn = document.getElementById('save-all-prompts-btn');
-                promptsFromScriptOutput.innerHTML = '';
-                if (!prompts || prompts.length === 0) {
-                     promptsFromScriptOutput.innerHTML = '<p class="text-center text-xs text-gray-500 p-4">Không thể tạo prompt từ kịch bản này.</p>';
-                     saveAllBtn.classList.add('hidden');
-                     return;
-                }
-                saveAllBtn.classList.remove('hidden');
-
-                prompts.forEach((prompt, index) => {
-                    const promptEl = document.createElement('div');
-                    promptEl.className = 'bg-gray-700 p-4 rounded-lg flex items-start gap-4';
-                    promptEl.innerHTML = `
-                        <span class="font-bold text-blue-400">${index + 1}.</span>
-                        <p class="text-sm text-gray-300 flex-grow">${escapeHtml(prompt)}</p>
-                        <div class="flex flex-col gap-2 flex-shrink-0">
-                            <button class="copy-s2p-prompt-btn text-gray-400 hover:text-green-400" title="Sao chép" data-text="${escapeHtml(prompt)}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3z"/></svg>
-                            </button>
-                            <button class="use-s2p-prompt-btn text-gray-400 hover:text-blue-400" title="Chuyển đến Phân cảnh" data-text="${escapeHtml(prompt)}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 0 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/></svg>
-                            </button>
-                            <button class="save-s2p-prompt-btn text-gray-400 hover:text-yellow-400" title="Lưu prompt" data-text="${escapeHtml(prompt)}">
-                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.72-2.58a.5.5 0 0 1 .56 0L13 14.566V2a1 1 0 0 0-1-1H4z"/></svg>
-                            </button>
-                        </div>
-                    `;
-                    promptsFromScriptOutput.appendChild(promptEl);
-                });
-
-                promptsFromScriptOutput.querySelectorAll('.copy-s2p-prompt-btn, .use-s2p-prompt-btn, .save-s2p-prompt-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const button = e.currentTarget;
-                        const promptText = button.dataset.text;
-                        if (button.classList.contains('copy-s2p-prompt-btn')) {
-                            navigator.clipboard.writeText(promptText);
-                            showToast('Đã sao chép prompt!');
-                        } else if (button.classList.contains('use-s2p-prompt-btn')) {
-                            refinementPrompt.value = promptText;
-                            switchTab(tabStoryboard, storyboardPanel);
-                            refinementPrompt.focus();
-                            refinementPrompt.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            showToast('Đã chuyển prompt đến mục Tạo Phân Cảnh!');
-                        } else if (button.classList.contains('save-s2p-prompt-btn')) {
-                            const newPromptItem = {
-                                id: Date.now(),
-                                title: promptText.substring(0, 40) + (promptText.length > 40 ? '...' : ''),
-                                content: promptText
-                            };
-                            memories.prompt.items.unshift(newPromptItem);
-                            saveAllMemory();
-                            showToast('Đã lưu prompt vào kho!');
-                        }
-                    });
-                });
-            }
-
-            const saveAllPromptsBtn = document.getElementById('save-all-prompts-btn');
-            saveAllPromptsBtn.addEventListener('click', () => {
-                const allPromptElements = promptsFromScriptOutput.querySelectorAll('.save-s2p-prompt-btn');
-                if(allPromptElements.length === 0) {
-                    showToast('Không có prompt nào để lưu.');
-                    return;
-                }
-                let savedCount = 0;
-                allPromptElements.forEach((btn, index) => {
-                    const promptText = btn.dataset.text;
-                    if (!memories.prompt.items.some(item => item.content === promptText)) {
-                        const newPromptItem = {
-                            id: Date.now() + index,
-                            title: promptText.substring(0, 40) + (promptText.length > 40 ? '...' : ''),
-                            content: promptText
-                        };
-                        memories.prompt.items.unshift(newPromptItem);
-                        savedCount++;
-                    }
-                });
-
-                if (savedCount > 0) {
-                    saveAllMemory();
-                    showToast(`Đã lưu ${savedCount} prompt mới vào kho!`);
-                } else {
-                    showToast('Tất cả các prompt đã có trong kho.');
-                }
-            });
-
-
-            generatePromptsFromScriptBtn.addEventListener('click', handleGeneratePromptsFromScript);
-            
-            // --- TEXT TO SPEECH (TTS) LOGIC (New Section) ---
-            const ttsInput = document.getElementById('tts-input');
-            const ttsVoiceList = document.getElementById('tts-voice-list');
-            const generateVoiceBtn = document.getElementById('generate-voice-btn');
-            const ttsOutput = document.getElementById('tts-output');
-            const ttsAudioPlayer = document.getElementById('tts-audio-player');
-            const ttsPlaceholder = document.getElementById('tts-placeholder');
-            const selectScriptForTTSBtn = document.getElementById('select-script-for-tts-btn');
-            
-            const voices = [
-                { name: 'Zephyr', description: 'Tươi sáng' }, { name: 'Puck', description: 'Sôi nổi' },
-                { name: 'Charon', description: 'Truyền cảm' }, { name: 'Kore', description: 'Chắc chắn' },
-                { name: 'Fenrir', description: 'Hào hứng' }, { name: 'Leda', description: 'Trẻ trung' },
-                { name: 'Orus', description: 'Chắc chắn' }, { name: 'Aoede', description: 'Nhẹ nhàng' },
-                { name: 'Callirrhoe', description: 'Dễ gần' }, { name: 'Autonoe', description: 'Tươi sáng' },
-                { name: 'Enceladus', description: 'Thì thầm' }, { name: 'Iapetus', description: 'Rõ ràng' },
-                { name: 'Umbriel', description: 'Dễ gần' }, { name: 'Algieba', description: 'Mượt mà' },
-                { name: 'Despina', description: 'Mượt mà' }, { name: 'Erinome', description: 'Rõ ràng' },
-                { name: 'Algenib', description: 'Trầm' }, { name: 'Rasalgethi', description: 'Truyền cảm' },
-                { name: 'Laomedeia', description: 'Sôi nổi' }, { name: 'Achernar', description: 'Mềm mại' },
-                { name: 'Alnilam', description: 'Chắc chắn' }, { name: 'Schedar', description: 'Ổn định' },
-                { name: 'Gacrux', description: 'Trưởng thành' }, { name: 'Pulcherrima', description: 'Thẳng thắn' },
-                { name: 'Achird', description: 'Thân thiện' }, { name: 'Zubenelgenubi', description: 'Thân mật' },
-                { name: 'Vindemiatrix', description: 'Nhẹ nhàng' }, { name: 'Sadachbia', description: 'Sống động' },
-                { name: 'Sadaltager', description: 'Tri thức' }, { name: 'Sulafat', description: 'Ấm áp' }
-            ];
-
-            function populateVoices() {
-                ttsVoiceList.innerHTML = '';
-                voices.forEach((voice, index) => {
+            function renderScriptList() {
+                scriptList.innerHTML = '';
+                const currentId = scriptMemoryId.value;
+                scripts.forEach(script => {
                     const item = document.createElement('div');
-                    item.className = 'voice-item flex items-center justify-between p-3 border-2 border-gray-700 rounded-lg transition-colors cursor-pointer';
-                    if (index === 0) item.classList.add('selected');
-
+                    item.className = `w-full text-left p-3 rounded-md transition-colors script-item cursor-pointer ${script.id == currentId ? 'active' : 'hover:bg-gray-700'}`;
+                    item.dataset.id = script.id;
                     item.innerHTML = `
-                        <label for="voice-${voice.name}" class="flex items-center cursor-pointer w-full">
-                            <input type="radio" id="voice-${voice.name}" name="tts-voice" value="${voice.name}" class="form-radio bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 h-4 w-4" ${index === 0 ? 'checked' : ''}>
-                            <span class="ml-3 font-semibold">${voice.name}</span>
-                            <span class="ml-auto text-xs text-gray-400">${voice.description}</span>
-                        </label>
-                        <button class="preview-voice-btn ml-4 p-2 rounded-full hover:bg-gray-600 transition" data-voice="${voice.name}" title="Nghe thử giọng ${voice.name}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="play-icon" viewBox="0 0 16 16"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
-                            <div class="tts-loading-spinner hidden w-4 h-4 rounded-full border-2 animate-spin"></div>
+                        <span class="truncate pointer-events-none">${script.title}</span>
+                        <button class="delete-script-btn text-gray-400 hover:text-red-500 p-1 rounded-full" data-id="${script.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                            </svg>
                         </button>
                     `;
-                    
-                    item.addEventListener('click', (e) => {
-                        if (e.target.closest('.preview-voice-btn')) return;
-                        document.querySelectorAll('.voice-item').forEach(el => el.classList.remove('selected'));
-                        item.classList.add('selected');
-                        item.querySelector('input[type="radio"]').checked = true;
-                    });
+                    scriptList.appendChild(item);
+                });
+            }
+            
+            function clearScriptForm() {
+                scriptMemoryForm.reset();
+                scriptMemoryId.value = '';
+                renderScriptList();
+            }
 
-                    item.querySelector('.preview-voice-btn').addEventListener('click', handlePreviewVoice);
-                    ttsVoiceList.appendChild(item);
+            function loadScriptIntoForm(id) {
+                const script = scripts.find(s => s.id == id);
+                if (script) {
+                    scriptMemoryId.value = script.id;
+                    scriptMemoryTitle.value = script.title;
+                    scriptMemoryInput.value = script.content;
+                }
+                renderScriptList();
+            }
+
+            function openDeleteModal(id) {
+                scriptIdToDelete = id;
+                deleteConfirmModal.classList.remove('hidden');
+            }
+
+            function closeDeleteModal() {
+                scriptIdToDelete = null;
+                deleteConfirmModal.classList.add('hidden');
+            }
+
+            function performDelete() {
+                if (!scriptIdToDelete) return;
+
+                scripts = scripts.filter(s => s.id != scriptIdToDelete);
+                saveScriptsToStorage();
+                
+                if (scriptMemoryId.value == scriptIdToDelete) {
+                    clearScriptForm();
+                } else {
+                    renderScriptList();
+                }
+                
+                closeDeleteModal();
+            }
+            
+            function downloadAsTxt(title, content) {
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const fileName = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50) + '.txt';
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            function populateScriptInputDropdown() {
+                scriptInputType.innerHTML = ''; // Clear existing options
+                
+                const placeholderOption = document.createElement('option');
+                placeholderOption.textContent = 'Chọn từ kịch bản đã lưu...';
+                placeholderOption.value = '';
+                scriptInputType.appendChild(placeholderOption);
+
+                scripts.forEach(script => {
+                    const option = document.createElement('option');
+                    option.value = script.id;
+                    option.textContent = script.title;
+                    scriptInputType.appendChild(option);
                 });
             }
 
-            async function handlePreviewVoice(event) {
-                const button = event.currentTarget;
-                const voiceName = button.dataset.voice;
-                
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                if (!apiKey) {
-                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
-                    return;
-                }
-                
-                const playIcon = button.querySelector('.play-icon');
-                const spinner = button.querySelector('.tts-loading-spinner');
+            // --- Initial Setup ---
+            toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG; // Set initial icon
 
-                playIcon.classList.add('hidden');
-                spinner.classList.remove('hidden');
-                button.disabled = true;
-
-                try {
-                    const audioData = await callTtsAPI("Đây là giọng đọc mẫu của trí tuệ nhân tạo.", voiceName, apiKey);
-                    await playAudioFromData(audioData);
-                } catch (error) {
-                    handleApiError(error);
-                } finally {
-                    playIcon.classList.remove('hidden');
-                    spinner.classList.add('hidden');
-                    button.disabled = false;
-                }
-            }
-
-            selectScriptForTTSBtn.addEventListener('click', () => {
-                isSelectingScriptForTTS = true;
-                scenarioHubBtn.click();
+            // --- Event Listeners ---
+            createScriptBtn.addEventListener('click', () => {
+                hideAllContainers();
+                scriptForm.reset();
+                populateScriptInputDropdown();
+                scriptDurationCustom.classList.add('hidden');
+                scriptFormContainer.classList.remove('hidden');
             });
 
-            async function handleGenerateVoice() {
-                const text = ttsInput.value.trim();
-                const selectedVoiceRadio = document.querySelector('input[name="tts-voice"]:checked');
-                if (!selectedVoiceRadio) return showError("Vui lòng chọn một giọng đọc.");
-                
-                const voice = selectedVoiceRadio.value;
-                if (!text) return showError("Vui lòng nhập văn bản để tạo giọng nói.");
-
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                if (!apiKey) {
-                    showError("Vui lòng nhập API Key trong phần Cài đặt.");
-                    setupModal.classList.remove('hidden');
+            scriptInputType.addEventListener('change', (e) => {
+                const selectedScriptId = e.target.value;
+                if (!selectedScriptId) {
+                    scriptIdea.value = '';
                     return;
-                }
-
-                generateVoiceBtn.disabled = true;
-                generateVoiceBtn.textContent = 'Đang tạo âm thanh...';
-                ttsPlaceholder.innerHTML = `<div class="mx-auto h-8 w-8 rounded-full border-4 border-t-4 border-gray-600 border-t-green-500 animate-spin"></div><p class="mt-4">AI đang tổng hợp giọng nói...</p>`;
-                ttsAudioPlayer.classList.add('hidden');
-
-                try {
-                    const audioData = await callTtsAPI(text, voice, apiKey);
-                    const audioUrl = await convertAudioDataToUrl(audioData);
-                    ttsAudioPlayer.src = audioUrl;
-                    ttsAudioPlayer.classList.remove('hidden');
-                    ttsPlaceholder.classList.add('hidden');
-                } catch (error) {
-                    handleApiError(error, ttsPlaceholder);
-                } finally {
-                    generateVoiceBtn.disabled = false;
-                    generateVoiceBtn.textContent = 'Tạo Âm thanh';
-                }
-            }
-            generateVoiceBtn.addEventListener('click', handleGenerateVoice);
-            
-            async function callTtsAPI(text, voice, apiKey) {
-                 const modelName = 'gemini-2.5-flash-preview-tts';
-                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-                 const payload = {
-                     contents: [{ parts: [{ text: text }] }],
-                     generationConfig: {
-                         responseModalities: ["AUDIO"],
-                         speechConfig: {
-                             voiceConfig: {
-                                 prebuiltVoiceConfig: { voiceName: voice }
-                             }
-                         }
-                     },
-                     model: "gemini-2.5-flash-preview-tts"
-                 };
-                 
-                 const response = await fetch(apiUrl, {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify(payload)
-                 });
-                 if (!response.ok) {
-                     const errorData = await response.json().catch(() => ({}));
-                     throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
-                 }
-                 const result = await response.json();
-                 const part = result?.candidates?.[0]?.content?.parts?.[0];
-                 const audioData = part?.inlineData?.data;
-
-                 if (audioData) {
-                     return audioData;
-                 } else {
-                     throw new Error("Không nhận được dữ liệu âm thanh từ API.");
-                 }
-            }
-            
-            function base64ToArrayBuffer(base64) {
-                const binaryString = window.atob(base64);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                return bytes.buffer;
-            }
-
-            function pcmToWav(pcmData, sampleRate) {
-                const numChannels = 1;
-                const bitsPerSample = 16;
-                const blockAlign = (numChannels * bitsPerSample) / 8;
-                const byteRate = sampleRate * blockAlign;
-                const dataSize = pcmData.length * (bitsPerSample / 8);
-                const buffer = new ArrayBuffer(44 + dataSize);
-                const view = new DataView(buffer);
-
-                /* RIFF identifier */
-                writeString(view, 0, 'RIFF');
-                /* file length */
-                view.setUint32(4, 36 + dataSize, true);
-                /* RIFF type */
-                writeString(view, 8, 'WAVE');
-                /* format chunk identifier */
-                writeString(view, 12, 'fmt ');
-                /* format chunk length */
-                view.setUint32(16, 16, true);
-                /* sample format (raw) */
-                view.setUint16(20, 1, true);
-                /* channel count */
-                view.setUint16(22, numChannels, true);
-                /* sample rate */
-                view.setUint32(24, sampleRate, true);
-                /* byte rate (sample rate * block align) */
-                view.setUint32(28, byteRate, true);
-                /* block align (channel count * bytes per sample) */
-                view.setUint16(32, blockAlign, true);
-                /* bits per sample */
-                view.setUint16(34, bitsPerSample, true);
-                /* data chunk identifier */
-                writeString(view, 36, 'data');
-                /* data chunk length */
-                view.setUint32(40, dataSize, true);
-
-                // Write PCM data
-                let offset = 44;
-                for (let i = 0; i < pcmData.length; i++, offset += 2) {
-                    view.setInt16(offset, pcmData[i], true);
-                }
-
-                return new Blob([view], { type: 'audio/wav' });
-            }
-
-            function writeString(view, offset, string) {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
-                }
-            }
-
-            async function convertAudioDataToUrl(base64Data) {
-                const pcmData = base64ToArrayBuffer(base64Data);
-                const pcm16 = new Int16Array(pcmData);
-                const wavBlob = pcmToWav(pcm16, 24000);
-                return URL.createObjectURL(wavBlob);
-            }
-
-            async function playAudioFromData(base64Data) {
-                const audioUrl = await convertAudioDataToUrl(base64Data);
-                const audio = new Audio(audioUrl);
-                audio.play();
-            }
-
-            // --- GENERIC HELPER FUNCTIONS ---
-            
-            async function getTranslation(textToTranslate) {
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                if (!apiKey) throw new Error("Chưa có API key.");
-                
-                const systemPrompt = "Bạn là một dịch giả chuyên nghiệp. Dịch đoạn văn bản sau từ tiếng Anh sang tiếng Việt. Chỉ trả về phần văn bản đã dịch, không thêm bất kỳ lời giải thích nào.";
-                const model = localStorage.getItem('gemini_model') || 'gemini-2.5-flash-preview-05-20';
-                
-                const translatedText = await callGeminiAPI(textToTranslate, systemPrompt, apiKey, model);
-                return translatedText;
-            }
-
-            async function handleExportPdf(config) {
-                const { type, title } = config;
-                const items = memories[type].items;
-
-                if (items.length === 0) {
-                    showToast(`Không có mục nào trong "${title}" để xuất.`);
-                    return;
-                }
-
-                showToast(`Đang tạo file PDF...`);
-                
-                try {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(18);
-                    doc.text(title, 105, 20, { align: 'center' });
-                    doc.setFontSize(10);
-                    doc.text(`Tạo lúc: ${new Date().toLocaleString('vi-VN')}`, 105, 28, { align: 'center' });
-
-                    let y = 40;
-
-                    for (const item of items) {
-                        if (y > 250) {
-                            doc.addPage();
-                            y = 20;
-                        }
-
-                        doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(12);
-                        const itemTitleLines = doc.splitTextToSize(`[ ${item.title} ]`, 190);
-                        doc.text(itemTitleLines, 10, y);
-                        y += (itemTitleLines.length * 5) + 2;
-
-                        doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(10);
-                        
-                        if (type === 'storyboard') {
-                            try {
-                                const data = JSON.parse(item.content);
-                                const storyboardData = data.sceneBreakdown || data;
-                                const tableBody = [
-                                    ['Thông tin cảnh', storyboardData.sceneInfo || 'N/A'],
-                                    ['Lời thoại', storyboardData.dialogue || 'Không có'],
-                                    ['Prompt Bối cảnh (EN)', storyboardData.backgroundPrompt || 'N/A'],
-                                    ['(Dịch) Prompt Bối cảnh', storyboardData.backgroundPromptVietnamese || 'N/A'],
-                                    ['Prompt Nhân vật (EN)', storyboardData.characterPrompt || 'N/A'],
-                                    ['(Dịch) Prompt Nhân vật', storyboardData.characterPromptVietnamese || 'N/A'],
-                                    ['Prompt Ảnh mồi (EN)', storyboardData.seedImagePrompt || 'N/A'],
-                                    ['(Dịch) Prompt Ảnh mồi', storyboardData.seedImagePromptVietnamese || 'N/A'],
-                                    ['Prompt Video (EN)', storyboardData.videoPrompt || 'N/A'],
-                                    ['(Dịch) Prompt Video', storyboardData.videoPromptVietnamese || 'N/A'],
-                                ];
-
-                                doc.autoTable({
-                                    startY: y,
-                                    head: [['Mục', 'Nội dung']],
-                                    body: tableBody,
-                                    theme: 'grid',
-                                    styles: { cellPadding: 2, fontSize: 9, font: 'helvetica' },
-                                    headStyles: { fillColor: [22, 160, 133], font: 'helvetica' },
-                                });
-                                y = doc.autoTable.previous.finalY + 10;
-                            } catch(e) {
-                                const errorLines = doc.splitTextToSize(`Lỗi parse dữ liệu storyboard: ${item.content}`, 190);
-                                doc.text(errorLines, 10, y);
-                                y += (errorLines.length * 5) + 5;
-                            }
-                        } else {
-                            const contentLines = doc.splitTextToSize(item.content, 190);
-                            doc.text(contentLines, 10, y);
-                            y += (contentLines.length * 5) + 5;
-                        }
-                        
-                        doc.setDrawColor(220, 220, 220);
-                        doc.line(10, y, 200, y);
-                        y += 7;
-                    }
-                    
-                    const pageCount = doc.internal.getNumberOfPages();
-                    for (let i = 1; i <= pageCount; i++) {
-                        doc.setPage(i);
-                        doc.setFontSize(8);
-                        doc.text(`Trang ${i} / ${pageCount}`, 105, 285, { align: 'center' });
-                    }
-
-                    doc.save(`${type}_export_${Date.now()}.pdf`);
-                    showToast('Xuất file PDF thành công!');
-                } catch (err) {
-                    showError(`Lỗi khi tạo PDF: ${err.message}`);
-                    console.error("PDF Export Error:", err);
-                }
-            }
-
-
-            function setupUIForLoading(button, outputContainer) {
-                outputContainer.innerHTML = `<div class="text-center text-gray-400 py-16"><div class="mx-auto h-8 w-8 rounded-full border-4 border-t-4 border-gray-600 border-t-blue-500 animate-spin"></div><p class="mt-4">AI đang xử lý...</p><p class="text-xs text-gray-500 mt-2">Quá trình phân tích phức tạp có thể mất đến 30 giây...</p></div>`;
-                if(copyScriptBtn) {
-                    copyScriptBtn.classList.add('hidden');
-                    sendScriptToAnalyzerBtn.classList.add('hidden');
-                    saveScriptBtn.classList.add('hidden');
-                    exportScriptPdfBtn.classList.add('hidden');
-                }
-                button.disabled = true;
-                button.classList.add('action-button:disabled');
-            }
-             
-            function handleApiError(error, outputContainer) {
-                console.error("Lỗi API:", error);
-                const errorMessage = (error instanceof Error) ? error.message : "Đã xảy ra lỗi không xác định.";
-                showError(errorMessage);
-                if(outputContainer){
-                     outputContainer.innerHTML = `<div class="text-center text-red-400 p-4">${escapeHtml(errorMessage)}</div>`;
-                }
-            }
-
-            function tearDownUIAfterLoading(button) {
-                 button.disabled = false;
-                 button.classList.remove('action-button:disabled');
-            }
-
-            async function callGeminiAPI(userQuery, systemPrompt, apiKey, modelName, forceJson = false) {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
                 };
-                if (forceJson) {
-                    payload.generationConfig = {
-                        responseMimeType: "application/json",
-                    };
-                }
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
-                }
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    let responseText = candidate.content.parts[0].text;
-                    if (forceJson) {
-                         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                         if (jsonMatch) return jsonMatch[0];
-                         throw new Error("Phản hồi không chứa đối tượng JSON hợp lệ.");
-                    }
-                    return responseText;
-                } else {
-                     const finishReason = candidate?.finishReason;
-                     const safetyRatings = candidate?.safetyRatings;
-                     let blockReason = "Phản hồi không hợp lệ từ API.";
-                    if (finishReason === "SAFETY") {
-                         blockReason = safetyRatings?.map(rating => `Nội dung bị chặn do chính sách an toàn: ${rating.category}`).join(', ') || "Nội dung bị chặn do chính sách an toàn.";
-                    }
-                    throw new Error(`Không thể tạo kết quả. Lý do: ${blockReason}.`);
-                }
-            }
-
-            // *** UPDATED: Image Generation Functions ***
-            async function callFlashImageAPI(prompt, apiKey) {
-                const modelName = 'gemini-2.5-flash-image-preview';
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ['IMAGE']
-                    },
-                };
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
-                }
-
-                const result = await response.json();
-                const imagePart = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-                
-                if (imagePart && imagePart.inlineData?.data) {
-                    return imagePart.inlineData.data;
-                } else {
-                    const candidate = result.candidates?.[0];
-                    const finishReason = candidate?.finishReason;
-                     if (finishReason === "SAFETY") {
-                        throw new Error("Hình ảnh không thể tạo do vi phạm chính sách an toàn.");
-                    }
-                    throw new Error("Không nhận được dữ liệu hình ảnh từ API. Phản hồi không hợp lệ.");
-                }
-            }
-            
-            async function handleGenerateImage(prompt, card, button) {
-                const apiKey = localStorage.getItem('gemini_api_key') || '';
-                if (!apiKey) {
-                    showError("Vui lòng nhập API Key trong phần Cài đặt để tạo ảnh.");
-                    setupModal.classList.remove('hidden');
-                    setupModal.classList.add('flex');
-                    return;
-                }
-                if (!prompt || prompt === 'N/A') {
-                    showToast("Prompt không hợp lệ để tạo ảnh.");
-                    return;
-                }
-
-                const imageContainer = card.querySelector('.image-container');
-                const placeholder = imageContainer.querySelector('.image-placeholder');
-                const spinner = imageContainer.querySelector('.image-loading-spinner');
-                const imgEl = imageContainer.querySelector('.generated-image');
-                
-                button.disabled = true;
-                button.textContent = 'Đang tạo...';
-                placeholder.classList.add('hidden');
-                spinner.classList.remove('hidden');
-                imgEl.classList.add('hidden');
-
-                try {
-                    const base64Data = await callFlashImageAPI(prompt, apiKey);
-                    imgEl.src = `data:image/png;base64,${base64Data}`;
-                    imgEl.classList.remove('hidden');
-                } catch (error) {
-                    console.error("Lỗi tạo ảnh:", error);
-                    showError(`Không thể tạo ảnh: ${error.message}`);
-                    placeholder.classList.remove('hidden'); 
-                } finally {
-                    spinner.classList.add('hidden');
-                    button.disabled = false;
-                    button.textContent = 'Tạo ảnh';
-                }
-            }
-
-            document.getElementById('generate-all-images-btn').addEventListener('click', () => {
-                const imageButtons = storyboardOutput.querySelectorAll('.generate-image-btn');
-                if (imageButtons.length > 0) {
-                    showToast(`Bắt đầu tạo ${imageButtons.length} hình ảnh...`);
-                    imageButtons.forEach((btn, index) => {
-                        setTimeout(() => {
-                             if (!btn.disabled) {
-                                btn.click();
-                             }
-                        }, index * 1000); 
-                    });
+                const selectedScript = scripts.find(s => s.id == selectedScriptId);
+                if (selectedScript) {
+                    scriptIdea.value = selectedScript.content;
                 }
             });
 
+            scriptDuration.addEventListener('change', (e) => {
+                if(e.target.value === 'custom') {
+                    scriptDurationCustom.classList.remove('hidden');
+                } else {
+                    scriptDurationCustom.classList.add('hidden');
+                }
+            });
 
-            function showError(message) {
-                const errorModal = document.getElementById('error-modal');
-                document.getElementById('error-message').textContent = message;
-                errorModal.classList.remove('hidden');
-                errorModal.classList.add('flex');
-            }
+            scriptMemoryBtn.addEventListener('click', () => {
+                hideAllContainers();
+                scriptMemoryContainer.classList.remove('hidden');
+                renderScriptList();
+                clearScriptForm();
+            });
+
+             promptsLibraryBtn.addEventListener('click', () => {
+                hideAllContainers();
+                promptsLibraryContainer.classList.remove('hidden');
+            });
+
+            apiKeyBtn.addEventListener('click', () => {
+                hideAllContainers();
+                renderSettingsDisplay();
+                apiKeyContainer.classList.remove('hidden');
+            });
+
+            apiKeyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                apiKey = apiKeyInput.value.trim();
+                aiModel = aiModelSelect.value;
+                saveSettings();
+                renderSettingsDisplay();
+                alert('Đã lưu Cài đặt thành công!');
+                apiKeyContainer.classList.add('hidden');
+            });
+
+            toggleApiKeyVisibilityBtn.addEventListener('click', () => {
+                if (apiKeyInput.type === 'password') {
+                    apiKeyInput.type = 'text';
+                    toggleApiKeyVisibilityBtn.innerHTML = eyeOffIconSVG;
+                } else {
+                    apiKeyInput.type = 'password';
+                    toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
+                }
+            });
+
+            newScriptBtn.addEventListener('click', clearScriptForm);
+
+            scriptList.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-script-btn');
+                const scriptItem = e.target.closest('.script-item');
+                
+                if (deleteBtn) {
+                    openDeleteModal(deleteBtn.dataset.id);
+                } else if (scriptItem) {
+                    loadScriptIntoForm(scriptItem.dataset.id);
+                }
+            });
+
+            scriptMemoryForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = scriptMemoryId.value;
+                const title = scriptMemoryTitle.value;
+                const content = scriptMemoryInput.value;
+                
+                if (id) { // Update existing
+                    const index = scripts.findIndex(s => s.id == id);
+                    if (index > -1) {
+                        scripts[index] = { ...scripts[index], title, content };
+                    }
+                } else { // Create new
+                    const newScript = { id: Date.now(), title, content };
+                    scripts.push(newScript);
+                    scriptMemoryId.value = newScript.id;
+                }
+                saveScriptsToStorage();
+                renderScriptList();
+                alert('Đã lưu kịch bản!');
+            });
             
-            function showToast(message) {
-                const toast = document.getElementById('toast-notification');
-                toast.textContent = message;
-                toast.classList.remove('translate-y-20', 'opacity-0');
-                setTimeout(() => {
-                    toast.classList.add('translate-y-20', 'opacity-0');
-                }, 3000);
-            }
-
-             function escapeHtml(unsafe) {
-                if (typeof unsafe !== 'string') return '';
-                return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-            }
-
-            function populateTaskReferenceDropdowns() {
-                const dropdowns = [storyboardTaskReference, s2pTaskReference];
-                dropdowns.forEach(dropdown => {
-                    if(!dropdown) return;
-                    const savedValue = dropdown.value;
-                    dropdown.innerHTML = '<option value="">-- Mặc định --</option>';
-                    memories.task.items.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id;
-                        option.textContent = item.title;
-                        dropdown.appendChild(option);
-                    });
-                    dropdown.value = savedValue;
+            copyScriptMemoryBtn.addEventListener('click', () => {
+                 const contentToCopy = scriptMemoryInput.value;
+                 if(!contentToCopy) {
+                     alert('Không có nội dung để sao chép.');
+                     return;
+                 }
+                navigator.clipboard.writeText(contentToCopy).then(() => {
+                    alert('Đã sao chép vào clipboard!');
+                }).catch(err => {
+                    alert('Sao chép thất bại!');
                 });
-            }
+            });
 
-            // Initialize the app
-            initSetupModal();
-            loadAllMemory();
-            populateVoices(); // Call this function to fill the dropdown
-            populateTaskReferenceDropdowns();
-            
-            setupMemoryModal({ modalId: 'memory-hub-modal', triggerId: 'memory-hub-btn', title: 'Quản lý Bộ nhớ Trung tâm', type: 'central' });
-            setupMemoryModal({ modalId: 'scenario-hub-modal', triggerId: 'scenario-hub-btn', title: 'Quản lý Bộ nhớ Kịch bản', type: 'scenario' });
-            setupMemoryModal({ modalId: 'prompt-library-modal', triggerId: 'prompt-library-btn', title: 'Kho lưu trữ Prompt', type: 'prompt' });
-            setupMemoryModal({ modalId: 'storyboard-hub-modal', triggerId: 'storyboard-hub-btn', title: 'Kho lưu trữ Phân Cảnh', type: 'storyboard' });
-            setupMemoryModal({ modalId: 'task-hub-modal', triggerId: 'task-hub-btn', title: 'Quản lý Bộ nhớ Giao việc', type: 'task' });
-            setupMemoryModal({ modalId: 'expander-hub-modal', triggerId: 'expander-hub-btn', title: 'Kho Mở Rộng Prompt Video', type: 'expander' });
+            exportScriptMemoryBtn.addEventListener('click', () => {
+                const title = scriptMemoryTitle.value;
+                const content = scriptMemoryInput.value;
+                if (!content) {
+                    alert('Không có nội dung để xuất file.');
+                    return;
+                }
+                downloadAsTxt(title || 'kich_ban_khong_tieu_de', content);
+            });
 
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            confirmDeleteBtn.addEventListener('click', performDelete);
+
+
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.closest('.bg-gray-800').classList.add('hidden');
+                });
+            });
+
+            scriptForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                console.log('Tạo kịch bản...');
+                hideAllContainers();
+            });
         });
     </script>
-
 </body>
 </html>
 

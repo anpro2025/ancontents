@@ -42,11 +42,11 @@
               <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734 1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38 1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
         </button>
-        <button id="prompts-library-btn" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center">
+        <a href="./thu-vien/" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" />
             </svg>
-        </button>
+        </a>
     </div>
 
     <header class="text-center my-8">
@@ -179,13 +179,6 @@
                 </form>
             </div>
             
-             <!-- Prompts Library Container (Hidden by default) -->
-             <div id="prompts-library-container" class="hidden bg-gray-800 p-6 rounded-lg">
-                 <h2 class="text-2xl font-bold mb-6">Thư viện PROMPTS</h2>
-                 <p class="text-center text-gray-400">Khu vực này sẽ chứa Thư viện PROMPTS.</p>
-             </div>
-
-
              <!-- Other containers will go here -->
         </main>
     </div>
@@ -222,9 +215,6 @@
             const scriptMemoryContainer = document.getElementById('script-memory-container');
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
-            const promptsLibraryBtn = document.getElementById('prompts-library-btn');
-            const promptsLibraryContainer = document.getElementById('prompts-library-container');
-
 
             const scriptForm = document.getElementById('script-form');
             const scriptInputType = document.getElementById('script-input-type');
@@ -264,7 +254,6 @@
                 scriptFormContainer.classList.add('hidden');
                 scriptMemoryContainer.classList.add('hidden');
                 apiKeyContainer.classList.add('hidden');
-                promptsLibraryContainer.classList.add('hidden');
                 // Add other containers here in the future
             }
 
@@ -414,11 +403,6 @@
                 clearScriptForm();
             });
 
-             promptsLibraryBtn.addEventListener('click', () => {
-                hideAllContainers();
-                promptsLibraryContainer.classList.remove('hidden');
-            });
-
             apiKeyBtn.addEventListener('click', () => {
                 hideAllContainers();
                 renderSettingsDisplay();
@@ -433,7 +417,7 @@
                 renderSettingsDisplay();
                 alert('Đã lưu Cài đặt thành công!');
                 apiKeyContainer.classList.add('hidden');
-            });
+});
 
             toggleApiKeyVisibilityBtn.addEventListener('click', () => {
                 if (apiKeyInput.type === 'password') {

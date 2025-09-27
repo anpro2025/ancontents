@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư viện PROMPTS & EXPANDER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    
+    <div class="flex space-x-8 h-full">
+        <!-- Left Sidebar -->
+        <div class="flex-shrink-0 w-60">
+            <div class="flex flex-col space-y-4 h-full">
+                <div>
+                    <button id="add-prompt-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
+                        Tạo prompt mới
+                    </button>
+                </div>
+                <div>
+                    <button id="storage-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
+                        Danh bạ lưu trữ
+                    </button>
+                </div>
+                <div class="border-t border-gray-700 my-2"></div>
+                <div>
+                    <button id="expander-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
+                        Tạo EXPANDER
+                    </button>
+                </div>
+                <div>
+                    <button id="expander-storage-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
+                        Lưu trữ EXPANDER
+                    </button>
+                </div>
+                <div class="mt-auto pt-4"> <!-- This will push the back button to the bottom -->
+                     <a href="https://anproduction2025.github.io/ancontents/" class="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300 w-full text-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-grow">
+            <!-- Vùng nhập liệu PROMPT, ẩn mặc định -->
+            <div id="prompt-form-container" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-bold mb-4">Tạo PROMPT mới</h2>
+                <form id="prompt-form" class="space-y-4">
+                    <div>
+                        <label for="prompt-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                        <input type="text" id="prompt-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="prompt-category" class="block text-sm font-medium text-gray-300">Danh bạ</label>
+                        <select id="prompt-category" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                            <option value="Góc máy">Góc máy</option>
+                            <option value="Kiến Trúc">Kiến Trúc</option>
+                            <option value="Trending">Trending</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="prompt-content" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                        <textarea id="prompt-content" rows="8" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-4 pt-2">
+                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Vùng nhập liệu EXPANDER, ẩn mặc định -->
+            <div id="expander-form-container" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-bold mb-4">Tạo EXPANDER mới</h2>
+                <form id="expander-form" class="space-y-4">
+                    <div>
+                        <label for="expander-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                        <input type="text" id="expander-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label for="expander-category" class="block text-sm font-medium text-gray-300">Danh bạ</label>
+                        <select id="expander-category" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
+                            <option value="CINEMATIC">CINEMATIC</option>
+                            <option value="FILM NOIR">FILM NOIR</option>
+                            <option value="ACTION FIGURE">ACTION FIGURE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expander-content" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                        <textarea id="expander-content" rows="8" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-4 pt-2">
+                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Vùng lưu trữ PROMPT, ẩn mặc định -->
+            <div id="storage-container" class="hidden">
+                <h2 class="text-2xl font-bold mb-6">Danh bạ lưu trữ</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-4 text-center">Góc máy</h3>
+                        <div id="category-goc-may" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-4 text-center">Kiến Trúc</h3>
+                        <div id="category-kien-truc" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-4 text-center">Trending</h3>
+                        <div id="category-trending" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vùng lưu trữ EXPANDER, ẩn mặc định -->
+            <div id="expander-storage-container" class="hidden">
+                <h2 class="text-2xl font-bold mb-6">Lưu trữ EXPANDER</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-4 text-center">CINEMATIC</h3>
+                        <div id="category-cinematic" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-4 text-center">FILM NOIR</h3>
+                        <div id="category-film-noir" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-4 text-center">ACTION FIGURE</h3>
+                        <div id="category-action-figure" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Items -->
+    <div id="view-item-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-2xl">
+            <h2 id="view-item-title" class="text-2xl font-bold mb-4"></h2>
+            <div id="view-item-content" class="text-gray-300 bg-gray-700 p-4 rounded-md whitespace-pre-wrap max-h-96 overflow-y-auto"></div>
+            <div class="flex justify-end mt-6 space-x-4">
+                <button id="download-view-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Tải TXT</button>
+                <button id="copy-view-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Copy</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const addPromptBtn = document.getElementById('add-prompt-btn');
+            const storageBtn = document.getElementById('storage-btn');
+            const expanderBtn = document.getElementById('expander-btn');
+            const expanderStorageBtn = document.getElementById('expander-storage-btn');
+            
+            const promptFormContainer = document.getElementById('prompt-form-container');
+            const expanderFormContainer = document.getElementById('expander-form-container');
+            const storageContainer = document.getElementById('storage-container');
+            const expanderStorageContainer = document.getElementById('expander-storage-container');
+
+            const promptForm = document.getElementById('prompt-form');
+            const expanderForm = document.getElementById('expander-form');
+            
+            const viewItemModal = document.getElementById('view-item-modal');
+            const viewItemTitle = document.getElementById('view-item-title');
+            const viewItemContent = document.getElementById('view-item-content');
+            const copyViewBtn = document.getElementById('copy-view-btn');
+            const downloadViewBtn = document.getElementById('download-view-btn');
+
+            // --- State ---
+            let prompts = JSON.parse(localStorage.getItem('prompts')) || [];
+            let expanders = JSON.parse(localStorage.getItem('expanders')) || [];
+            let currentItemInView = null;
+
+            // --- Utility Functions ---
+            function hideAllContainers() {
+                promptFormContainer.classList.add('hidden');
+                storageContainer.classList.add('hidden');
+                expanderFormContainer.classList.add('hidden');
+                expanderStorageContainer.classList.add('hidden');
+            }
+
+            function savePrompts() { localStorage.setItem('prompts', JSON.stringify(prompts)); }
+            function saveExpanders() { localStorage.setItem('expanders', JSON.stringify(expanders)); }
+
+            // --- Rendering ---
+            function renderPromptStorage() {
+                const containers = {
+                    'Góc máy': document.getElementById('category-goc-may'),
+                    'Kiến Trúc': document.getElementById('category-kien-truc'),
+                    'Trending': document.getElementById('category-trending')
+                };
+                Object.values(containers).forEach(c => c.innerHTML = '');
+                
+                prompts.forEach(prompt => {
+                    const card = createCardElement(prompt, 'prompt');
+                    if (containers[prompt.category]) {
+                        containers[prompt.category].appendChild(card);
+                    }
+                });
+            }
+
+            function renderExpanderStorage() {
+                const containers = {
+                    'CINEMATIC': document.getElementById('category-cinematic'),
+                    'FILM NOIR': document.getElementById('category-film-noir'),
+                    'ACTION FIGURE': document.getElementById('category-action-figure')
+                };
+                Object.values(containers).forEach(c => c.innerHTML = '');
+
+                expanders.forEach(expander => {
+                    const card = createCardElement(expander, 'expander');
+                     if (containers[expander.category]) {
+                        containers[expander.category].appendChild(card);
+                    }
+                });
+            }
+
+            function createCardElement(item, type) {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-700 p-3 rounded cursor-pointer hover:bg-gray-600 transition-colors';
+                card.dataset.id = item.id;
+                card.dataset.type = type;
+                let categoryHTML = '';
+                if(item.category) {
+                     categoryHTML = `<span class="inline-block ${type === 'prompt' ? 'bg-blue-600/50 text-blue-300' : 'bg-purple-600/50 text-purple-300'} text-xs font-semibold px-2 py-0.5 rounded-full mb-2">${item.category}</span>`;
+                }
+
+                card.innerHTML = `
+                    ${categoryHTML}
+                    <h4 class="font-semibold pointer-events-none">${item.title}</h4>
+                    <p class="text-sm text-gray-400 truncate pointer-events-none">${item.content}</p>
+                `;
+                return card;
+            }
+
+
+            // --- Modal Logic ---
+            function showItemDetails(itemId, type) {
+                const source = type === 'prompt' ? prompts : expanders;
+                const item = source.find(p => p.id == itemId);
+                if (item) {
+                    currentItemInView = item;
+                    viewItemTitle.textContent = item.title;
+                    viewItemContent.textContent = item.content;
+                    viewItemModal.classList.remove('hidden');
+                }
+            }
+
+            // --- Download and Copy ---
+             function downloadAsTxt(title, content) {
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const fileName = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50) + '.txt';
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            // --- Event Listeners ---
+            addPromptBtn.addEventListener('click', () => {
+                hideAllContainers();
+                promptFormContainer.classList.remove('hidden');
+            });
+            storageBtn.addEventListener('click', () => {
+                hideAllContainers();
+                renderPromptStorage();
+                storageContainer.classList.remove('hidden');
+            });
+            expanderBtn.addEventListener('click', () => {
+                hideAllContainers();
+                expanderFormContainer.classList.remove('hidden');
+            });
+            expanderStorageBtn.addEventListener('click', () => {
+                hideAllContainers();
+                renderExpanderStorage();
+                expanderStorageContainer.classList.remove('hidden');
+            });
+
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.closest('.bg-gray-800').classList.add('hidden');
+                });
+            });
+            
+            viewItemModal.addEventListener('click', (e) => {
+                if (e.target === viewItemModal) viewItemModal.classList.add('hidden');
+            });
+
+            copyViewBtn.addEventListener('click', () => {
+                const contentToCopy = viewItemContent.textContent;
+                const textArea = document.createElement("textarea");
+                textArea.value = contentToCopy;
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyViewBtn.textContent = 'Đã sao chép!';
+                    setTimeout(() => { copyViewBtn.textContent = 'Copy'; }, 2000);
+                } catch (err) { alert('Sao chép thất bại!'); }
+                document.body.removeChild(textArea);
+            });
+
+            downloadViewBtn.addEventListener('click', () => {
+                if (currentItemInView) {
+                    downloadAsTxt(currentItemInView.title, currentItemInView.content);
+                }
+            });
+
+            storageContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('[data-id]');
+                if (card) showItemDetails(card.dataset.id, card.dataset.type);
+            });
+            expanderStorageContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('[data-id]');
+                if (card) showItemDetails(card.dataset.id, card.dataset.type);
+            });
+
+            promptForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newPrompt = {
+                    id: Date.now(),
+                    title: document.getElementById('prompt-title').value,
+                    category: document.getElementById('prompt-category').value,
+                    content: document.getElementById('prompt-content').value,
+                };
+                prompts.push(newPrompt);
+                savePrompts();
+                promptForm.reset();
+                promptFormContainer.classList.add('hidden');
+                alert('Đã lưu prompt thành công!');
+            });
+            
+            expanderForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newExpander = {
+                    id: Date.now(),
+                    title: document.getElementById('expander-title').value,
+                    category: document.getElementById('expander-category').value,
+                    content: document.getElementById('expander-content').value,
+                };
+                expanders.push(newExpander);
+                saveExpanders();
+                expanderForm.reset();
+                expanderFormContainer.classList.add('hidden');
+                alert('Đã lưu EXPANDER thành công!');
+            });
+        });
+    </script>
+</body>
+</html>
+

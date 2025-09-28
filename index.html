@@ -68,7 +68,7 @@
     
     <div class="flex space-x-8">
         <!-- Left Sidebar with Buttons -->
-        <aside class="w-64 flex-shrink-0">
+        <aside id="sidebar" class="w-64 flex-shrink-0">
             <div class="flex flex-col space-y-4">
                 <div class="flex flex-col space-y-2 items-start">
                     <div class="flex space-x-2">
@@ -192,33 +192,35 @@
             </div>
 
             <!-- API Key Container (Hidden by default) -->
-            <div id="api-key-container" class="hidden bg-gray-800 p-6 rounded-lg max-w-lg mx-auto">
-                <h2 class="text-2xl font-bold mb-6">Cài đặt</h2>
-                <form id="api-key-form" class="space-y-4">
-                    <div>
-                        <label for="api-key-input" class="block text-sm font-medium text-gray-300">
-                            API Key của bạn
-                             <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a>
-                        </label>
-                        <div class="relative mt-1">
-                            <input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10">
-                            <button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white">
-                                <!-- Eye Icon SVG will be injected here -->
-                            </button>
+            <div id="api-key-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                 <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full">
+                    <h2 class="text-2xl font-bold mb-6">Cài đặt</h2>
+                    <form id="api-key-form" class="space-y-4">
+                        <div>
+                            <label for="api-key-input" class="block text-sm font-medium text-gray-300">
+                                API Key của bạn
+                                 <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a>
+                            </label>
+                            <div class="relative mt-1">
+                                <input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10">
+                                <button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white">
+                                    <!-- Eye Icon SVG will be injected here -->
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
-                        <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <option value="gemini-2.5-flash-image-preview">gemini-2.5-flash-image-preview</option>
-                            <option value="gpt-4">GPT-4</option>
-                            <option value="claude-3">Claude 3</option>
-                        </select>
-                    </div>
-                     <div class="flex justify-end space-x-4 pt-4">
-                        <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button>
-                    </div>
-                </form>
+                        <div>
+                            <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
+                            <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <option value="gemini-2.5-flash-image-preview">gemini-2.5-flash-image-preview</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="claude-3">Claude 3</option>
+                            </select>
+                        </div>
+                         <div class="flex justify-end space-x-4 pt-4">
+                            <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button>
+                        </div>
+                    </form>
+                </div>
             </div>
             
              <!-- Script Result Container (Hidden by default) -->
@@ -602,8 +604,14 @@
             document.addEventListener('click', (e) => {
                 const isClickInsideMemoryContainer = scriptMemoryContainer.contains(e.target);
                 const isClickOnMemoryButton = scriptMemoryBtn.contains(e.target);
+                const isClickInsideApiKeyContainer = apiKeyContainer.querySelector('div').contains(e.target);
+                const isClickOnApiKeyButton = apiKeyBtn.contains(e.target);
+
                 if (!scriptMemoryContainer.classList.contains('hidden') && !isClickInsideMemoryContainer && !isClickOnMemoryButton) {
                     scriptMemoryContainer.classList.add('hidden');
+                }
+                if (!apiKeyContainer.classList.contains('hidden') && !isClickInsideApiKeyContainer && !isClickOnApiKeyButton) {
+                    apiKeyContainer.classList.add('hidden');
                 }
             });
         });

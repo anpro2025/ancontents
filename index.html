@@ -160,7 +160,7 @@
             
             <!-- Script Memory Container (Hidden by default) -->
             <div id="script-memory-container" class="hidden bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-6">Đầu vào kịch bản</h2>
+                <h2 id="script-memory-header" class="text-2xl font-bold mb-6">Đầu vào kịch bản</h2>
                 <div class="flex space-x-6">
                     <!-- Script List -->
                     <div class="w-1/3 border-r border-gray-700 pr-6">
@@ -281,6 +281,7 @@
             const scriptMemoryInput = document.getElementById('script-memory-input');
             const copyScriptMemoryBtn = document.getElementById('copy-script-memory-btn');
             const exportScriptMemoryBtn = document.getElementById('export-script-memory-btn');
+            const scriptMemoryHeader = document.getElementById('script-memory-header');
 
             // --- Script Result Elements ---
             const saveResultBtn = document.getElementById('save-result-btn');
@@ -354,6 +355,7 @@
             function clearScriptForm() {
                 scriptMemoryForm.reset();
                 scriptMemoryId.value = '';
+                scriptMemoryHeader.textContent = 'Soạn kịch bản mới';
                 renderScriptList();
             }
 
@@ -363,6 +365,7 @@
                     scriptMemoryId.value = script.id;
                     scriptMemoryTitle.value = script.title;
                     scriptMemoryInput.value = script.content;
+                    scriptMemoryHeader.textContent = `Chỉnh sửa: ${script.title}`;
                 }
                 renderScriptList();
             }

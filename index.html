@@ -45,6 +45,11 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen flex flex-col">
@@ -109,9 +114,9 @@
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-grow overflow-y-auto">
-            <!-- Script Creation Form (Hidden by default) -->
-            <div id="script-form-container" class="hidden bg-gray-800 p-6 rounded-lg">
+        <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto">
+            <!-- Script Creation Column -->
+            <div id="script-form-container" class="hidden w-[450px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold mb-6">Tạo kịch bản mới</h2>
                 <form id="script-form" class="space-y-4">
                     <div>
@@ -119,7 +124,7 @@
                         <textarea id="script-idea" rows="5" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500"></textarea>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-4">
                         <div>
                             <label for="script-input-type" class="block text-sm font-medium text-gray-300">Đầu vào kịch bản (từ bộ nhớ)</label>
                             <select id="script-input-type" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
@@ -151,7 +156,7 @@
                     </div>
 
                     <div class="flex justify-end space-x-4 pt-4">
-                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
+                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
                         <button type="submit" id="generate-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
                             <span class="btn-text">Tạo</span>
                             <span class="loader hidden ml-2"></span>
@@ -160,90 +165,8 @@
                 </form>
             </div>
             
-            <!-- Script Memory Container (Hidden by default) -->
-            <div id="script-memory-container" class="hidden bg-gray-800 p-6 rounded-lg relative">
-                 <button id="close-memory-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <h2 id="script-memory-header" class="text-2xl font-bold mb-6">Đầu vào kịch bản</h2>
-                <div class="flex space-x-6">
-                    <!-- Script List -->
-                    <div class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
-                        <div class="flex-shrink-0 flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-lg">Danh sách</h3>
-                            <button id="new-script-btn" title="Kịch bản mới" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
-                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="script-list" class="space-y-2 overflow-y-auto flex-grow">
-                            <!-- Saved scripts will be listed here -->
-                        </div>
-                    </div>
-                    <!-- Script Editor -->
-                    <div id="script-editor-panel" class="w-2/3 hidden">
-                        <form id="script-memory-form" class="space-y-4">
-                            <input type="hidden" id="script-memory-id">
-                            <div>
-                                <label for="script-memory-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                                <input type="text" id="script-memory-title" placeholder="Nhập tiêu đề cho kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label for="script-memory-input" class="block text-sm font-medium text-gray-300">Nội dung kịch bản</label>
-                                <textarea id="script-memory-input" rows="10" placeholder="Dán hoặc nhập kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500"></textarea>
-                            </div>
-                            <div class="flex justify-end space-x-3 pt-2">
-                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
-                                <button type="button" id="copy-script-memory-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
-                                <button type="button" id="export-script-memory-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- API Key Container (Hidden by default) -->
-            <div id="api-key-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-                 <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full relative">
-                     <button id="close-api-key-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                    <h2 class="text-2xl font-bold mb-6">Cài đặt</h2>
-                    <form id="api-key-form" class="space-y-4">
-                        <div>
-                            <label for="api-key-input" class="block text-sm font-medium text-gray-300">
-                                API Key của bạn
-                                 <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a>
-                            </label>
-                            <div class="relative mt-1">
-                                <input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10">
-                                <button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white">
-                                    <!-- Eye Icon SVG will be injected here -->
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
-                            <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                                <option value="gemini-2.5-flash-image-preview">gemini-2.5-flash-image-preview</option>
-                                <option value="gpt-4">GPT-4</option>
-                                <option value="claude-3">Claude 3</option>
-                            </select>
-                        </div>
-                         <div class="flex justify-end space-x-4 pt-4">
-                            <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-             <!-- Script Result Container (Hidden by default) -->
-            <div id="script-result-container" class="hidden bg-gray-800 p-6 rounded-lg">
+             <!-- Script Result Column -->
+            <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold mb-6">Kịch bản được tạo bởi AI</h2>
                 <form id="script-result-form" class="space-y-4">
                     <div>
@@ -261,15 +184,98 @@
                     </div>
                 </form>
             </div>
-
         </main>
     </div>
+    
+    <!-- Script Memory Modal -->
+    <div id="script-memory-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-4xl h-[80vh] flex flex-col">
+            <button id="close-memory-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 id="script-memory-header" class="text-2xl font-bold mb-6 flex-shrink-0">Đầu vào kịch bản</h2>
+            <div class="flex space-x-6 flex-grow overflow-hidden">
+                <!-- Script List -->
+                <div class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
+                    <div class="flex-shrink-0 flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">Danh sách</h3>
+                        <button id="new-script-btn" title="Kịch bản mới" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                        </button>
+                    </div>
+                    <div id="script-list" class="space-y-2 overflow-y-auto flex-grow">
+                        <!-- Saved scripts will be listed here -->
+                    </div>
+                </div>
+                <!-- Script Editor -->
+                <div id="script-editor-panel" class="w-2/3 hidden flex-col">
+                    <form id="script-memory-form" class="space-y-4 flex flex-col flex-grow">
+                        <input type="hidden" id="script-memory-id">
+                        <div>
+                            <label for="script-memory-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                            <input type="text" id="script-memory-title" placeholder="Nhập tiêu đề cho kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
+                        </div>
+                        <div class="flex-grow flex flex-col">
+                            <label for="script-memory-input" class="block text-sm font-medium text-gray-300">Nội dung kịch bản</label>
+                            <textarea id="script-memory-input" placeholder="Dán hoặc nhập kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 flex-grow"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                            <button type="button" id="copy-script-memory-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
+                            <button type="button" id="export-script-memory-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- API Key Modal -->
+    <div id="api-key-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+         <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full relative">
+             <button id="close-api-key-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Cài đặt</h2>
+            <form id="api-key-form" class="space-y-4">
+                <div>
+                    <label for="api-key-input" class="block text-sm font-medium text-gray-300">
+                        API Key của bạn
+                         <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a>
+                    </label>
+                    <div class="relative mt-1">
+                        <input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10">
+                        <button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white">
+                            <!-- Eye Icon SVG will be injected here -->
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
+                    <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                        <option value="gemini-2.5-flash-image-preview">gemini-2.5-flash-image-preview</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="claude-3">Claude 3</option>
+                    </select>
+                </div>
+                 <div class="flex justify-end space-x-4 pt-4">
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- Delete Confirmation Modal -->
     <div id="delete-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md">
+         <div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md">
             <h2 class="text-xl font-bold mb-4">Xác nhận xóa</h2>
-            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa kịch bản này không? Hành động này không thể hoàn tác.</p>
+            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa kịch bản này không?</p>
             <div class="flex justify-end space-x-4">
                 <button type="button" id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
                 <button type="button" id="confirm-delete-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md">Xóa</button>
@@ -286,7 +292,7 @@
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
             const scriptResultContainer = document.getElementById('script-result-container');
-
+            
             const scriptForm = document.getElementById('script-form');
             const scriptInputType = document.getElementById('script-input-type');
             const scriptIdea = document.getElementById('script-idea');
@@ -305,14 +311,14 @@
             const exportScriptMemoryBtn = document.getElementById('export-script-memory-btn');
             const scriptMemoryHeader = document.getElementById('script-memory-header');
             const closeMemoryBtn = document.getElementById('close-memory-btn');
-
+            
             // --- Script Result Elements ---
             const saveResultBtn = document.getElementById('save-result-btn');
             const copyResultBtn = document.getElementById('copy-result-btn');
             const exportResultBtn = document.getElementById('export-result-btn');
             const scriptResultTitle = document.getElementById('script-result-title');
             const scriptResultContent = document.getElementById('script-result-content');
-
+            
             // --- API Key Elements ---
             const apiKeyForm = document.getElementById('api-key-form');
             const apiKeyInput = document.getElementById('api-key-input');
@@ -322,7 +328,6 @@
             const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C3.732 4.943 7.523 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-7.523 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`;
             const eyeOffIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 8.517 16.635 7.412 14.722 6.708l-1.414-1.414A10.009 10.009 0 0010 3C7.523 3 5.268 4.943 2.458 10a11.97 11.97 0 003.876 3.655l-2.227-2.228a1 1 0 00-1.414-1.414L.293 8.293a1 1 0 000 1.414l2 2a1 1 0 001.414 0l1.293-1.293A8.003 8.003 0 0110 7a8 8 0 012.828.532l1.432-1.432A9.98 9.98 0 0010 5c-2.477 0-4.732 1.943-7.542 7 .57 1.1 1.254 2.063 2.07 2.912l-1.42-1.42a1 1 0 00-1.414-1.414L.293 15.707a1 1 0 001.414 1.414l14-14a1 1 0 00-1.414-1.414L3.707 2.293z" clip-rule="evenodd" /><path d="M10.707 10.293a1 1 0 10-1.414-1.414 1 1 0 001.414 1.414z" /></svg>`;
 
-            // --- Delete Modal Elements ---
             const deleteConfirmModal = document.getElementById('delete-confirm-modal');
             const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -333,11 +338,16 @@
             let scriptIdToDelete = null;
 
             function hideAllContainers() {
+                // Main workspace containers
                 scriptFormContainer.classList.add('hidden');
-                scriptMemoryContainer.classList.add('hidden');
-                apiKeyContainer.classList.add('hidden');
                 scriptResultContainer.classList.add('hidden');
             }
+
+             function hideModals() {
+                scriptMemoryContainer.classList.add('hidden');
+                apiKeyContainer.classList.add('hidden');
+            }
+
 
             // --- Settings Functions ---
             function saveSettings() {
@@ -453,7 +463,7 @@
             });
 
             scriptInputType.addEventListener('change', (e) => {
-                // This dropdown is now for reference only, so no auto-fill action is needed.
+                 // No auto-fill action
             });
 
             scriptDuration.addEventListener('change', (e) => {
@@ -651,23 +661,18 @@ Hãy viết kịch bản mới theo đúng các yêu cầu trên, giữ vững t
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
                     });
-
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.error.message || `Lỗi HTTP: ${response.status}`);
                     }
-
                     const result = await response.json();
                     const generatedScript = result.candidates[0]?.content?.parts[0]?.text;
-
                     if (generatedScript) {
                         const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 20)}...` : `Tập mới của: ${referenceScript.title.substring(0, 20)}...`;
                         scriptResultTitle.value = newTitle;
                         scriptResultContent.value = generatedScript;
-                        hideAllContainers();
                         scriptResultContainer.classList.remove('hidden');
                     } else { throw new Error('Không nhận được nội dung kịch bản từ AI.'); }
-
                 } catch (error) {
                     console.error('Lỗi khi tạo kịch bản:', error);
                     alert(`Đã xảy ra lỗi: ${error.message}`);

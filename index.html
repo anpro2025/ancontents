@@ -63,7 +63,7 @@
     </div>
 
     <header class="text-center py-6 flex-shrink-0">
-        <h1 class="text-4xl font-bold tracking-wider uppercase text-blue-400">AN PRODUCTION AI FILMS - STORY BROAD</h1>
+        <h1 class="text-4xl font-bold tracking-wider uppercase text-white">AN PRODUCTION AI FILMS - STORY BROAD</h1>
     </header>
     
     <div class="flex space-x-8 flex-grow p-8 overflow-hidden">
@@ -455,11 +455,10 @@
             scriptInputType.addEventListener('change', (e) => {
                 const selectedScriptId = e.target.value;
                 if (!selectedScriptId) {
-                    scriptIdea.value = '';
+                   // scriptIdea.value = ''; // This line is removed
                     return;
                 }
-                const selectedScript = scripts.find(s => s.id == selectedScriptId);
-                if (selectedScript) scriptIdea.value = selectedScript.content;
+                // Logic to use the selected script can be added here if needed later
             });
 
             scriptDuration.addEventListener('change', (e) => {

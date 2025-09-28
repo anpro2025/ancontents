@@ -221,7 +221,26 @@
                 </form>
             </div>
             
-             <!-- Other containers will go here -->
+             <!-- Script Result Container (Hidden by default) -->
+            <div id="script-result-container" class="hidden bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-6">Kịch bản được tạo bởi AI</h2>
+                <form id="script-result-form" class="space-y-4">
+                    <div>
+                        <label for="script-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                        <input type="text" id="script-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                    </div>
+                    <div>
+                        <label for="script-result-content" class="block text-sm font-medium text-gray-300">Nội dung kịch bản</label>
+                        <textarea id="script-result-content" rows="15" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" id="save-result-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu vào bộ nhớ</button>
+                        <button type="button" id="copy-result-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
+                        <button type="button" id="export-result-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
+                    </div>
+                </form>
+            </div>
+
         </main>
     </div>
 
@@ -245,6 +264,7 @@
             const scriptMemoryContainer = document.getElementById('script-memory-container');
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
+            const scriptResultContainer = document.getElementById('script-result-container');
 
             const scriptForm = document.getElementById('script-form');
             const scriptInputType = document.getElementById('script-input-type');
@@ -261,6 +281,13 @@
             const scriptMemoryInput = document.getElementById('script-memory-input');
             const copyScriptMemoryBtn = document.getElementById('copy-script-memory-btn');
             const exportScriptMemoryBtn = document.getElementById('export-script-memory-btn');
+
+            // --- Script Result Elements ---
+            const saveResultBtn = document.getElementById('save-result-btn');
+            const copyResultBtn = document.getElementById('copy-result-btn');
+            const exportResultBtn = document.getElementById('export-result-btn');
+            const scriptResultTitle = document.getElementById('script-result-title');
+            const scriptResultContent = document.getElementById('script-result-content');
 
             // --- API Key Elements ---
             const apiKeyForm = document.getElementById('api-key-form');
@@ -284,7 +311,7 @@
                 scriptFormContainer.classList.add('hidden');
                 scriptMemoryContainer.classList.add('hidden');
                 apiKeyContainer.classList.add('hidden');
-                // Add other containers here in the future
+                scriptResultContainer.classList.add('hidden');
             }
 
             // --- Settings Functions ---
@@ -352,16 +379,10 @@
 
             function performDelete() {
                 if (!scriptIdToDelete) return;
-
                 scripts = scripts.filter(s => s.id != scriptIdToDelete);
                 saveScriptsToStorage();
-                
-                if (scriptMemoryId.value == scriptIdToDelete) {
-                    clearScriptForm();
-                } else {
-                    renderScriptList();
-                }
-                
+                if (scriptMemoryId.value == scriptIdToDelete) clearScriptForm();
+                else renderScriptList();
                 closeDeleteModal();
             }
             
@@ -379,13 +400,11 @@
             }
 
             function populateScriptInputDropdown() {
-                scriptInputType.innerHTML = ''; // Clear existing options
-                
+                scriptInputType.innerHTML = '';
                 const placeholderOption = document.createElement('option');
                 placeholderOption.textContent = 'Chọn từ kịch bản đã lưu...';
                 placeholderOption.value = '';
                 scriptInputType.appendChild(placeholderOption);
-
                 scripts.forEach(script => {
                     const option = document.createElement('option');
                     option.value = script.id;
@@ -395,7 +414,7 @@
             }
 
             // --- Initial Setup ---
-            toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG; // Set initial icon
+            toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
 
             // --- Event Listeners ---
             createScriptBtn.addEventListener('click', () => {
@@ -411,19 +430,13 @@
                 if (!selectedScriptId) {
                     scriptIdea.value = '';
                     return;
-                };
-                const selectedScript = scripts.find(s => s.id == selectedScriptId);
-                if (selectedScript) {
-                    scriptIdea.value = selectedScript.content;
                 }
+                const selectedScript = scripts.find(s => s.id == selectedScriptId);
+                if (selectedScript) scriptIdea.value = selectedScript.content;
             });
 
             scriptDuration.addEventListener('change', (e) => {
-                if(e.target.value === 'custom') {
-                    scriptDurationCustom.classList.remove('hidden');
-                } else {
-                    scriptDurationCustom.classList.add('hidden');
-                }
+                scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
             });
 
             scriptMemoryBtn.addEventListener('click', () => {
@@ -464,12 +477,8 @@
             scriptList.addEventListener('click', (e) => {
                 const deleteBtn = e.target.closest('.delete-script-btn');
                 const scriptItem = e.target.closest('.script-item');
-                
-                if (deleteBtn) {
-                    openDeleteModal(deleteBtn.dataset.id);
-                } else if (scriptItem) {
-                    loadScriptIntoForm(scriptItem.dataset.id);
-                }
+                if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
+                else if (scriptItem) loadScriptIntoForm(scriptItem.dataset.id);
             });
 
             scriptMemoryForm.addEventListener('submit', (e) => {
@@ -477,13 +486,10 @@
                 const id = scriptMemoryId.value;
                 const title = scriptMemoryTitle.value;
                 const content = scriptMemoryInput.value;
-                
-                if (id) { // Update existing
+                if (id) {
                     const index = scripts.findIndex(s => s.id == id);
-                    if (index > -1) {
-                        scripts[index] = { ...scripts[index], title, content };
-                    }
-                } else { // Create new
+                    if (index > -1) scripts[index] = { ...scripts[index], title, content };
+                } else {
                     const newScript = { id: Date.now(), title, content };
                     scripts.push(newScript);
                     scriptMemoryId.value = newScript.id;
@@ -495,115 +501,95 @@
             
             copyScriptMemoryBtn.addEventListener('click', () => {
                  const contentToCopy = scriptMemoryInput.value;
-                 if(!contentToCopy) {
-                     alert('Không có nội dung để sao chép.');
-                     return;
-                 }
+                 if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
                 navigator.clipboard.writeText(contentToCopy).then(() => {
                     alert('Đã sao chép vào clipboard!');
-                }).catch(err => {
-                    alert('Sao chép thất bại!');
-                });
+                }).catch(err => alert('Sao chép thất bại!'));
             });
 
             exportScriptMemoryBtn.addEventListener('click', () => {
                 const title = scriptMemoryTitle.value;
                 const content = scriptMemoryInput.value;
-                if (!content) {
-                    alert('Không có nội dung để xuất file.');
+                if (!content) { alert('Không có nội dung để xuất file.'); return; }
+                downloadAsTxt(title || 'kich_ban_khong_tieu_de', content);
+            });
+
+            // --- Result Container Listeners ---
+            saveResultBtn.addEventListener('click', () => {
+                const title = scriptResultTitle.value.trim();
+                const content = scriptResultContent.value.trim();
+                if (!title || !content) {
+                    alert('Vui lòng nhập tiêu đề và nội dung.');
                     return;
                 }
+                const newScript = { id: Date.now(), title, content };
+                scripts.push(newScript);
+                saveScriptsToStorage();
+                alert('Đã lưu kịch bản vào bộ nhớ!');
+                scriptResultContainer.classList.add('hidden');
+            });
+
+            copyResultBtn.addEventListener('click', () => {
+                const contentToCopy = scriptResultContent.value;
+                if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
+                navigator.clipboard.writeText(contentToCopy).then(() => {
+                    alert('Đã sao chép vào clipboard!');
+                }).catch(err => alert('Sao chép thất bại!'));
+            });
+
+            exportResultBtn.addEventListener('click', () => {
+                 const title = scriptResultTitle.value;
+                const content = scriptResultContent.value;
+                if (!content) { alert('Không có nội dung để xuất file.'); return; }
                 downloadAsTxt(title || 'kich_ban_khong_tieu_de', content);
             });
 
             cancelDeleteBtn.addEventListener('click', closeDeleteModal);
             confirmDeleteBtn.addEventListener('click', performDelete);
 
-
             document.querySelectorAll('.cancel-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.closest('.bg-gray-800').classList.add('hidden');
-                });
+                btn.addEventListener('click', () => btn.closest('.bg-gray-800').classList.add('hidden'));
             });
 
             scriptForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
                 const submitButton = e.target.querySelector('button[type="submit"]');
                 const btnText = submitButton.querySelector('.btn-text');
                 const loader = submitButton.querySelector('.loader');
-
-                // Validate inputs
                 const ideaValue = scriptIdea.value.trim();
                 const styleValue = document.getElementById('script-style').value;
-                
-                if (!ideaValue || !styleValue) {
-                    alert('Vui lòng điền đầy đủ ý tưởng và chọn phong cách.');
-                    return;
-                }
-
+                if (!ideaValue || !styleValue) { alert('Vui lòng điền đầy đủ ý tưởng và chọn phong cách.'); return; }
                 apiKey = localStorage.getItem('apiKey') || '';
-                if (!apiKey) {
-                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
-                    openSettings();
-                    return;
-                }
-                
-                aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash-preview-05-20';
-
-                // Show loading state
+                if (!apiKey) { alert('Vui lòng nhập API Key trong phần Cài đặt.'); openSettings(); return; }
+                aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash-image-preview';
                 btnText.textContent = 'Đang tạo...';
                 loader.classList.remove('hidden');
                 submitButton.disabled = true;
-
                 let durationValue = scriptDuration.value;
-                if (durationValue === 'custom') {
-                    durationValue = scriptDurationCustom.value;
-                }
-
-                const finalPrompt = `Hãy viết một kịch bản phim chuyên nghiệp.
-- **Chủ đề/Ý tưởng:** ${ideaValue}
-- **Thể loại/Phong cách:** ${styleValue}
-- **Thời lượng dự kiến:** ${durationValue} phút
-
-Kịch bản cần có cấu trúc rõ ràng, bao gồm tiêu đề, mô tả cảnh, hành động của nhân vật, và lời thoại.`;
-
+                if (durationValue === 'custom') durationValue = scriptDurationCustom.value;
+                const finalPrompt = `Hãy viết một kịch bản phim chuyên nghiệp.\n- **Chủ đề/Ý tưởng:** ${ideaValue}\n- **Thể loại/Phong cách:** ${styleValue}\n- **Thời lượng dự kiến:** ${durationValue} phút\n\nKịch bản cần có cấu trúc rõ ràng, bao gồm tiêu đề, mô tả cảnh, hành động của nhân vật, và lời thoại.`;
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
                     });
-
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.error.message || `Lỗi HTTP: ${response.status}`);
                     }
-
                     const result = await response.json();
                     const generatedScript = result.candidates[0]?.content?.parts[0]?.text;
-
                     if (generatedScript) {
-                        const newScript = {
-                            id: Date.now(),
-                            title: `Kịch bản: ${ideaValue.substring(0, 20)}...`,
-                            content: generatedScript
-                        };
-                        scripts.push(newScript);
-                        saveScriptsToStorage();
-                        
+                        scriptResultTitle.value = `Kịch bản: ${ideaValue.substring(0, 20)}...`;
+                        scriptResultContent.value = generatedScript;
                         hideAllContainers();
-                        scriptMemoryContainer.classList.remove('hidden');
-                        loadScriptIntoForm(newScript.id);
-                    } else {
-                         throw new Error('Không nhận được nội dung kịch bản từ AI.');
-                    }
-
+                        scriptResultContainer.classList.remove('hidden');
+                    } else { throw new Error('Không nhận được nội dung kịch bản từ AI.'); }
                 } catch (error) {
                     console.error('Lỗi khi tạo kịch bản:', error);
                     alert(`Đã xảy ra lỗi: ${error.message}`);
                 } finally {
-                    // Restore button state
                     btnText.textContent = 'Tạo';
                     loader.classList.add('hidden');
                     submitButton.disabled = false;
@@ -613,7 +599,6 @@ Kịch bản cần có cấu trúc rõ ràng, bao gồm tiêu đề, mô tả c�
             document.addEventListener('click', (e) => {
                 const isClickInsideMemoryContainer = scriptMemoryContainer.contains(e.target);
                 const isClickOnMemoryButton = scriptMemoryBtn.contains(e.target);
-
                 if (!scriptMemoryContainer.classList.contains('hidden') && !isClickInsideMemoryContainer && !isClickOnMemoryButton) {
                     scriptMemoryContainer.classList.add('hidden');
                 }

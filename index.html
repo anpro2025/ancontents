@@ -63,7 +63,7 @@
     </div>
 
     <header class="text-center my-8">
-        <h1 class="text-4xl font-bold tracking-wider uppercase">AN PRODUCTION AI FILMS - STORY BROAD</h1>
+        <h1 class="text-4xl font-bold tracking-wider uppercase text-blue-400">AN PRODUCTION AI FILMS - STORY BROAD</h1>
     </header>
     
     <div class="flex space-x-8">
@@ -602,15 +602,15 @@
             });
 
             document.addEventListener('click', (e) => {
-                const isClickInsideMemoryContainer = scriptMemoryContainer.contains(e.target);
-                const isClickOnMemoryButton = scriptMemoryBtn.contains(e.target);
-                const isClickInsideApiKeyContainer = apiKeyContainer.querySelector('div').contains(e.target);
-                const isClickOnApiKeyButton = apiKeyBtn.contains(e.target);
-
-                if (!scriptMemoryContainer.classList.contains('hidden') && !isClickInsideMemoryContainer && !isClickOnMemoryButton) {
+                const sidebar = document.getElementById('sidebar');
+                if (scriptMemoryContainer.contains(e.target) || scriptMemoryBtn.contains(e.target) || sidebar.contains(e.target)) {
+                    return;
+                }
+                if (!scriptMemoryContainer.classList.contains('hidden')) {
                     scriptMemoryContainer.classList.add('hidden');
                 }
-                if (!apiKeyContainer.classList.contains('hidden') && !isClickInsideApiKeyContainer && !isClickOnApiKeyButton) {
+
+                if (apiKeyContainer.contains(e.target) && !apiKeyContainer.querySelector('div').contains(e.target)) {
                     apiKeyContainer.classList.add('hidden');
                 }
             });

@@ -194,7 +194,7 @@
                     <div>
                         <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
                         <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <option value="gemini-2.5-flash">gemini Flash 2.5</option>
+                            <option value="gemini-2.5-flash-image-preview">gemini-2.5-flash-image-preview</option>
                             <option value="gpt-4">GPT-4</option>
                             <option value="claude-3">Claude 3</option>
                         </select>
@@ -261,7 +261,7 @@
             
             let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
             let apiKey = localStorage.getItem('apiKey') || '';
-            let aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash';
+            let aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash-image-preview';
             let scriptIdToDelete = null;
 
             function hideAllContainers() {

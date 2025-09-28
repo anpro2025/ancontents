@@ -63,7 +63,7 @@
     </div>
 
     <header class="text-center my-8">
-        <h1 class="text-4xl font-bold tracking-wider uppercase text-blue-400">AN PRODUCTION AI FILMS - STORY BROAD</h1>
+        <h1 class="text-4xl font-bold tracking-wider uppercase">AN PRODUCTION AI FILMS - STORY BROAD</h1>
     </header>
     
     <div class="flex space-x-8">
@@ -422,7 +422,8 @@
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
 
             // --- Event Listeners ---
-            createScriptBtn.addEventListener('click', () => {
+            createScriptBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 hideAllContainers();
                 scriptForm.reset();
                 populateScriptInputDropdown();
@@ -444,14 +445,16 @@
                 scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
             });
 
-            scriptMemoryBtn.addEventListener('click', () => {
+            scriptMemoryBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 hideAllContainers();
                 scriptMemoryContainer.classList.remove('hidden');
                 renderScriptList();
                 clearScriptForm();
             });
 
-            apiKeyBtn.addEventListener('click', () => {
+            apiKeyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 hideAllContainers();
                 renderSettingsDisplay();
                 apiKeyContainer.classList.remove('hidden');
@@ -602,16 +605,15 @@
             });
 
             document.addEventListener('click', (e) => {
-                const sidebar = document.getElementById('sidebar');
-                if (scriptMemoryContainer.contains(e.target) || scriptMemoryBtn.contains(e.target) || sidebar.contains(e.target)) {
-                    return;
-                }
                 if (!scriptMemoryContainer.classList.contains('hidden')) {
-                    scriptMemoryContainer.classList.add('hidden');
+                     if (!scriptMemoryContainer.contains(e.target) && e.target !== scriptMemoryBtn) {
+                        scriptMemoryContainer.classList.add('hidden');
+                    }
                 }
-
-                if (apiKeyContainer.contains(e.target) && !apiKeyContainer.querySelector('div').contains(e.target)) {
-                    apiKeyContainer.classList.add('hidden');
+                if (!apiKeyContainer.classList.contains('hidden')) {
+                    if (!apiKeyContainer.querySelector('div').contains(e.target) && e.target !== apiKeyBtn) {
+                        apiKeyContainer.classList.add('hidden');
+                    }
                 }
             });
         });

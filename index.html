@@ -47,7 +47,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white p-8">
+<body class="bg-gray-900 text-white h-screen flex flex-col">
     <!-- Nút điều khiển ở góc trên bên phải -->
     <div class="fixed top-8 right-8 z-20 flex flex-col space-y-2">
         <button id="api-key-btn" title="Cài đặt" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center">
@@ -62,11 +62,11 @@
         </a>
     </div>
 
-    <header class="text-center my-8">
-        <h1 class="text-4xl font-bold tracking-wider uppercase">AN PRODUCTION AI FILMS - STORY BROAD</h1>
+    <header class="text-center py-6 flex-shrink-0">
+        <h1 class="text-4xl font-bold tracking-wider uppercase text-blue-400">AN PRODUCTION AI FILMS - STORY BROAD</h1>
     </header>
     
-    <div class="flex space-x-8">
+    <div class="flex space-x-8 flex-grow p-8 overflow-hidden">
         <!-- Left Sidebar with Buttons -->
         <aside id="sidebar" class="w-64 flex-shrink-0">
             <div class="flex flex-col space-y-4">
@@ -109,7 +109,7 @@
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-grow">
+        <main class="flex-grow overflow-y-auto">
             <!-- Script Creation Form (Hidden by default) -->
             <div id="script-form-container" class="hidden bg-gray-800 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold mb-6">Tạo kịch bản mới</h2>
@@ -159,7 +159,12 @@
             </div>
             
             <!-- Script Memory Container (Hidden by default) -->
-            <div id="script-memory-container" class="hidden bg-gray-800 p-6 rounded-lg">
+            <div id="script-memory-container" class="hidden bg-gray-800 p-6 rounded-lg relative">
+                 <button id="close-memory-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
                 <h2 id="script-memory-header" class="text-2xl font-bold mb-6">Đầu vào kịch bản</h2>
                 <div class="flex space-x-6">
                     <!-- Script List -->
@@ -193,7 +198,12 @@
 
             <!-- API Key Container (Hidden by default) -->
             <div id="api-key-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-                 <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full">
+                 <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full relative">
+                     <button id="close-api-key-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                     <h2 class="text-2xl font-bold mb-6">Cài đặt</h2>
                     <form id="api-key-form" class="space-y-4">
                         <div>
@@ -284,6 +294,7 @@
             const copyScriptMemoryBtn = document.getElementById('copy-script-memory-btn');
             const exportScriptMemoryBtn = document.getElementById('export-script-memory-btn');
             const scriptMemoryHeader = document.getElementById('script-memory-header');
+            const closeMemoryBtn = document.getElementById('close-memory-btn');
 
             // --- Script Result Elements ---
             const saveResultBtn = document.getElementById('save-result-btn');
@@ -297,6 +308,7 @@
             const apiKeyInput = document.getElementById('api-key-input');
             const toggleApiKeyVisibilityBtn = document.getElementById('toggle-api-key-visibility');
             const aiModelSelect = document.getElementById('ai-model-select');
+            const closeApiKeyBtn = document.getElementById('close-api-key-btn');
             const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C3.732 4.943 7.523 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-7.523 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`;
             const eyeOffIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 8.517 16.635 7.412 14.722 6.708l-1.414-1.414A10.009 10.009 0 0010 3C7.523 3 5.268 4.943 2.458 10a11.97 11.97 0 003.876 3.655l-2.227-2.228a1 1 0 00-1.414-1.414L.293 8.293a1 1 0 000 1.414l2 2a1 1 0 001.414 0l1.293-1.293A8.003 8.003 0 0110 7a8 8 0 012.828.532l1.432-1.432A9.98 9.98 0 0010 5c-2.477 0-4.732 1.943-7.542 7 .57 1.1 1.254 2.063 2.07 2.912l-1.42-1.42a1 1 0 00-1.414-1.414L.293 15.707a1 1 0 001.414 1.414l14-14a1 1 0 00-1.414-1.414L3.707 2.293z" clip-rule="evenodd" /><path d="M10.707 10.293a1 1 0 10-1.414-1.414 1 1 0 001.414 1.414z" /></svg>`;
 
@@ -357,7 +369,7 @@
             function clearScriptForm() {
                 scriptMemoryForm.reset();
                 scriptMemoryId.value = '';
-                scriptMemoryHeader.textContent = 'Soạn kịch bản mới';
+                scriptMemoryHeader.textContent = 'Đầu vào công việc mới';
                 renderScriptList();
             }
 
@@ -367,7 +379,7 @@
                     scriptMemoryId.value = script.id;
                     scriptMemoryTitle.value = script.title;
                     scriptMemoryInput.value = script.content;
-                    scriptMemoryHeader.textContent = `Chỉnh sửa: ${script.title}`;
+                    scriptMemoryHeader.textContent = `Đầu vào công việc: ${script.title}`;
                 }
                 renderScriptList();
             }
@@ -422,8 +434,7 @@
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
 
             // --- Event Listeners ---
-            createScriptBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
+            createScriptBtn.addEventListener('click', () => {
                 hideAllContainers();
                 scriptForm.reset();
                 populateScriptInputDropdown();
@@ -445,19 +456,25 @@
                 scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
             });
 
-            scriptMemoryBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
+            scriptMemoryBtn.addEventListener('click', () => {
                 hideAllContainers();
                 scriptMemoryContainer.classList.remove('hidden');
                 renderScriptList();
                 clearScriptForm();
             });
 
-            apiKeyBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
+            apiKeyBtn.addEventListener('click', () => {
                 hideAllContainers();
                 renderSettingsDisplay();
                 apiKeyContainer.classList.remove('hidden');
+            });
+            
+            closeMemoryBtn.addEventListener('click', () => {
+                 scriptMemoryContainer.classList.add('hidden');
+            });
+            
+            closeApiKeyBtn.addEventListener('click', () => {
+                apiKeyContainer.classList.add('hidden');
             });
 
             apiKeyForm.addEventListener('submit', (e) => {
@@ -556,7 +573,9 @@
             confirmDeleteBtn.addEventListener('click', performDelete);
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
-                btn.addEventListener('click', () => btn.closest('.bg-gray-800').classList.add('hidden'));
+                btn.addEventListener('click', (e) => {
+                    btn.closest('.bg-gray-800').classList.add('hidden');
+                });
             });
 
             scriptForm.addEventListener('submit', async (e) => {
@@ -601,19 +620,6 @@
                     btnText.textContent = 'Tạo';
                     loader.classList.add('hidden');
                     submitButton.disabled = false;
-                }
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!scriptMemoryContainer.classList.contains('hidden')) {
-                     if (!scriptMemoryContainer.contains(e.target) && e.target !== scriptMemoryBtn) {
-                        scriptMemoryContainer.classList.add('hidden');
-                    }
-                }
-                if (!apiKeyContainer.classList.contains('hidden')) {
-                    if (!apiKeyContainer.querySelector('div').contains(e.target) && e.target !== apiKeyBtn) {
-                        apiKeyContainer.classList.add('hidden');
-                    }
                 }
             });
         });

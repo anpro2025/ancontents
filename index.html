@@ -803,8 +803,7 @@
             // --- Event Listeners ---
             createScriptBtn.addEventListener('click', () => {
                 autoSaveToTrash();
-                hideAllContainers();
-                hideAllModals();
+                // hideAllContainers();
                 scriptForm.reset();
                 populateAllInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
@@ -813,8 +812,7 @@
 
             createSegmentBtn.addEventListener('click', () => {
                 autoSaveToTrash();
-                hideAllContainers();
-                hideAllModals();
+                // hideAllContainers();
                 segmentForm.reset();
                 segmentResultContainer.classList.add('hidden');
                 segmentFormContainer.classList.remove('hidden');
@@ -945,7 +943,7 @@
                 if (button.id === 'go-to-segment-btn') {
                     autoSaveToTrash();
                     const content = scriptResultContent.value;
-                    hideAllContainers();
+                    // hideAllContainers();
                     segmentInputScript.value = content;
                     segmentFormContainer.classList.remove('hidden');
                     populateAllInputDropdowns();

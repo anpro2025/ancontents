@@ -151,19 +151,19 @@
                     
                     <div class="space-y-4">
                         <div>
-                            <label for="script-input-script" class="block text-sm font-medium text-gray-300">Đầu vào Dự án</label>
+                            <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Đầu vào Dự án</label>
                             <select id="script-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
                         <div>
-                            <label for="script-input-prompt" class="block text-sm font-medium text-gray-300">Đầu vào Se</label>
+                            <label for="script-input-prompt" class="block text-sm font-medium text-yellow-400">Đầu vào Se</label>
                             <select id="script-input-prompt" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
                         <div>
-                            <label for="script-input-voice" class="block text-sm font-medium text-gray-300">Đầu vào VO</label>
+                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
                             <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
@@ -436,7 +436,6 @@
             
             // Result Containers
             const scriptResultContainer = document.getElementById('script-result-container');
-            const additionalResultsContainer = document.getElementById('additional-results-container');
             
             const scriptForm = document.getElementById('script-form');
             const scriptInputPrompt = document.getElementById('script-input-prompt');
@@ -515,7 +514,6 @@
             function hideAllContainers() {
                 scriptFormContainer.classList.add('hidden');
                 scriptResultContainer.classList.add('hidden');
-                additionalResultsContainer.classList.add('hidden');
             }
 
             function hideAllModals() {
@@ -780,52 +778,53 @@
                     toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
                 }
             });
+            
+             // Delegated event listener for result container buttons
+            document.getElementById('main-workspace').addEventListener('click', e => {
+                const button = e.target.closest('button');
+                if (!button) return;
 
-            // Result Container Listeners
-            saveResultBtn.addEventListener('click', () => {
-                const title = scriptResultTitle.value.trim();
-                const promptContent = scriptResultPromptContent.value.trim();
-                const voiceContent = scriptResultVoiceContent.value.trim();
+                if (button.id === 'save-result-btn') {
+                     const title = scriptResultTitle.value.trim();
+                    const promptContent = scriptResultPromptContent.value.trim();
+                    const voiceContent = scriptResultVoiceContent.value.trim();
 
-                if (!title || (!promptContent && !voiceContent)) {
-                    alert('Vui lòng nhập tiêu đề và có ít nhất một phần nội dung.');
-                    return;
+                    if (!title || (!promptContent && !voiceContent)) {
+                        alert('Vui lòng nhập tiêu đề và có ít nhất một phần nội dung.');
+                        return;
+                    }
+                    const fullContent = `### PHẦN PROMPT / MÔ TẢ HÌNH ẢNH\n\n${promptContent}\n\n### PHẦN THOẠI / VOICE OFF\n\n${voiceContent}`;
+                    
+                    const newScript = { id: Date.now(), title, content: fullContent };
+                    inputScripts.push(newScript); // Save to the input memory
+                    saveDataToStorage('script');
+                    alert('Đã lưu kịch bản vào bộ nhớ đầu vào!');
+                    scriptResultContainer.classList.add('hidden');
                 }
-                const fullContent = `### PHẦN PROMPT / MÔ TẢ HÌNH ẢNH\n\n${promptContent}\n\n### PHẦN THOẠI / VOICE OFF\n\n${voiceContent}`;
                 
-                const newScript = { id: Date.now(), title, content: fullContent };
-                inputScripts.push(newScript); // Save to the input memory
-                saveDataToStorage('script');
-                alert('Đã lưu kịch bản vào bộ nhớ đầu vào!');
-                scriptResultContainer.classList.add('hidden');
-                additionalResultsContainer.classList.add('hidden');
-            });
-
-            document.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const targetId = e.target.dataset.target;
+                if (button.classList.contains('copy-btn')) {
+                    const targetId = button.dataset.target;
                     const contentToCopy = document.getElementById(targetId).value;
                     if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
                     navigator.clipboard.writeText(contentToCopy).then(() => alert('Đã sao chép vào clipboard!')).catch(err => alert('Sao chép thất bại!'));
-                });
-            });
-
-            document.querySelectorAll('.export-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const targetId = e.target.dataset.target;
-                    const title = e.target.dataset.title || 'untitled';
+                }
+                
+                if (button.classList.contains('export-btn')) {
+                    const targetId = button.dataset.target;
+                    const title = button.dataset.title || 'untitled';
                     const content = document.getElementById(targetId).value;
                     if (!content) { alert('Không có nội dung để xuất file.'); return; }
                     downloadAsTxt(title, content);
-                });
+                }
             });
+
 
             cancelDeleteBtn.addEventListener('click', () => deleteConfirmModal.classList.add('hidden'));
             confirmDeleteBtn.addEventListener('click', performDelete);
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    btn.closest('.bg-gray-800').classList.add('hidden');
+                    e.target.closest('.bg-gray-800').classList.add('hidden');
                 });
             });
             
@@ -960,5 +959,5 @@
     </script>
 </body>
 </html>
-" selected.
+
 

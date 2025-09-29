@@ -209,27 +209,32 @@
             
              <!-- Script Result Column -->
             <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">Kịch bản được tạo bởi AI</h2>
-                    <button type="button" id="save-result-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu vào bộ nhớ</button>
-                </div>
+                <h2 class="text-2xl font-bold mb-4">Kịch bản được tạo bởi AI</h2>
                 <div class="space-y-4 flex-grow flex flex-col">
                      <div>
                         <label for="script-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
                         <input type="text" id="script-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
                     </div>
                     <div class="flex-grow flex flex-col">
-                        <label for="script-result-prompt-content" class="block text-sm font-medium text-gray-300">Phần Prompt / Mô tả hình ảnh</label>
+                        <div class="flex justify-between items-center">
+                            <label for="script-result-prompt-content" class="block text-sm font-medium text-gray-300">Phần Prompt / Mô tả hình ảnh</label>
+                            <span id="prompt-word-count" class="text-xs text-gray-400">0 từ</span>
+                        </div>
                         <textarea id="script-result-prompt-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
                         <div class="flex justify-end space-x-2 pt-2">
+                             <button type="button" id="save-prompt-to-sections-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se xanh</button>
                              <button type="button" data-target="script-result-prompt-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
                              <button type="button" data-target="script-result-prompt-content" data-title="prompt_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
                         </div>
                     </div>
                      <div class="flex-grow flex flex-col">
-                        <label for="script-result-voice-content" class="block text-sm font-medium text-gray-300">Phần Thoại / Voice Off</label>
+                        <div class="flex justify-between items-center">
+                            <label for="script-result-voice-content" class="block text-sm font-medium text-gray-300">Phần Thoại / Voice Off</label>
+                            <span id="voice-word-count" class="text-xs text-gray-400">0 từ</span>
+                        </div>
                         <textarea id="script-result-voice-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
                          <div class="flex justify-end space-x-2 pt-2">
+                             <button type="button" id="save-voice-to-voice-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào VO xanh</button>
                              <button type="button" data-target="script-result-voice-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
                              <button type="button" data-target="script-result-voice-content" data-title="voice_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
                         </div>
@@ -450,7 +455,8 @@
             const scriptResultTitle = document.getElementById('script-result-title');
             const scriptResultPromptContent = document.getElementById('script-result-prompt-content');
             const scriptResultVoiceContent = document.getElementById('script-result-voice-content');
-
+            const promptWordCount = document.getElementById('prompt-word-count');
+            const voiceWordCount = document.getElementById('voice-word-count');
 
             // API Key Elements
             const apiKeyForm = document.getElementById('api-key-form');
@@ -784,32 +790,42 @@
                 const button = e.target.closest('button');
                 if (!button) return;
 
-                if (button.id === 'save-result-btn') {
-                     const title = scriptResultTitle.value.trim();
-                    const promptContent = scriptResultPromptContent.value.trim();
-                    const voiceContent = scriptResultVoiceContent.value.trim();
-
-                    if (!title || (!promptContent && !voiceContent)) {
-                        alert('Vui lòng nhập tiêu đề và có ít nhất một phần nội dung.');
+                if (button.id === 'save-prompt-to-sections-btn') {
+                    const title = scriptResultTitle.value.trim();
+                    const content = scriptResultPromptContent.value.trim();
+                    if (!title || !content) {
+                        alert('Cần có tiêu đề và nội dung để lưu.');
                         return;
                     }
-                    const fullContent = `### PHẦN PROMPT / MÔ TẢ HÌNH ẢNH\n\n${promptContent}\n\n### PHẦN THOẠI / VOICE OFF\n\n${voiceContent}`;
-                    
-                    const newScript = { id: Date.now(), title, content: fullContent };
-                    inputScripts.push(newScript); // Save to the input memory
-                    saveDataToStorage('script');
-                    alert('Đã lưu kịch bản vào bộ nhớ đầu vào!');
-                    scriptResultContainer.classList.add('hidden');
+                    let sectionsMemory = JSON.parse(localStorage.getItem('segments')) || [];
+                    const newItem = { id: Date.now(), title: title + ' (Phần Prompt)', content: content };
+                    sectionsMemory.push(newItem);
+                    localStorage.setItem('segments', JSON.stringify(sectionsMemory));
+                    alert('Đã lưu vào Bộ nhớ Sections (Se xanh)!');
                 }
                 
-                if (button.classList.contains('copy-btn')) {
+                else if (button.id === 'save-voice-to-voice-btn') {
+                    const title = scriptResultTitle.value.trim();
+                    const content = scriptResultVoiceContent.value.trim();
+                     if (!title || !content) {
+                        alert('Cần có tiêu đề và nội dung để lưu.');
+                        return;
+                    }
+                    let voiceMemory = JSON.parse(localStorage.getItem('voiceOvers')) || [];
+                    const newItem = { id: Date.now(), title: title + ' (Phần Voice)', content: content };
+                    voiceMemory.push(newItem);
+                    localStorage.setItem('voiceOvers', JSON.stringify(voiceMemory));
+                    alert('Đã lưu vào Bộ nhớ Voice Off (VO xanh)!');
+                }
+                
+                else if (button.classList.contains('copy-btn')) {
                     const targetId = button.dataset.target;
                     const contentToCopy = document.getElementById(targetId).value;
                     if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
                     navigator.clipboard.writeText(contentToCopy).then(() => alert('Đã sao chép vào clipboard!')).catch(err => alert('Sao chép thất bại!'));
                 }
                 
-                if (button.classList.contains('export-btn')) {
+                else if (button.classList.contains('export-btn')) {
                     const targetId = button.dataset.target;
                     const title = button.dataset.title || 'untitled';
                     const content = document.getElementById(targetId).value;
@@ -854,6 +870,20 @@
                     submitButton.disabled = false;
                 }
             }
+            
+            function updateWordCount(textArea, countElement) {
+                if (!textArea || !countElement) return;
+                const text = textArea.value.trim();
+                if (text === '') {
+                    countElement.textContent = '0 từ';
+                    return;
+                }
+                const wordCount = text.split(/\s+/).filter(Boolean).length;
+                countElement.textContent = `${wordCount} từ`;
+            }
+
+            scriptResultPromptContent.addEventListener('input', () => updateWordCount(scriptResultPromptContent, promptWordCount));
+            scriptResultVoiceContent.addEventListener('input', () => updateWordCount(scriptResultVoiceContent, voiceWordCount));
 
             // --- Main Script Form Submission ---
             scriptForm.addEventListener('submit', async (e) => {
@@ -948,6 +978,10 @@
                     scriptResultTitle.value = newTitle;
                     scriptResultPromptContent.value = promptPart;
                     scriptResultVoiceContent.value = voicePart;
+                    
+                    updateWordCount(scriptResultPromptContent, promptWordCount);
+                    updateWordCount(scriptResultVoiceContent, voiceWordCount);
+                    
                     scriptResultContainer.classList.remove('hidden');
 
                 } catch (error) {
@@ -959,5 +993,4 @@
     </script>
 </body>
 </html>
-
 

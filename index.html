@@ -874,7 +874,7 @@
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    e.target.closest('.bg-gray-800').classList.add('hidden');
+                    btn.closest('.bg-gray-800').classList.add('hidden');
                 });
             });
             
@@ -931,7 +931,9 @@
                     return;
                 }
                 
-                hideAllContainers();
+                // Keep the form container visible, but hide previous results
+                scriptResultContainer.classList.add('hidden');
+                additionalResultsContainer.classList.add('hidden');
                 
                 try {
                     let durationValue = scriptDuration.value;
@@ -950,7 +952,7 @@
                     const optionVoiceScript = document.getElementById('option-voice-script').checked;
                     const optionDescription = document.getElementById('option-description').checked;
 
-                    const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới. Hãy cấu trúc câu trả lời của bạn thành hai phần rõ ràng, phân tách bởi '---VOICE_PART---'.
+                     const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới. Hãy cấu trúc câu trả lời của bạn thành hai phần rõ ràng, phân tách bởi '---VOICE_PART---'.
                         Phần đầu tiên, bắt đầu bằng '---PROMPT_PART---', sẽ chứa tất cả mô tả hình ảnh, cảnh quay, hành động.
                         Phần thứ hai, bắt đầu bằng '---VOICE_PART---', sẽ chứa tất cả lời thoại.
                         Sử dụng các thông tin sau để tạo kịch bản:
@@ -966,7 +968,7 @@
                         ---
                         ${referenceScriptContent}
                         ---
-                        - Ý tưởng/Yêu cầu bổ sung: ${ideaValue ? ideaValue : "Kết hợp các yếu tố trên để tạo ra một kịch bản hoàn chỉnh."}
+                        - Ý tưởng/Yêu cầu bổ sung từ người dùng: ${ideaValue ? ideaValue : "Hãy kết hợp các yếu tố trên để tạo ra một kịch bản hoàn chỉnh."}
                         - Phong cách: ${styleValue}
                         - Thời lượng dự kiến: ${durationValue} phút
                         Hãy đảm bảo bạn tuân thủ đúng định dạng đầu ra đã yêu cầu.`;

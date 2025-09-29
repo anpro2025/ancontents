@@ -1,4 +1,4 @@
-element<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -139,9 +139,9 @@ element<!DOCTYPE html>
                 <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
                     P2S
                 </button>
-                <button id="create-segment-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
+                <a href="./S2Se/" id="create-segment-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
                     S2Se
-                </button>
+                </a>
                 <button id="create-prompts-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
                     Tạo PROMPTS
                 </button>
@@ -810,13 +810,10 @@ element<!DOCTYPE html>
                 scriptFormContainer.classList.remove('hidden');
             });
 
-            createSegmentBtn.addEventListener('click', () => {
+            createSegmentBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default link behavior
                 autoSaveToTrash();
-                // hideAllContainers();
-                segmentForm.reset();
-                segmentResultContainer.classList.add('hidden');
-                segmentFormContainer.classList.remove('hidden');
-                populateAllInputDropdowns();
+                window.location.href = e.currentTarget.href;
             });
 
             scriptDuration.addEventListener('change', (e) => {
@@ -943,10 +940,8 @@ element<!DOCTYPE html>
                 if (button.id === 'go-to-segment-btn') {
                     autoSaveToTrash();
                     const content = scriptResultContent.value;
-                    // hideAllContainers();
-                    segmentInputScript.value = content;
-                    segmentFormContainer.classList.remove('hidden');
-                    populateAllInputDropdowns();
+                    localStorage.setItem('scriptToProcess', content);
+                    window.location.href = './S2Se/';
                     return;
                 }
 

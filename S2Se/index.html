@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AN PRODUCTION AI FILMS - STORY BROAD</title>
+    <title>AN PRODUCTION - S2Se (Script to Section)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,6 @@
             visibility: visible;
             opacity: 1;
         }
-        /* Loading spinner */
         .loader {
             border: 2px solid #f3f3f3;
             border-top: 2px solid #4a90e2;
@@ -46,30 +45,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #111827; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-
-        /* Transitions for containers */
-        .workspace-column, #memory-list-column, #memory-editor-panel {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, width 0.3s ease-in-out;
-        }
-        .workspace-column.hidden-transition {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-            /* position: absolute; */ /* Removed to prevent layout issues */
-        }
-        .modal-overlay {
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        /* Make textareas non-resizable and take full height */
         textarea {
             resize: none;
         }
@@ -85,19 +64,21 @@
         <button id="api-key-btn" title="Cài đặt" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734 1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38 1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
         </button>
-        <a href="./thu-vien/" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" /></svg></a>
-        <a href="./text-to-voice/" title="Tạo Voice (TTS)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></a>
-        <a href="./image-generator/" title="Tạo Ảnh AI" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg></a>
+        <a href="/ancontents/thu-vien/" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 flex items-center shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" /></svg></a>
+        <a href="/ancontents/text-to-voice/" title="Tạo Voice (TTS)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></a>
+        <a href="/ancontents/image-generator/" title="Tạo Ảnh AI" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-2 rounded-full transition duration-300 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg></a>
     </div>
 
     <header class="text-center py-6 flex-shrink-0">
-        <h1 class="text-4xl font-bold tracking-wider uppercase text-white">AN PRODUCTION AI FILMS - STORY BROAD</h1>
+        <h1 class="text-4xl font-bold tracking-wider uppercase text-white">SCRIPT TO SECTION (S2SE)</h1>
     </header>
     
     <div class="flex space-x-8 flex-grow p-8 overflow-hidden pb-20"> <!-- Added padding-bottom for taskbar -->
         <!-- Left Sidebar with Buttons -->
         <aside id="sidebar" class="w-64 flex-shrink-0">
             <div class="flex flex-col space-y-4">
+                 <a href="/ancontents/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">Trang chủ P2S</a>
+                <div class="border-t border-gray-600 pt-4"></div>
                 <div class="flex flex-col space-y-2 items-start">
                     <!-- Yellow Input Buttons -->
                     <div class="flex flex-wrap gap-2">
@@ -114,66 +95,18 @@
                         <button data-type="trash" title="Bộ nhớ Rác" class="memory-btn bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
                     </div>
                 </div>
-                <div class="border-t border-gray-600 pt-4"></div>
-                <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">P2S</button>
-                <a href="./S2Se/" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">S2Se</a>
             </div>
         </aside>
 
         <!-- Main Content Area -->
         <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto relative">
-            <!-- Initial Input Column -->
-            <div id="script-form-container" class="workspace-column hidden w-[400px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-6">Nhập đầu vào</h2>
-                <form id="script-form" class="space-y-4">
-                    <div>
-                        <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Tùy chọn)</label>
-                        <textarea id="script-idea" rows="4" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Đầu vào Dự án (Tham khảo)</label>
-                            <select id="script-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
-                        </div>
-                         <div>
-                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO (Tham khảo)</label>
-                            <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
-                        </div>
-                        <div>
-                            <label for="script-style" class="block text-sm font-medium text-gray-300">Phong cách (Tùy chọn)</label>
-                            <select id="script-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                                <option value="">Mặc định</option>
-                                <option>Storytelling</option><option>Hài hước</option><option>Chính kịch</option><option>Hành động</option><option>Kinh dị</option><option>Kịch câm</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="script-duration" class="block text-sm font-medium text-gray-300">Thời lượng</label>
-                             <select id="script-duration" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                                <option value="1">1 phút</option><option value="10">10 phút</option><option value="60">60 phút</option><option value="custom">Tùy chỉnh...</option>
-                            </select>
-                            <input type="number" id="script-duration-custom" placeholder="Nhập số phút" class="hidden mt-2 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
-                        </div>
-                         <div>
-                            <label for="word-limit" class="block text-sm font-medium text-gray-300">Giới hạn số từ (Tùy chọn)</label>
-                            <input type="number" id="word-limit" placeholder="Ví dụ: 500" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-4 pt-4">
-                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
-                        <button type="submit" id="generate-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
-                            <span class="btn-text">Tạo</span><span class="loader hidden ml-2"></span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Result Window Wrappers -->
-            <div id="script-window-wrapper" class="flex-1"></div>
-            <div id="vo-window-wrapper" class="flex-1"></div>
+             <!-- Result Window Wrappers -->
+            <div id="source-script-window-wrapper" class="flex-1"></div>
+            <div id="sections-window-wrapper" class="flex-1"></div>
         </main>
     </div>
     
-    <!-- Generic Memory Modal -->
+    <!-- Modals and Taskbar (Copied from index.html) -->
     <div id="memory-modal-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-[95vw] h-[95vh] flex flex-col shadow-2xl">
             <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
@@ -274,19 +207,14 @@
     </div>
 
     <script>
+        // --- SCRIPT FOR S2SE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
             // --- UI Elements ---
-            const createScriptBtn = document.getElementById('create-script-btn');
-            const scriptFormContainer = document.getElementById('script-form-container');
             const mainWorkspace = document.getElementById('main-workspace');
-            const scriptWindowWrapper = document.getElementById('script-window-wrapper');
-            const voWindowWrapper = document.getElementById('vo-window-wrapper');
+            const sourceScriptWindowWrapper = document.getElementById('source-script-window-wrapper');
+            const sectionsWindowWrapper = document.getElementById('sections-window-wrapper');
             const taskbar = document.getElementById('taskbar');
 
-            const scriptForm = document.getElementById('script-form');
-            const scriptDuration = document.getElementById('script-duration');
-            const scriptDurationCustom = document.getElementById('script-duration-custom');
-            
             // --- Settings Modal Elements ---
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
@@ -340,7 +268,7 @@
             };
             
             // --- State Management ---
-            const savedWindows = JSON.parse(localStorage.getItem('anProduction_windows'));
+            const savedWindows = JSON.parse(localStorage.getItem('anProduction_windows_s2se'));
 
             const state = {
                 // All memories loaded from localStorage
@@ -361,8 +289,13 @@
                 isEditingMemory: false,
                 currentMemoryType: null,
                 windows: savedWindows || {
-                    script: null,
-                    vo: null
+                    source: {
+                        title: "Kịch bản gốc",
+                        content: localStorage.getItem('scriptToProcess') || "Không có kịch bản nào được chuyển qua. Vui lòng quay lại và thử lại.",
+                        status: 'open',
+                        saved: true // Source is always considered "saved"
+                    },
+                    sections: null
                 }
             };
 
@@ -386,7 +319,7 @@
                 const btnText = button.querySelector('.btn-text');
                 const loader = button.querySelector('.loader');
                 button.disabled = isLoading;
-                if (btnText) btnText.textContent = isLoading ? 'Đang tạo...' : 'Tạo';
+                if (btnText) btnText.textContent = isLoading ? 'Đang tạo...' : 'Tạo Sections';
                 if (loader) loader.classList.toggle('hidden', !isLoading);
             }
 
@@ -397,23 +330,10 @@
                 countElement.textContent = `${wordCount} từ`;
             }
 
-            function downloadAsTxt(title, content) {
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                const fileName = `${(title || 'untitled').toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50)}.txt`;
-                link.href = url;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }
-            
             function formatScriptContent(content) {
                 if (typeof content === 'string') return content;
                 if (Array.isArray(content)) {
-                    return content.map(item => Object.entries(item).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n')).join('\n\n---\n\n');
+                    return content.map((section, index) => `--- SECTION ${index + 1} ---\n${section}`).join('\n\n');
                 }
                 if (typeof content === 'object' && content !== null) {
                     return JSON.stringify(content, null, 2);
@@ -421,48 +341,12 @@
                 return String(content);
             }
 
-            function saveUnsavedWindowsToTrash() {
-                let savedSomething = false;
-                Object.entries(state.windows).forEach(([type, win]) => {
-                    if (win && !win.saved) {
-                        const title = document.getElementById(`${type}-result-title`)?.value.trim();
-                        const content = document.getElementById(`${type}-result-content`)?.value.trim();
-                        if (title || content) {
-                            const now = new Date();
-                            state.trash.push({
-                                id: now.getTime() + (type === 'vo' ? 1 : 0),
-                                title: `Tự động lưu (${type === 'script' ? 'Kịch bản' : 'VO'}): ${title || 'Chưa có tiêu đề'}`,
-                                content: content,
-                                savedAt: now.toLocaleString('vi-VN')
-                            });
-                            savedSomething = true;
-                            win.saved = true; 
-                        }
-                    }
-                });
-
-                if (savedSomething) {
-                    saveDataToStorage('trash');
-                    showToast('Nội dung chưa lưu đã được chuyển vào Rác.');
-                }
-            }
-
-
-            function hideMainPanels() {
-                scriptFormContainer.classList.add('hidden');
-            }
-
-            function showWorkspaceColumn(element) {
-                 hideMainPanels();
-                 element.classList.remove('hidden');
-            }
-
             function hideAllModals() {
                 document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
             }
 
             function saveWindowsState() {
-                localStorage.setItem('anProduction_windows', JSON.stringify(state.windows));
+                localStorage.setItem('anProduction_windows_s2se', JSON.stringify(state.windows));
             }
 
             // --- Generic Memory Management ---
@@ -510,8 +394,6 @@
             }
 
             function openMemoryModal(type) {
-                saveUnsavedWindowsToTrash();
-                hideMainPanels();
                 hideAllModals();
                 state.currentMemoryType = type;
                 state.isEditingMemory = false;
@@ -566,20 +448,6 @@
                 toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             }
             
-            // --- Dropdown Population ---
-             function populateAllInputDropdowns() {
-                const populate = (selectId, data, placeholder) => {
-                    const select = document.getElementById(selectId);
-                    if (!select) return;
-                    select.innerHTML = `<option value="">${placeholder}</option>`;
-                    [...data].sort((a, b) => b.id - a.id).forEach(item => {
-                        select.innerHTML += `<option value="${item.id}">${item.title}</option>`;
-                    });
-                };
-                populate('script-input-script', state.script, 'Chọn từ Đầu vào Dự án...');
-                populate('script-input-voice', state.voiceOver, 'Chọn từ Đầu vào VO...');
-            }
-
             // --- API Calls ---
             async function generateAiContent(prompt, submitButton) {
                 setButtonLoading(submitButton, true);
@@ -590,7 +458,18 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                              contents: [{ parts: [{ text: prompt }] }],
-                             generationConfig: { responseMimeType: "application/json" }
+                             generationConfig: { 
+                                responseMimeType: "application/json",
+                                responseSchema: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        sections: {
+                                            type: "ARRAY",
+                                            items: { type: "STRING" }
+                                        }
+                                    }
+                                }
+                             }
                         })
                     });
                     if (!response.ok) {
@@ -606,24 +485,24 @@
                 }
             }
             
-            // --- Main App Rendering ---
+            // --- S2SE App Rendering ---
             function renderApp() {
-                // Render Script Window
-                if (state.windows.script) {
-                    scriptWindowWrapper.innerHTML = createResultWindowHTML('script', state.windows.script);
-                    scriptWindowWrapper.classList.toggle('hidden', state.windows.script.status === 'minimized');
+                // Render Source Script Window
+                if (state.windows.source) {
+                    sourceScriptWindowWrapper.innerHTML = createS2SWindowHTML('source', state.windows.source);
+                    sourceScriptWindowWrapper.classList.toggle('hidden', state.windows.source.status === 'minimized');
                 } else {
-                    scriptWindowWrapper.innerHTML = '';
-                    scriptWindowWrapper.classList.add('hidden');
+                    sourceScriptWindowWrapper.innerHTML = '';
+                    sourceScriptWindowWrapper.classList.add('hidden');
                 }
 
-                // Render VO Window
-                if (state.windows.vo) {
-                    voWindowWrapper.innerHTML = createResultWindowHTML('vo', state.windows.vo);
-                    voWindowWrapper.classList.toggle('hidden', state.windows.vo.status === 'minimized');
+                // Render Sections Window
+                if (state.windows.sections) {
+                    sectionsWindowWrapper.innerHTML = createS2SWindowHTML('sections', state.windows.sections);
+                    sectionsWindowWrapper.classList.toggle('hidden', state.windows.sections.status === 'minimized');
                 } else {
-                    voWindowWrapper.innerHTML = '';
-                    voWindowWrapper.classList.add('hidden');
+                    sectionsWindowWrapper.innerHTML = '';
+                    sectionsWindowWrapper.classList.add('hidden');
                 }
 
                 // Render Taskbar
@@ -642,22 +521,9 @@
             }
 
             // --- Event Listeners Setup ---
-            createScriptBtn.addEventListener('click', () => {
-                saveUnsavedWindowsToTrash();
-                scriptForm.reset();
-                populateAllInputDropdowns();
-                scriptDurationCustom.classList.add('hidden');
-                showWorkspaceColumn(scriptFormContainer);
-            });
-
-            scriptDuration.addEventListener('change', (e) => {
-                scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
-            });
             
             apiKeyBtn.addEventListener('click', () => {
-                saveUnsavedWindowsToTrash();
                 hideAllModals();
-                hideMainPanels();
                 renderSettingsDisplay();
                 apiKeyContainer.classList.remove('hidden');
             });
@@ -807,141 +673,97 @@
                 showToast(isPurge ? 'Đã xóa vĩnh viễn.' : 'Đã chuyển vào thùng rác.', 'success');
             });
             
-            document.querySelectorAll('.close-modal-btn, .cancel-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => e.target.closest('.modal-overlay, .workspace-column').classList.add('hidden'));
+            document.querySelectorAll('.close-modal-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => e.target.closest('.modal-overlay').classList.add('hidden'));
             });
 
-            scriptForm.addEventListener('submit', async (e) => {
+            mainWorkspace.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const submitButton = e.target.querySelector('button[type="submit"]');
-                saveUnsavedWindowsToTrash();
-                
-                const ideaValue = document.getElementById('script-idea').value.trim();
-                const selectedScriptId = document.getElementById('script-input-script').value;
-                const selectedVoId = document.getElementById('script-input-voice').value;
-                const hasCreativeInput = ideaValue || selectedScriptId || selectedVoId;
-
-                if (!state.settings.apiKey) {
-                    showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
-                    apiKeyBtn.click();
-                    return;
-                }
-                
-                hideMainPanels();
-                
-                const loadingOverlay = document.createElement('div');
-                loadingOverlay.id = 'loading-indicator';
-                loadingOverlay.className = 'fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-75 z-50';
-                loadingOverlay.innerHTML = `<div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>`;
-                document.body.appendChild(loadingOverlay);
-
-                try {
-                    const styleValue = document.getElementById('script-style').value;
-                    let durationValue = scriptDuration.value === 'custom' ? scriptDurationCustom.value : scriptDuration.value;
-                    const wordLimit = document.getElementById('word-limit').value;
-                    const referenceScript = state.script.find(s => s.id == selectedScriptId);
-                    const referenceVo = state.voiceOver.find(v => v.id == selectedVoId);
-
-                    let prompt;
-                    let newTitle;
-
-                    if (hasCreativeInput) {
-                        prompt = `Bạn là một biên kịch chuyên nghiệp.
-Nhiệm vụ: Viết một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt dựa trên các thông tin được cung cấp.
-Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
-
-Sử dụng các thông tin sau:
-${ideaValue ? `- Ý tưởng/Yêu cầu chính: ${ideaValue}\n` : ''}
-${referenceScript ? `- Kịch bản tham khảo (cốt truyện): --- ${referenceScript.content} ---\n` : ''}
-${referenceVo ? `- Lời thoại tham khảo (VO): --- ${referenceVo.content} ---\n` : ''}
-${styleValue ? `- Phong cách: ${styleValue}\n` : ''}
-- Thời lượng dự kiến: ${durationValue} phút
-${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
-
-Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
-                        newTitle = `Kịch bản cho: ${(ideaValue || referenceScript?.title || 'dữ liệu vào').substring(0, 30)}...`;
-                    } else {
-                        prompt = `Bạn là một biên kịch chuyên nghiệp.
-Nhiệm vụ: Hãy sáng tạo ngẫu nhiên một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt.
-Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
-
-Yêu cầu về kịch bản:
-${styleValue ? `- Phong cách: ${styleValue}\n` : '- Phong cách: Hãy tự do sáng tạo một phong cách thú vị.\n'}
-- Thời lượng dự kiến: ${durationValue} phút
-${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
-
-Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
-                        newTitle = `Kịch bản ngẫu nhiên (${durationValue} phút)`;
+                if (e.target.id === 's2se-form') {
+                    const submitButton = e.target.querySelector('button[type="submit"]');
+                    const sourceScript = state.windows.source.content;
+                    if (!sourceScript) {
+                        showToast('Không có kịch bản gốc để xử lý.', 'error');
+                        return;
+                    }
+                    if (!state.settings.apiKey) {
+                        showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
+                        apiKeyBtn.click();
+                        return;
                     }
 
-                    const generatedContent = await generateAiContent(prompt, submitButton);
-                    const result = JSON.parse(generatedContent);
-                    
-                    state.windows.script = {
-                        title: newTitle,
-                        content: formatScriptContent(result.main_script || "AI không tạo được kịch bản chính."),
-                        status: 'open',
-                        saved: false
-                    };
-                    state.windows.vo = {
-                        title: `VO cho: ${newTitle}`,
-                        content: formatScriptContent(result.voice_over_script || "AI không tạo được phần VO riêng biệt."),
-                        status: 'open',
-                        saved: false
-                    };
-                    
-                    renderApp();
+                    const sectionCount = document.getElementById('section-count').value;
+                    const extraInstructions = document.getElementById('extra-instructions').value.trim();
 
-                } catch (error) {
-                    console.error('Lỗi trong quá trình tạo:', error);
-                    showToast(`Lỗi: ${error.message}`, 'error');
-                } finally {
-                    document.getElementById('loading-indicator')?.remove();
+                    const sectionsResultContainer = document.getElementById('sections-result-container');
+                    sectionsResultContainer.classList.remove('hidden');
+                    sectionsResultContainer.querySelector('textarea').value = 'Đang tạo, vui lòng chờ...';
+
+                    try {
+                         const prompt = `Bạn là một biên tập viên kịch bản. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections).
+Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ có một khóa duy nhất là "sections". Giá trị của "sections" phải là một mảng (array) các chuỗi (string), mỗi chuỗi là một section của kịch bản.
+
+Thông tin:
+- Kịch bản gốc: ---
+${sourceScript}
+---
+${sectionCount ? `- Số lượng section mong muốn: ${sectionCount}`: ''}
+${extraInstructions ? `- Hướng dẫn thêm: ${extraInstructions}`: ''}
+
+Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
+
+                        const generatedContent = await generateAiContent(prompt, submitButton);
+                        const result = JSON.parse(generatedContent);
+
+                        state.windows.sections = {
+                            title: `Các Section cho: ${state.windows.source.title.substring(0,20)}...`,
+                            content: formatScriptContent(result.sections || ["AI không tạo được sections."]),
+                            status: 'open',
+                            saved: false
+                        };
+                        renderApp();
+
+                    } catch (error) {
+                         console.error('Lỗi trong quá trình tạo sections:', error);
+                        showToast(`Lỗi: ${error.message}`, 'error');
+                        if (state.windows.sections) {
+                            state.windows.sections.content = `Đã xảy ra lỗi: ${error.message}`;
+                            renderApp();
+                        }
+                    }
                 }
             });
 
-            function createResultWindowHTML(type, windowData) {
+            function createS2SWindowHTML(type, windowData) {
                 const { title, content } = windowData;
-                const isScript = type === 'script';
+                const isSource = type === 'source';
                 return `
                 <div class="bg-gray-800 rounded-lg flex flex-col h-full shadow-2xl">
                     <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-t-lg select-none">
                         <span class="font-bold truncate px-2">${title}</span>
                         <div class="flex space-x-2">
                             <button data-window-type="${type}" class="minimize-btn h-6 w-6 flex items-center justify-center bg-yellow-500 hover:bg-yellow-400 rounded-full text-black font-bold text-lg leading-none pb-1">-</button>
-                            <button data-window-type="${type}" class="close-btn h-6 w-6 flex items-center justify-center bg-red-500 hover:bg-red-400 rounded-full text-white font-bold text-lg leading-none pb-1">×</button>
+                            ${!isSource ? `<button data-window-type="${type}" class="close-btn h-6 w-6 flex items-center justify-center bg-red-500 hover:bg-red-400 rounded-full text-white font-bold text-lg leading-none pb-1">×</button>` : ''}
                         </div>
                     </div>
                     <div class="p-4 flex-grow flex flex-col min-h-0">
-                        <div class="flex-shrink-0 mb-4">
-                            <div class="flex justify-between items-center">
-                                <label for="${type}-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                                <button data-type="${isScript ? 'mainScripts' : 'mainVoiceOvers'}" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào ${isScript ? 'S' : 'VO'}</button>
-                            </div>
-                            <input type="text" id="${type}-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" value="${title}">
-                        </div>
-                        <div class="flex-grow flex flex-col min-h-0">
-                            <div class="flex justify-between items-center flex-shrink-0">
-                                <label for="${type}-result-content" class="block text-sm font-medium text-gray-300">Nội dung</label>
-                                <span id="${type}-word-count" class="text-xs text-gray-400">0 từ</span>
-                            </div>
-                            <textarea id="${type}-result-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow">${content}</textarea>
-                            <div class="flex justify-between items-center pt-2 flex-shrink-0">
-                                <div>
-                                    ${isScript 
-                                        ? `<a href="./S2Se/" class="nav-link-dynamic bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md">Chuyển sang S2Se</a>`
-                                        : `<a href="./text-to-voice/" class="nav-link-dynamic bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-3 text-sm rounded-md">Tạo Voice TTS</a>`
-                                    }
+                        ${isSource 
+                            ? `<div class="flex-grow flex flex-col min-h-0">
+                                <textarea id="source-script-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" readonly>${content}</textarea>
+                               </div>`
+                            : `<div class="flex-shrink-0 mb-4">
+                                    <div class="flex justify-between items-center">
+                                        <label for="sections-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                                        <button data-type="sections" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se</button>
+                                    </div>
+                                    <input type="text" id="sections-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" value="${title}">
                                 </div>
-                                <div class="flex space-x-2">
-                                    <button data-target="${type}-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                                    <button data-target="${type}-result-content" data-title="${type}" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                                </div>
-                            </div>
-                        </div>
+                                <div class="flex-grow flex flex-col min-h-0">
+                                    <textarea id="sections-result-content" class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md flex-grow p-3">${content}</textarea>
+                                </div>`
+                        }
                     </div>
-                </div>
-                `;
+                </div>`;
             }
             
             // Centralized event listener for the whole app
@@ -960,22 +782,6 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                         }
                     } else if (button.classList.contains('close-btn')) {
                         if (state.windows[windowType]) {
-                            const win = state.windows[windowType];
-                            if (!win.saved) {
-                                const title = document.getElementById(`${windowType}-result-title`)?.value.trim();
-                                const content = document.getElementById(`${windowType}-result-content`)?.value.trim();
-                                if (title || content) {
-                                    const now = new Date();
-                                    state.trash.push({
-                                        id: now.getTime() + (windowType === 'vo' ? 1 : 0),
-                                        title: `Tự động lưu (Đóng cửa sổ): ${title || 'Chưa có tiêu đề'}`,
-                                        content: content,
-                                        savedAt: now.toLocaleString('vi-VN')
-                                    });
-                                    saveDataToStorage('trash');
-                                    showToast('Nội dung chưa lưu đã được chuyển vào Rác.');
-                                }
-                            }
                             state.windows[windowType] = null;
                             renderApp();
                         }
@@ -984,62 +790,29 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                             state.windows[windowType].status = 'open';
                             renderApp();
                         }
-                    } else if (button.classList.contains('copy-btn')) {
-                        const content = document.getElementById(target)?.value;
-                        if (!content) return showToast('Không có nội dung để sao chép.', 'info');
-                        navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép vào clipboard!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
-                    } else if (button.classList.contains('export-btn')) {
-                        const content = document.getElementById(target)?.value;
-                        const titleText = document.getElementById(`${title}-result-title`)?.value;
-                        if (!content) return showToast('Không có nội dung để xuất.', 'info');
-                        downloadAsTxt(titleText, content);
                     } else if (button.classList.contains('save-result-btn')) {
-                        const isScript = type === 'mainScripts';
-                        const titleElemId = isScript ? 'script-result-title' : 'vo-result-title';
-                        const contentElemId = isScript ? 'script-result-content' : 'vo-result-content';
-                        const titleText = document.getElementById(titleElemId)?.value.trim();
-                        const content = document.getElementById(contentElemId)?.value.trim();
+                        const titleText = document.getElementById('sections-result-title')?.value.trim();
+                        const content = document.getElementById('sections-result-content')?.value.trim();
                         if (!titleText || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
                         
                         state[type].push({ id: Date.now(), title: titleText, content });
                         saveDataToStorage(type);
                         
-                        if(isScript) { if(state.windows.script) state.windows.script.saved = true; } 
-                        else { if(state.windows.vo) state.windows.vo.saved = true; }
+                        if(state.windows.sections) state.windows.sections.saved = true;
 
                         showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
                     }
                 }
 
-                if (navLink && navLink.href.includes('./')) {
+                if (navLink && navLink.href.includes('/ancontents/')) {
                     e.preventDefault();
-                    saveUnsavedWindowsToTrash();
-                    if (navLink.href.includes('/S2Se/')) {
-                        const content = document.getElementById('script-result-content')?.value;
-                        localStorage.setItem('scriptToProcess', content || '');
-                    }
-                    if (navLink.href.includes('/text-to-voice/')) {
-                        const content = document.getElementById('vo-result-content')?.value;
-                        localStorage.setItem('textToVoice', content || '');
-                    }
                     window.location.href = navLink.href;
                 }
             });
             
-            // Listen for changes in result textareas to update saved state
-            document.body.addEventListener('input', e => {
-                const targetId = e.target.id;
-                if (targetId === 'script-result-content' || targetId === 'script-result-title') {
-                    if (state.windows.script) state.windows.script.saved = false;
-                } else if (targetId === 'vo-result-content' || targetId === 'vo-result-title') {
-                    if (state.windows.vo) state.windows.vo.saved = false;
-                }
-            });
-
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
-            populateAllInputDropdowns();
-            renderApp(); // Initial render
+            renderApp(); // Initial render for S2Se page
         });
     </script>
 </body>

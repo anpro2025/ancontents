@@ -340,6 +340,8 @@
             };
             
             // --- State Management ---
+            const savedWindows = JSON.parse(localStorage.getItem('anProduction_windows'));
+
             const state = {
                 // All memories loaded from localStorage
                 script: JSON.parse(localStorage.getItem(memoryConfig.script.storageKey)) || [],
@@ -358,8 +360,8 @@
                 itemToDelete: null,
                 isEditingMemory: false,
                 currentMemoryType: null,
-                windows: {
-                    script: null, // { title, content, status: 'open' | 'minimized' }
+                windows: savedWindows || {
+                    script: null,
                     vo: null
                 }
             };
@@ -434,6 +436,10 @@
 
             function hideAllModals() {
                 document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+            }
+
+            function saveWindowsState() {
+                localStorage.setItem('anProduction_windows', JSON.stringify(state.windows));
             }
 
             // --- Generic Memory Management ---
@@ -607,6 +613,8 @@
                         taskbar.appendChild(btn);
                     }
                 });
+
+                saveWindowsState();
             }
 
             // --- Event Listeners Setup ---
@@ -951,7 +959,7 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     } else if (button.classList.contains('copy-btn')) {
                         const content = document.getElementById(target)?.value;
                         if (!content) return showToast('Không có nội dung để sao chép.', 'info');
-                        navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
+                        navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép vào clipboard!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
                     } else if (button.classList.contains('export-btn')) {
                         const content = document.getElementById(target)?.value;
                         const titleText = document.getElementById(`${title}-result-title`)?.value;

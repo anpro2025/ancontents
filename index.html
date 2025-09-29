@@ -140,14 +140,20 @@
                     
                     <div class="space-y-4">
                         <div>
-                            <label for="script-input-type-1" class="block text-sm font-medium text-gray-300">Kịch bản tham khảo 1 (Cốt truyện chính)</label>
-                            <select id="script-input-type-1" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                            <label for="script-input-prompt" class="block text-sm font-medium text-gray-300">Yêu cầu Prompt</label>
+                            <select id="script-input-prompt" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
                         <div>
-                            <label for="script-input-type-2" class="block text-sm font-medium text-gray-300">Kịch bản tham khảo 2 (Phong cách) (Tùy chọn)</label>
-                            <select id="script-input-type-2" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                            <label for="script-input-voice" class="block text-sm font-medium text-gray-300">Yêu cầu Voice</label>
+                            <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="script-input-script" class="block text-sm font-medium text-gray-300">Yêu cầu đầu vào kịch bản</label>
+                            <select id="script-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
@@ -472,8 +478,9 @@
             const descriptionResultWrapper = document.getElementById('description-result-wrapper');
             
             const scriptForm = document.getElementById('script-form');
-            const scriptInputType1 = document.getElementById('script-input-type-1');
-            const scriptInputType2 = document.getElementById('script-input-type-2');
+            const scriptInputPrompt = document.getElementById('script-input-prompt');
+            const scriptInputVoice = document.getElementById('script-input-voice');
+            const scriptInputScript = document.getElementById('script-input-script');
             const scriptIdea = document.getElementById('script-idea');
             const scriptDuration = document.getElementById('script-duration');
             const scriptDurationCustom = document.getElementById('script-duration-custom');
@@ -663,23 +670,28 @@
                 URL.revokeObjectURL(url);
             }
 
-            function populateScriptInputDropdowns() {
-                [scriptInputType1, scriptInputType2].forEach((select, index) => {
-                    if (!select) return;
-                    select.innerHTML = '';
-                    const placeholderOption = document.createElement('option');
-                    placeholderOption.textContent = index === 0 ? 'Chọn kịch bản cho cốt truyện...' : 'Chọn kịch bản cho phong cách...';
-                    placeholderOption.value = '';
-                    select.appendChild(placeholderOption);
+            function populateDropdown(selectElement, data, placeholderText) {
+                if (!selectElement) return;
+                selectElement.innerHTML = '';
+                const placeholderOption = document.createElement('option');
+                placeholderOption.textContent = placeholderText;
+                placeholderOption.value = '';
+                selectElement.appendChild(placeholderOption);
 
-                    scripts.forEach(script => {
-                        const option = document.createElement('option');
-                        option.value = script.id;
-                        option.textContent = script.title;
-                        select.appendChild(option.cloneNode(true));
-                    });
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.title;
+                    selectElement.appendChild(option.cloneNode(true));
                 });
             }
+
+            function populateAllInputDropdowns() {
+                populateDropdown(scriptInputPrompt, prompts, 'Chọn từ Yêu cầu Prompt...');
+                populateDropdown(scriptInputVoice, voiceOvers, 'Chọn từ Yêu cầu Voice...');
+                populateDropdown(scriptInputScript, scripts, 'Chọn từ Đầu vào kịch bản...');
+            }
+
 
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
@@ -689,7 +701,7 @@
                 hideAllContainers();
                 hideAllModals();
                 scriptForm.reset();
-                populateScriptInputDropdowns();
+                populateAllInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
                 scriptFormContainer.classList.remove('hidden');
             });
@@ -894,13 +906,14 @@
                 e.preventDefault();
                 
                 const submitButton = e.target.querySelector('button[type="submit"]');
-                const selectedScriptId1 = scriptInputType1.value;
-                const selectedScriptId2 = scriptInputType2.value;
+                const selectedPromptId = scriptInputPrompt.value;
+                const selectedVoiceId = scriptInputVoice.value;
+                const selectedScriptId = scriptInputScript.value;
                 const ideaValue = scriptIdea.value.trim();
                 const styleValue = document.getElementById('script-style').value;
 
-                if (!selectedScriptId1 && !ideaValue) {
-                    alert('Vui lòng chọn Kịch bản tham khảo 1 hoặc nhập ý tưởng mới.');
+                if (!selectedPromptId && !selectedVoiceId && !selectedScriptId && !ideaValue) {
+                    alert('Vui lòng cung cấp ít nhất một yêu cầu đầu vào (Prompt, Voice, Kịch bản) hoặc nhập ý tưởng mới.');
                     return;
                 }
                 if (!styleValue) {
@@ -919,24 +932,34 @@
                 try {
                     let durationValue = scriptDuration.value;
                     if (durationValue === 'custom') durationValue = scriptDurationCustom.value;
-                    const referenceScript1 = scripts.find(s => s.id == selectedScriptId1);
-                    const referenceContent1 = referenceScript1 ? referenceScript1.content : "Không có";
-                    const referenceScript2 = scripts.find(s => s.id == selectedScriptId2);
-                    const referenceContent2 = referenceScript2 ? referenceScript2.content : "Không có";
+                    
+                    const referencePrompt = prompts.find(p => p.id == selectedPromptId);
+                    const referencePromptContent = referencePrompt ? referencePrompt.content : "Không có";
+                    
+                    const referenceVoice = voiceOvers.find(v => v.id == selectedVoiceId);
+                    const referenceVoiceContent = referenceVoice ? referenceVoice.content : "Không có";
+
+                    const referenceScript = scripts.find(s => s.id == selectedScriptId);
+                    const referenceScriptContent = referenceScript ? referenceScript.content : "Không có";
+
                     const optionPromptVideo = document.getElementById('option-prompt-video').checked;
                     const optionVoiceScript = document.getElementById('option-voice-script').checked;
                     const optionDescription = document.getElementById('option-description').checked;
 
                     const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới dựa trên các thông tin sau:
-                        - Kịch bản tham khảo 1 (Sử dụng làm nền tảng cho cốt truyện, bối cảnh):
+                        - Yêu cầu Prompt đầu vào (để tham khảo về hình ảnh, cảnh quay):
                         ---
-                        ${referenceContent1}
+                        ${referencePromptContent}
                         ---
-                        - Kịch bản tham khảo 2 (Học hỏi văn phong, lời thoại, phát triển nhân vật từ đây. Nếu "Không có" thì bỏ qua):
+                        - Yêu cầu Voice Off đầu vào (để tham khảo về lời thoại):
                         ---
-                        ${referenceContent2}
+                        ${referenceVoiceContent}
                         ---
-                        - Ý tưởng chính: ${ideaValue ? ideaValue : "Kết hợp những yếu tố hay nhất từ (các) kịch bản tham khảo để tạo ra một câu chuyện mới."}
+                        - Kịch bản tham khảo (dùng làm cốt truyện, bối cảnh chính):
+                        ---
+                        ${referenceScriptContent}
+                        ---
+                        - Ý tưởng/Yêu cầu bổ sung từ người dùng: ${ideaValue ? ideaValue : "Hãy kết hợp các yếu tố trên để tạo ra một kịch bản hoàn chỉnh."}
                         - Phong cách: ${styleValue}
                         - Thời lượng dự kiến: ${durationValue} phút
                         Hãy chỉ viết kịch bản mới, không thêm bất kỳ lời giải thích hay tiêu đề nào khác.`;
@@ -945,7 +968,9 @@
                     
                     if (!generatedScript) throw new Error('Không nhận được nội dung kịch bản chính từ AI.');
 
-                    const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 30)}...` : `Kết hợp từ: ${referenceScript1?.title.substring(0, 20)}...`;
+                    const newTitle = ideaValue 
+                        ? `Kịch bản cho: ${ideaValue.substring(0, 30)}...` 
+                        : `Kịch bản từ: ${referenceScript?.title.substring(0, 20) || 'dữ liệu vào'}...`;
                     scriptResultTitle.value = newTitle;
                     scriptResultContent.value = generatedScript;
                     scriptResultContainer.classList.remove('hidden');

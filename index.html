@@ -164,12 +164,12 @@
             </div>
 
             <!-- Result Column -->
-            <div id="script-result-container" class="workspace-column hidden w-[800px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col">
+            <div id="script-result-container" class="workspace-column hidden flex-1 bg-gray-800 p-6 rounded-lg flex flex-col">
                  <!-- This will be populated by JS -->
             </div>
             
             <!-- VO Result Column -->
-            <div id="vo-result-container" class="workspace-column hidden w-[800px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col">
+            <div id="vo-result-container" class="workspace-column hidden flex-1 bg-gray-800 p-6 rounded-lg flex flex-col">
                  <!-- This will be populated by JS -->
             </div>
         </main>
@@ -202,7 +202,7 @@
                             <label for="memory-modal-title-input" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
                             <input type="text" id="memory-modal-title-input" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
                         </div>
-                        <div class="flex-grow flex flex-col">
+                        <div class="flex-grow flex flex-col min-h-0">
                              <div class="flex justify-between items-center">
                                 <label for="memory-modal-content-input" class="block text-sm font-medium text-gray-300">Nội dung</label>
                                 <span id="memory-word-count" class="text-xs text-gray-400">0 từ</span>
@@ -827,27 +827,30 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
             function createResultCardHTML(type, title, content) {
                 const isScript = type === 'script';
                 return `
-                    <h2 class="text-2xl font-bold mb-4">${isScript ? 'Kịch bản được tạo' : 'VO được tạo'}</h2>
-                    <div class="space-y-4 flex-grow flex flex-col">
+                    <h2 class="text-2xl font-bold mb-4 flex-shrink-0">${isScript ? 'Kịch bản được tạo' : 'VO được tạo'}</h2>
+                    
+                    <div class="flex-shrink-0 mb-4">
                         <div class="flex justify-between items-center">
-                             <label for="${type}-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                             <div class="flex space-x-2">
+                            <label for="${type}-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                            <div class="flex space-x-2">
                                 <button type="button" data-type="${isScript ? 'mainScripts' : 'mainVoiceOvers'}" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào ${isScript ? 'S' : 'VO'}</button>
                             </div>
                         </div>
-                        <input type="text" id="${type}-result-title" required class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" value="${title}">
-                        <div class="flex-grow flex flex-col">
-                            <div class="flex justify-between items-center">
-                                <label for="${type}-result-content" class="block text-sm font-medium text-gray-300">Nội dung</label>
-                                <span id="${type}-word-count" class="text-xs text-gray-400">0 từ</span>
-                            </div>
-                            <textarea id="${type}-result-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow">${content}</textarea>
-                            <div class="flex justify-end space-x-2 pt-2">
-                                <button type="button" data-target="${type}-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                                <button type="button" data-target="${type}-result-content" data-title="${type}" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                            </div>
+                        <input type="text" id="${type}-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" value="${title}">
+                    </div>
+
+                    <div class="flex-grow flex flex-col min-h-0">
+                        <div class="flex justify-between items-center flex-shrink-0">
+                            <label for="${type}-result-content" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                            <span id="${type}-word-count" class="text-xs text-gray-400">0 từ</span>
                         </div>
-                    </div>`;
+                        <textarea id="${type}-result-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow">${content}</textarea>
+                        <div class="flex justify-end space-x-2 pt-2 flex-shrink-0">
+                            <button type="button" data-target="${type}-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                            <button type="button" data-target="${type}-result-content" data-title="${type}" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        </div>
+                    </div>
+                    `;
             }
 
             document.body.addEventListener('click', e => {
@@ -881,6 +884,15 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     }
 
                     showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
+                }
+            });
+            
+            // Listen for changes in result textareas to update saved state
+            document.body.addEventListener('input', e => {
+                if (e.target.id === 'script-result-content') {
+                    state.currentScriptSaved = false;
+                } else if (e.target.id === 'vo-result-content') {
+                    state.currentVoSaved = false;
                 }
             });
 

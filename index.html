@@ -421,6 +421,48 @@
                 return String(content);
             }
 
+            function saveUnsavedWindowsToTrash() {
+                let savedSomething = false;
+                // Check Script Window
+                if (state.windows.script && !state.windows.script.saved) {
+                    const title = document.getElementById('script-result-title')?.value.trim();
+                    const content = document.getElementById('script-result-content')?.value.trim();
+                    if (title || content) {
+                        const now = new Date();
+                        state.trash.push({
+                            id: now.getTime(),
+                            title: `Tự động lưu (Kịch bản): ${title || 'Chưa có tiêu đề'}`,
+                            content: content,
+                            savedAt: now.toLocaleString('vi-VN')
+                        });
+                        savedSomething = true;
+                        state.windows.script.saved = true; 
+                    }
+                }
+
+                // Check VO Window
+                if (state.windows.vo && !state.windows.vo.saved) {
+                    const title = document.getElementById('vo-result-title')?.value.trim();
+                    const content = document.getElementById('vo-result-content')?.value.trim();
+                    if (title || content) {
+                        const now = new Date();
+                        state.trash.push({
+                            id: now.getTime() + 1,
+                            title: `Tự động lưu (VO): ${title || 'Chưa có tiêu đề'}`,
+                            content: content,
+                            savedAt: now.toLocaleString('vi-VN')
+                        });
+                        savedSomething = true;
+                        state.windows.vo.saved = true;
+                    }
+                }
+
+                if (savedSomething) {
+                    saveDataToStorage('trash');
+                    showToast('Nội dung chưa lưu đã được chuyển vào Rác.');
+                }
+            }
+
             function hideAllWorkspaceColumns() {
                 mainWorkspace.querySelectorAll('.workspace-column').forEach(c => {
                     if (!c.classList.contains('hidden')) {
@@ -487,6 +529,7 @@
             }
 
             function openMemoryModal(type) {
+                saveUnsavedWindowsToTrash();
                 hideAllWorkspaceColumns();
                 hideAllModals();
                 state.currentMemoryType = type;
@@ -619,6 +662,7 @@
 
             // --- Event Listeners Setup ---
             createScriptBtn.addEventListener('click', () => {
+                saveUnsavedWindowsToTrash();
                 scriptForm.reset();
                 populateAllInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
@@ -630,6 +674,7 @@
             });
             
             apiKeyBtn.addEventListener('click', () => {
+                saveUnsavedWindowsToTrash();
                 hideAllModals();
                 hideAllWorkspaceColumns();
                 renderSettingsDisplay();
@@ -788,6 +833,8 @@
             scriptForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitButton = e.target.querySelector('button[type="submit"]');
+                saveUnsavedWindowsToTrash();
+                
                 const ideaValue = document.getElementById('script-idea').value.trim();
                 const selectedScriptId = document.getElementById('script-input-script').value;
                 const selectedVoId = document.getElementById('script-input-voice').value;

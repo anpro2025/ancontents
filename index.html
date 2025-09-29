@@ -165,7 +165,7 @@
             </div>
             
             <!-- VO Result Column -->
-            <div id="vo-result-container" class="workspace-column hidden w-[600px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col">
+            <div id="vo-result-container" class="workspace-column hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
                  <!-- This will be populated by JS -->
             </div>
         </main>
@@ -612,6 +612,27 @@
 
             document.querySelectorAll('.memory-btn').forEach(btn => {
                 btn.addEventListener('click', () => openMemoryModal(btn.dataset.type));
+            });
+
+            // Add listeners to navigation links to auto-save work
+            document.querySelectorAll('a[href^="./"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    autoSaveToTrash();
+                    
+                    // Special logic for S2Se to pass current script content
+                    if (link.href.includes('/S2Se/')) {
+                        const content = document.getElementById('script-result-content')?.value;
+                        if (content) {
+                            localStorage.setItem('scriptToProcess', content);
+                        } else {
+                            localStorage.removeItem('scriptToProcess');
+                        }
+                    }
+                    
+                    // Navigate after handling logic
+                    window.location.href = link.href;
+                });
             });
             
             toggleListBtn.addEventListener('click', () => {

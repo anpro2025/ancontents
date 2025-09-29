@@ -168,8 +168,8 @@
             </div>
 
             <!-- Result Window Wrappers -->
-            <div id="script-window-wrapper" class="workspace-column hidden flex-1"></div>
-            <div id="vo-window-wrapper" class="workspace-column hidden flex-1"></div>
+            <div id="script-window-wrapper" class="flex-1"></div>
+            <div id="vo-window-wrapper" class="flex-1"></div>
         </main>
     </div>
     
@@ -423,39 +423,23 @@
 
             function saveUnsavedWindowsToTrash() {
                 let savedSomething = false;
-                // Check Script Window
-                if (state.windows.script && !state.windows.script.saved) {
-                    const title = document.getElementById('script-result-title')?.value.trim();
-                    const content = document.getElementById('script-result-content')?.value.trim();
-                    if (title || content) {
-                        const now = new Date();
-                        state.trash.push({
-                            id: now.getTime(),
-                            title: `Tự động lưu (Kịch bản): ${title || 'Chưa có tiêu đề'}`,
-                            content: content,
-                            savedAt: now.toLocaleString('vi-VN')
-                        });
-                        savedSomething = true;
-                        state.windows.script.saved = true; 
+                Object.entries(state.windows).forEach(([type, win]) => {
+                    if (win && !win.saved) {
+                        const title = document.getElementById(`${type}-result-title`)?.value.trim();
+                        const content = document.getElementById(`${type}-result-content`)?.value.trim();
+                        if (title || content) {
+                            const now = new Date();
+                            state.trash.push({
+                                id: now.getTime() + (type === 'vo' ? 1 : 0),
+                                title: `Tự động lưu (${type === 'script' ? 'Kịch bản' : 'VO'}): ${title || 'Chưa có tiêu đề'}`,
+                                content: content,
+                                savedAt: now.toLocaleString('vi-VN')
+                            });
+                            savedSomething = true;
+                            win.saved = true; 
+                        }
                     }
-                }
-
-                // Check VO Window
-                if (state.windows.vo && !state.windows.vo.saved) {
-                    const title = document.getElementById('vo-result-title')?.value.trim();
-                    const content = document.getElementById('vo-result-content')?.value.trim();
-                    if (title || content) {
-                        const now = new Date();
-                        state.trash.push({
-                            id: now.getTime() + 1,
-                            title: `Tự động lưu (VO): ${title || 'Chưa có tiêu đề'}`,
-                            content: content,
-                            savedAt: now.toLocaleString('vi-VN')
-                        });
-                        savedSomething = true;
-                        state.windows.vo.saved = true;
-                    }
-                }
+                });
 
                 if (savedSomething) {
                     saveDataToStorage('trash');
@@ -463,16 +447,13 @@
                 }
             }
 
-            function hideAllWorkspaceColumns() {
-                mainWorkspace.querySelectorAll('.workspace-column').forEach(c => {
-                    if (!c.classList.contains('hidden')) {
-                         c.classList.add('hidden');
-                    }
-                });
+
+            function hideMainPanels() {
+                scriptFormContainer.classList.add('hidden');
             }
 
             function showWorkspaceColumn(element) {
-                 hideAllWorkspaceColumns();
+                 hideMainPanels();
                  element.classList.remove('hidden');
             }
 
@@ -530,7 +511,7 @@
 
             function openMemoryModal(type) {
                 saveUnsavedWindowsToTrash();
-                hideAllWorkspaceColumns();
+                hideMainPanels();
                 hideAllModals();
                 state.currentMemoryType = type;
                 state.isEditingMemory = false;
@@ -676,7 +657,7 @@
             apiKeyBtn.addEventListener('click', () => {
                 saveUnsavedWindowsToTrash();
                 hideAllModals();
-                hideAllWorkspaceColumns();
+                hideMainPanels();
                 renderSettingsDisplay();
                 apiKeyContainer.classList.remove('hidden');
             });
@@ -846,7 +827,7 @@
                     return;
                 }
                 
-                hideAllWorkspaceColumns();
+                hideMainPanels();
                 
                 const loadingOverlay = document.createElement('div');
                 loadingOverlay.id = 'loading-indicator';
@@ -1032,6 +1013,7 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
 
                 if (navLink && navLink.href.includes('./')) {
                     e.preventDefault();
+                    saveUnsavedWindowsToTrash();
                     if (navLink.href.includes('/S2Se/')) {
                         const content = document.getElementById('script-result-content')?.value;
                         localStorage.setItem('scriptToProcess', content || '');

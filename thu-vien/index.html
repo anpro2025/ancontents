@@ -77,9 +77,7 @@
                     <div>
                         <label for="prompt-category" class="block text-sm font-medium text-gray-300">Danh bạ</label>
                         <select id="prompt-category" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
-                            <option value="Góc máy">Góc máy</option>
-                            <option value="Kiến Trúc">Kiến Trúc</option>
-                            <option value="Trending">Trending</option>
+                            <!-- Categories will be populated dynamically -->
                         </select>
                     </div>
                     <div>
@@ -104,9 +102,7 @@
                     <div>
                         <label for="expander-category" class="block text-sm font-medium text-gray-300">Danh bạ</label>
                         <select id="expander-category" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
-                            <option value="CINEMATIC">CINEMATIC</option>
-                            <option value="FILM NOIR">FILM NOIR</option>
-                            <option value="ACTION FIGURE">ACTION FIGURE</option>
+                           <!-- Categories will be populated dynamically -->
                         </select>
                     </div>
                     <div>
@@ -137,6 +133,25 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal for adding new category -->
+    <div id="add-category-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Thêm danh bạ mới</h2>
+            <form id="add-category-form">
+                 <input type="hidden" id="category-type-input">
+                <div>
+                    <label for="new-category-name" class="block text-sm font-medium text-gray-300">Tên danh bạ</label>
+                    <input type="text" id="new-category-name" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                </div>
+                <div class="flex justify-end mt-6 space-x-4">
+                    <button type="button" id="cancel-add-category-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md transition-colors">Hủy</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <!-- Modal for Viewing Items -->
     <div id="view-item-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
@@ -178,6 +193,14 @@
 
             const promptForm = document.getElementById('prompt-form');
             const expanderForm = document.getElementById('expander-form');
+            const promptCategorySelect = document.getElementById('prompt-category');
+            const expanderCategorySelect = document.getElementById('expander-category');
+
+            const addCategoryModal = document.getElementById('add-category-modal');
+            const addCategoryForm = document.getElementById('add-category-form');
+            const newCategoryNameInput = document.getElementById('new-category-name');
+            const categoryTypeInput = document.getElementById('category-type-input');
+            const cancelAddCategoryBtn = document.getElementById('cancel-add-category-btn');
             
             const viewItemModal = document.getElementById('view-item-modal');
             const viewItemTitle = document.getElementById('view-item-title');
@@ -192,10 +215,11 @@
             // --- State ---
             let prompts = JSON.parse(localStorage.getItem('prompts')) || [];
             let expanders = JSON.parse(localStorage.getItem('expanders')) || [];
+            let promptCategories = JSON.parse(localStorage.getItem('promptCategories')) || ['Góc máy', 'Kiến Trúc', 'Trending'];
+            let expanderCategories = JSON.parse(localStorage.getItem('expanderCategories')) || ['CINEMATIC', 'FILM NOIR', 'ACTION FIGURE'];
             let currentItemInView = null;
             let draggedItem = null;
             let itemToDelete = null;
-
 
             // --- Utility Functions ---
             function hideAllContainers() {
@@ -207,15 +231,32 @@
 
             function savePrompts() { localStorage.setItem('prompts', JSON.stringify(prompts)); }
             function saveExpanders() { localStorage.setItem('expanders', JSON.stringify(expanders)); }
+            function savePromptCategories() { localStorage.setItem('promptCategories', JSON.stringify(promptCategories)); }
+            function saveExpanderCategories() { localStorage.setItem('expanderCategories', JSON.stringify(expanderCategories)); }
+
+            function populateCategorySelect(selectElement, categories) {
+                selectElement.innerHTML = '';
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    selectElement.appendChild(option);
+                });
+                const addNewOption = document.createElement('option');
+                addNewOption.value = 'add_new';
+                addNewOption.textContent = '-- Thêm danh bạ mới --';
+                selectElement.appendChild(addNewOption);
+            }
 
             // --- Rendering ---
             function renderPromptStorage() {
                 const promptGrid = document.getElementById('prompt-storage-grid');
                 promptGrid.innerHTML = '';
                 
-                const categories = ['Góc máy', 'Kiến Trúc', 'Trending'];
+                promptCategories.forEach(category => {
+                    const categoryPrompts = prompts.filter(p => p.category === category);
+                    if (categoryPrompts.length === 0) return; // Don't render empty categories
 
-                categories.forEach(category => {
                     const columnEl = document.createElement('div');
                     columnEl.className = 'bg-gray-800 p-4 rounded-lg drop-zone transition-colors';
                     columnEl.dataset.category = category;
@@ -225,7 +266,7 @@
                     const cardsContainer = document.createElement('div');
                     cardsContainer.className = 'space-y-3 min-h-[100px]';
 
-                    prompts.filter(p => p.category === category).forEach(prompt => {
+                    categoryPrompts.forEach(prompt => {
                         const card = createCardElement(prompt, 'prompt');
                         card.draggable = true;
                         cardsContainer.appendChild(card);
@@ -240,9 +281,10 @@
                 const expanderGrid = document.getElementById('expander-storage-grid');
                 expanderGrid.innerHTML = '';
                 
-                const categories = ['CINEMATIC', 'FILM NOIR', 'ACTION FIGURE'];
+                expanderCategories.forEach(category => {
+                    const categoryExpanders = expanders.filter(p => p.category === category);
+                     if (categoryExpanders.length === 0) return;
 
-                categories.forEach(category => {
                     const columnEl = document.createElement('div');
                     columnEl.className = 'bg-gray-800 p-4 rounded-lg drop-zone transition-colors';
                     columnEl.dataset.category = category;
@@ -252,7 +294,7 @@
                     const cardsContainer = document.createElement('div');
                     cardsContainer.className = 'space-y-3 min-h-[100px]';
 
-                    expanders.filter(p => p.category === category).forEach(expander => {
+                    categoryExpanders.forEach(expander => {
                         const card = createCardElement(expander, 'expander');
                         card.draggable = true;
                         cardsContainer.appendChild(card);
@@ -336,6 +378,7 @@
             // --- Event Listeners ---
             addPromptBtn.addEventListener('click', () => {
                 hideAllContainers();
+                populateCategorySelect(promptCategorySelect, promptCategories);
                 promptFormContainer.classList.remove('hidden');
             });
             storageBtn.addEventListener('click', () => {
@@ -345,6 +388,7 @@
             });
             expanderBtn.addEventListener('click', () => {
                 hideAllContainers();
+                 populateCategorySelect(expanderCategorySelect, expanderCategories);
                 expanderFormContainer.classList.remove('hidden');
             });
             expanderStorageBtn.addEventListener('click', () => {
@@ -365,19 +409,12 @@
 
             copyViewBtn.addEventListener('click', () => {
                 const contentToCopy = viewItemContent.textContent;
-                const textArea = document.createElement("textarea");
-                textArea.value = contentToCopy;
-                textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
+                navigator.clipboard.writeText(contentToCopy).then(() => {
                     copyViewBtn.textContent = 'Đã sao chép!';
                     setTimeout(() => { copyViewBtn.textContent = 'Copy'; }, 2000);
-                } catch (err) { alert('Sao chép thất bại!'); }
-                document.body.removeChild(textArea);
+                }).catch(err => alert('Sao chép thất bại!'));
             });
+
 
             downloadViewBtn.addEventListener('click', () => {
                 if (currentItemInView) {
@@ -493,6 +530,51 @@
                 expanderFormContainer.classList.add('hidden');
                 alert('Đã lưu EXPANDER thành công!');
             });
+
+            // --- Add Category Logic ---
+            function handleCategoryChange(e, type) {
+                if (e.target.value === 'add_new') {
+                    categoryTypeInput.value = type;
+                    addCategoryModal.classList.remove('hidden');
+                }
+            }
+
+            promptCategorySelect.addEventListener('change', (e) => handleCategoryChange(e, 'prompt'));
+            expanderCategorySelect.addEventListener('change', (e) => handleCategoryChange(e, 'expander'));
+            
+            cancelAddCategoryBtn.addEventListener('click', () => {
+                addCategoryModal.classList.add('hidden');
+                // Reset select to avoid being stuck on "add new"
+                populateCategorySelect(promptCategorySelect, promptCategories);
+                populateCategorySelect(expanderCategorySelect, expanderCategories);
+            });
+
+            addCategoryForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newCategory = newCategoryNameInput.value.trim();
+                const type = categoryTypeInput.value;
+                if (!newCategory) return;
+
+                if (type === 'prompt') {
+                    if (!promptCategories.includes(newCategory)) {
+                        promptCategories.push(newCategory);
+                        savePromptCategories();
+                    }
+                    populateCategorySelect(promptCategorySelect, promptCategories);
+                    promptCategorySelect.value = newCategory;
+                } else if (type === 'expander') {
+                     if (!expanderCategories.includes(newCategory)) {
+                        expanderCategories.push(newCategory);
+                        saveExpanderCategories();
+                    }
+                    populateCategorySelect(expanderCategorySelect, expanderCategories);
+                    expanderCategorySelect.value = newCategory;
+                }
+
+                addCategoryForm.reset();
+                addCategoryModal.classList.add('hidden');
+            });
+
 
             // --- Delete Modal Listeners ---
             cancelDeleteBtn.addEventListener('click', closeDeleteModal);

@@ -100,9 +100,35 @@
 
         <!-- Main Content Area -->
         <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto relative">
-             <!-- Result Window Wrappers -->
-            <div id="source-script-window-wrapper" class="flex-1"></div>
-            <div id="sections-window-wrapper" class="flex-1"></div>
+            
+            <!-- Source Script Column -->
+            <div id="source-script-window-wrapper" class="workspace-column flex-1"></div>
+            
+            <!-- Generation and Result Column -->
+            <div class="workspace-column w-[400px] flex-shrink-0 flex flex-col space-y-8">
+                <!-- Generation Form -->
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h2 class="text-xl font-bold mb-6">Tùy chọn chia Section</h2>
+                    <form id="s2se-form" class="space-y-4">
+                        <div>
+                            <label for="section-count" class="block text-sm font-medium text-gray-300">Số lượng Section mong muốn</label>
+                            <input type="number" id="section-count" placeholder="Ví dụ: 8" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label for="s2se-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se (Tùy chọn)</label>
+                            <select id="s2se-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="submit" id="generate-sections-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md min-w-[100px] flex justify-center items-center">
+                                <span class="btn-text">Tạo Sections</span><span class="loader hidden ml-2"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Result Area -->
+                <div id="sections-window-wrapper" class="flex-1"></div>
+            </div>
+
         </main>
     </div>
     
@@ -448,7 +474,15 @@
                 toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             }
             
-            
+            function populateS2SeDropdowns() {
+                const select = document.getElementById('s2se-input-se');
+                if (!select) return;
+                select.innerHTML = `<option value="">Chọn từ Đầu vào Se...</option>`;
+                [...state.prompt].sort((a, b) => b.id - a.id).forEach(item => {
+                    select.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                });
+            }
+
             // --- API Calls ---
             async function generateAiContent(prompt, submitButton) {
                 setButtonLoading(submitButton, true);
@@ -694,7 +728,9 @@
                     }
 
                     const sectionCount = document.getElementById('section-count').value;
-                    const extraInstructions = document.getElementById('extra-instructions').value.trim();
+                    const selectedSeId = document.getElementById('s2se-input-se').value;
+                    const referenceSe = state.prompt.find(p => p.id == selectedSeId);
+                    const extraInstructions = referenceSe ? referenceSe.content : '';
                     
                     const loadingOverlay = document.createElement('div');
                     loadingOverlay.id = 'loading-indicator';
@@ -711,7 +747,7 @@ Thông tin:
 ${sourceScript}
 ---
 ${sectionCount ? `- Số lượng section mong muốn: ${sectionCount}`: ''}
-${extraInstructions ? `- Hướng dẫn thêm: ${extraInstructions}`: ''}
+${extraInstructions ? `- Hướng dẫn thêm từ Đầu vào Se: ${extraInstructions}`: ''}
 
 Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
 
@@ -746,14 +782,9 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
 
                 if (isSource) {
                      bottomBarHTML = `
-                        <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-b-lg">
-                            <form id="s2se-form" class="flex items-center space-x-4 w-full">
-                                <input type="number" id="section-count" placeholder="Số sections" class="w-28 px-2 py-1 bg-gray-800 border border-gray-600 rounded-md text-sm">
-                                <input type="text" id="extra-instructions" placeholder="Yêu cầu thêm (tùy chọn)" class="flex-grow px-2 py-1 bg-gray-800 border border-gray-600 rounded-md text-sm">
-                                <button type="submit" id="generate-sections-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md min-w-[100px] flex justify-center items-center">
-                                    <span class="btn-text">Tạo Sections</span><span class="loader hidden ml-2"></span>
-                                </button>
-                            </form>
+                        <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-end items-center rounded-b-lg space-x-2">
+                             <button data-target="source-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                             <button data-target="source-result-content" data-title="source" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
                         </div>`;
                 } else { // It's the sections window
                     bottomBarHTML = `
@@ -779,7 +810,7 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                         </div>
                     </div>
                     <div class="p-4 flex-grow flex flex-col min-h-0">
-                        <textarea id="${type}-result-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" ${isSource ? 'readonly' : ''}>${content}</textarea>
+                        <textarea id="${type}-result-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3">${content}</textarea>
                     </div>
                     ${bottomBarHTML}
                 </div>`;
@@ -843,11 +874,14 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 const targetId = e.target.id;
                 if (targetId === 'sections-result-content') {
                     if (state.windows.sections) state.windows.sections.saved = false;
+                } else if (targetId === 'source-result-content') {
+                     if (state.windows.source) state.windows.source.content = e.target.value;
                 }
             });
 
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
+            populateS2SeDropdowns();
             renderApp(); // Initial render for S2Se page
         });
     </script>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ nhớ Voice Off</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hidden {
+            display: none;
+        }
+        .item.active {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .delete-btn {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .item:hover .delete-btn {
+            visibility: visible;
+            opacity: 1;
+        }
+         /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; } /* gray-800 */
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; } /* gray-600 */
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; } /* gray-500 */
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col p-8">
+    
+    <header class="flex justify-between items-center mb-6 flex-shrink-0">
+        <h1 class="text-3xl font-bold">Bộ nhớ Voice Off</h1>
+        <a href="../" title="Quay lại Story Broad" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+            </svg>
+        </a>
+    </header>
+
+    <main class="bg-gray-800 p-6 rounded-lg w-full h-full flex flex-col shadow-2xl">
+        <div class="flex space-x-6 flex-grow overflow-hidden">
+            <!-- List Column -->
+            <div class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
+                <div class="flex-shrink-0 flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">Danh sách Voice Off</h3>
+                    <button id="new-item-btn" title="Tạo mục mới" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                    </button>
+                </div>
+                <div id="item-list" class="space-y-2 overflow-y-auto flex-grow pr-2">
+                    <!-- Dynamic list of items -->
+                </div>
+            </div>
+            <!-- Editor Column -->
+            <div id="editor-panel" class="w-2/3 hidden flex-col">
+                <form id="item-form" class="space-y-4 flex flex-col flex-grow">
+                    <input type="hidden" id="item-id">
+                    <div>
+                        <label for="item-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                        <input type="text" id="item-title" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                    </div>
+                    <div class="flex-grow flex flex-col">
+                        <label for="item-content" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                        <textarea id="item-content" placeholder="Dán hoặc nhập nội dung..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 flex-grow"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                        <button type="button" id="copy-item-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
+                    </div>
+                </form>
+            </div>
+             <div id="editor-placeholder" class="w-2/3 flex items-center justify-center text-gray-500">
+                <p>Chọn một mục để xem hoặc tạo mục mới.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+         <div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Xác nhận xóa</h2>
+            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa mục này không?</p>
+            <div class="flex justify-end space-x-4">
+                <button type="button" id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
+                <button type="button" id="confirm-delete-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements ---
+            const newItemBtn = document.getElementById('new-item-btn');
+            const itemList = document.getElementById('item-list');
+            const editorPanel = document.getElementById('editor-panel');
+            const editorPlaceholder = document.getElementById('editor-placeholder');
+            const itemForm = document.getElementById('item-form');
+            const itemIdInput = document.getElementById('item-id');
+            const itemTitleInput = document.getElementById('item-title');
+            const itemContentInput = document.getElementById('item-content');
+            const copyItemBtn = document.getElementById('copy-item-btn');
+            
+            const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+            // --- Data ---
+            let voiceOvers = JSON.parse(localStorage.getItem('voiceOvers')) || [];
+            let itemIdToDelete = null;
+
+            // --- Functions ---
+            const saveData = () => {
+                localStorage.setItem('voiceOvers', JSON.stringify(voiceOvers));
+            };
+
+            const renderItemList = () => {
+                itemList.innerHTML = '';
+                const currentId = itemIdInput.value;
+                voiceOvers.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = `w-full text-left p-3 rounded-md transition-colors item cursor-pointer ${item.id == currentId ? 'active' : 'hover:bg-gray-700'}`;
+                    div.dataset.id = item.id;
+                    div.innerHTML = `
+                        <span class="truncate pointer-events-none">${item.title}</span>
+                        <button class="delete-btn text-gray-400 hover:text-red-500 p-1 rounded-full" data-id="${item.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    `;
+                    itemList.appendChild(div);
+                });
+            };
+
+            const showEditor = (show) => {
+                editorPanel.classList.toggle('hidden', !show);
+                editorPlaceholder.classList.toggle('hidden', show);
+            };
+
+            const clearEditorForm = () => {
+                itemForm.reset();
+                itemIdInput.value = '';
+                renderItemList();
+            };
+            
+            const loadItemIntoForm = (id) => {
+                const item = voiceOvers.find(p => p.id == id);
+                if (item) {
+                    itemIdInput.value = item.id;
+                    itemTitleInput.value = item.title;
+                    itemContentInput.value = item.content;
+                    showEditor(true);
+                }
+                renderItemList();
+            };
+
+            const openDeleteModal = (id) => {
+                itemIdToDelete = id;
+                deleteConfirmModal.classList.remove('hidden');
+            };
+
+            const closeDeleteModal = () => {
+                itemIdToDelete = null;
+                deleteConfirmModal.classList.add('hidden');
+            };
+
+            const performDelete = () => {
+                if (!itemIdToDelete) return;
+                voiceOvers = voiceOvers.filter(p => p.id != itemIdToDelete);
+                saveData();
+                if (itemIdInput.value == itemIdToDelete) {
+                     clearEditorForm();
+                     showEditor(false);
+                }
+                renderItemList();
+                closeDeleteModal();
+            };
+
+            // --- Event Listeners ---
+            newItemBtn.addEventListener('click', () => {
+                clearEditorForm();
+                showEditor(true);
+                itemTitleInput.focus();
+            });
+
+            itemList.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-btn');
+                const itemDiv = e.target.closest('.item');
+                if (deleteBtn) {
+                    openDeleteModal(deleteBtn.dataset.id);
+                } else if (itemDiv) {
+                    loadItemIntoForm(itemDiv.dataset.id);
+                }
+            });
+
+            itemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = itemIdInput.value;
+                const title = itemTitleInput.value.trim();
+                const content = itemContentInput.value.trim();
+                
+                if (id) { // Update existing
+                    const index = voiceOvers.findIndex(p => p.id == id);
+                    if (index > -1) voiceOvers[index] = { ...voiceOvers[index], title, content };
+                } else { // Create new
+                    const newItem = { id: Date.now(), title, content };
+                    voiceOvers.push(newItem);
+                    itemIdInput.value = newItem.id;
+                }
+                saveData();
+                renderItemList();
+                alert('Đã lưu!');
+            });
+            
+            copyItemBtn.addEventListener('click', () => {
+                 const contentToCopy = itemContentInput.value;
+                 if(!contentToCopy) { 
+                     alert('Không có nội dung để sao chép.');
+                     return;
+                 }
+                navigator.clipboard.writeText(contentToCopy).then(() => {
+                    alert('Đã sao chép vào clipboard!');
+                }).catch(err => alert('Sao chép thất bại!'));
+            });
+
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            confirmDeleteBtn.addEventListener('click', performDelete);
+
+            // Initial Load
+            renderItemList();
+            showEditor(false);
+        });
+    </script>
+</body>
+</html>

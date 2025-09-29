@@ -127,7 +127,7 @@
                 </div>
                 <div class="border-t border-gray-600"></div>
                 <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
-                    Tạo kịch bản
+                    Nhập đầu vào
                 </button>
                 <button id="create-segment-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
                     Tạo phân đoạn
@@ -140,9 +140,9 @@
 
         <!-- Main Content Area -->
         <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto">
-            <!-- Script Creation Column -->
+            <!-- Initial Input Column -->
             <div id="script-form-container" class="hidden w-[450px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-6">Tạo kịch bản mới</h2>
+                <h2 class="text-2xl font-bold mb-6">Nhập đầu vào</h2>
                 <form id="script-form" class="space-y-4">
                     <div>
                         <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Tùy chọn)</label>
@@ -153,18 +153,6 @@
                         <div>
                             <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Đầu vào Dự án</label>
                             <select id="script-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                                <!-- Options will be dynamically populated -->
-                            </select>
-                        </div>
-                        <div>
-                            <label for="script-input-prompt" class="block text-sm font-medium text-yellow-400">Đầu vào Se</label>
-                            <select id="script-input-prompt" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                                <!-- Options will be dynamically populated -->
-                            </select>
-                        </div>
-                        <div>
-                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
-                            <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
@@ -205,6 +193,62 @@
                         </button>
                     </div>
                 </form>
+            </div>
+
+             <!-- Refinement Column -->
+            <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
+                <h2 class="text-2xl font-bold mb-4">Kịch bản được tạo từ đầu vào</h2>
+                <form id="refine-form" class="space-y-4 border-b border-gray-700 pb-4 mb-4">
+                     <div>
+                        <label for="refine-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se</label>
+                        <select id="refine-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                            <!-- Options will be dynamically populated -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="refine-input-vo" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
+                        <select id="refine-input-vo" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                            <!-- Options will be dynamically populated -->
+                        </select>
+                    </div>
+                     <div class="flex justify-end">
+                         <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
+                            <span class="btn-text">Tạo tiếp từ đầu vào</span>
+                            <span class="loader hidden ml-2"></span>
+                        </button>
+                     </div>
+                </form>
+
+                <div class="space-y-4 flex-grow flex flex-col">
+                     <div>
+                        <label for="script-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                        <input type="text" id="script-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                    </div>
+                    <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-center">
+                            <label for="script-result-prompt-content" class="block text-sm font-medium text-gray-300">Phần Prompt / Mô tả hình ảnh</label>
+                            <span id="prompt-word-count" class="text-xs text-gray-400">0 từ</span>
+                        </div>
+                        <textarea id="script-result-prompt-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
+                        <div class="flex justify-end space-x-2 pt-2">
+                             <button type="button" id="save-prompt-to-sections-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se xanh</button>
+                             <button type="button" data-target="script-result-prompt-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                             <button type="button" data-target="script-result-prompt-content" data-title="prompt_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        </div>
+                    </div>
+                     <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-center">
+                            <label for="script-result-voice-content" class="block text-sm font-medium text-gray-300">Phần Thoại / Voice Off</label>
+                            <span id="voice-word-count" class="text-xs text-gray-400">0 từ</span>
+                        </div>
+                        <textarea id="script-result-voice-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
+                         <div class="flex justify-end space-x-2 pt-2">
+                             <button type="button" id="save-voice-to-voice-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào VO xanh</button>
+                             <button type="button" data-target="script-result-voice-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                             <button type="button" data-target="script-result-voice-content" data-title="voice_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Segment Creation Column -->
@@ -270,41 +314,6 @@
                 </form>
             </div>
             
-             <!-- Script Result Column -->
-            <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
-                <h2 class="text-2xl font-bold mb-4">Kịch bản được tạo bởi AI</h2>
-                <div class="space-y-4 flex-grow flex flex-col">
-                     <div>
-                        <label for="script-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                        <input type="text" id="script-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
-                    </div>
-                    <div class="flex-grow flex flex-col">
-                        <div class="flex justify-between items-center">
-                            <label for="script-result-prompt-content" class="block text-sm font-medium text-gray-300">Phần Prompt / Mô tả hình ảnh</label>
-                            <span id="prompt-word-count" class="text-xs text-gray-400">0 từ</span>
-                        </div>
-                        <textarea id="script-result-prompt-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
-                        <div class="flex justify-end space-x-2 pt-2">
-                             <button type="button" id="save-prompt-to-sections-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se xanh</button>
-                             <button type="button" data-target="script-result-prompt-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                             <button type="button" data-target="script-result-prompt-content" data-title="prompt_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                        </div>
-                    </div>
-                     <div class="flex-grow flex flex-col">
-                        <div class="flex justify-between items-center">
-                            <label for="script-result-voice-content" class="block text-sm font-medium text-gray-300">Phần Thoại / Voice Off</label>
-                            <span id="voice-word-count" class="text-xs text-gray-400">0 từ</span>
-                        </div>
-                        <textarea id="script-result-voice-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
-                         <div class="flex justify-end space-x-2 pt-2">
-                             <button type="button" id="save-voice-to-voice-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào VO xanh</button>
-                             <button type="button" data-target="script-result-voice-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                             <button type="button" data-target="script-result-voice-content" data-title="voice_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Segment Result Column -->
             <div id="segment-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
                 <h2 class="text-2xl font-bold mb-4">Kết quả Phân đoạn</h2>
@@ -527,6 +536,7 @@
             const segmentResultContainer = document.getElementById('segment-result-container');
             
             const scriptForm = document.getElementById('script-form');
+            const refineForm = document.getElementById('refine-form');
             const scriptInputPrompt = document.getElementById('script-input-prompt');
             const scriptInputVoice = document.getElementById('script-input-voice');
             const scriptInputScript = document.getElementById('script-input-script');
@@ -535,7 +545,6 @@
             const scriptDurationCustom = document.getElementById('script-duration-custom');
             
             // Script Result Elements
-            const saveResultBtn = document.getElementById('save-result-btn');
             const scriptResultTitle = document.getElementById('script-result-title');
             const scriptResultPromptContent = document.getElementById('script-result-prompt-content');
             const scriptResultVoiceContent = document.getElementById('script-result-voice-content');
@@ -746,6 +755,8 @@
                 populateDropdown(scriptInputPrompt, inputPrompts, 'Chọn từ Đầu vào Se...');
                 populateDropdown(scriptInputVoice, inputVoiceOvers, 'Chọn từ Đầu vào VO...');
                 populateDropdown(scriptInputScript, inputScripts, 'Chọn từ Đầu vào Dự án...');
+                populateDropdown(document.getElementById('refine-input-se'), inputPrompts, 'Chọn từ Đầu vào Se...');
+                populateDropdown(document.getElementById('refine-input-vo'), inputVoiceOvers, 'Chọn từ Đầu vào VO...');
             }
 
 
@@ -991,14 +1002,12 @@
                 e.preventDefault();
                 
                 const submitButton = e.target.querySelector('button[type="submit"]');
-                const selectedPromptId = scriptInputPrompt.value;
-                const selectedVoiceId = scriptInputVoice.value;
                 const selectedScriptId = scriptInputScript.value;
                 const ideaValue = scriptIdea.value.trim();
                 const styleValue = document.getElementById('script-style').value;
 
-                if (!selectedPromptId && !selectedVoiceId && !selectedScriptId && !ideaValue) {
-                    alert('Vui lòng cung cấp ít nhất một yêu cầu đầu vào (Se, VO, Dự án) hoặc nhập ý tưởng mới.');
+                if (!selectedScriptId && !ideaValue) {
+                    alert('Vui lòng cung cấp "Đầu vào Dự án" hoặc nhập "Ý tưởng" mới.');
                     return;
                 }
                 if (!styleValue) {
@@ -1017,36 +1026,20 @@
                 try {
                     let durationValue = scriptDuration.value;
                     if (durationValue === 'custom') durationValue = scriptDurationCustom.value;
-                    
                     const wordLimit = document.getElementById('word-limit').value;
-
-                    const referencePrompt = inputPrompts.find(p => p.id == selectedPromptId);
-                    const referencePromptContent = referencePrompt ? referencePrompt.content : "Không có";
-                    
-                    const referenceVoice = inputVoiceOvers.find(v => v.id == selectedVoiceId);
-                    const referenceVoiceContent = referenceVoice ? referenceVoice.content : "Không có";
 
                     const referenceScript = inputScripts.find(s => s.id == selectedScriptId);
                     const referenceScriptContent = referenceScript ? referenceScript.content : "Không có";
 
-
-                     const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới. Hãy cấu trúc câu trả lời của bạn thành hai phần rõ ràng, phân tách bởi '---VOICE_PART---'.
+                    const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới. Hãy cấu trúc câu trả lời của bạn thành hai phần rõ ràng, phân tách bởi '---VOICE_PART---'.
                         Phần đầu tiên, bắt đầu bằng '---PROMPT_PART---', sẽ chứa tất cả mô tả hình ảnh, cảnh quay, hành động.
                         Phần thứ hai, bắt đầu bằng '---VOICE_PART---', sẽ chứa tất cả lời thoại.
                         Sử dụng các thông tin sau để tạo kịch bản:
-                        - Đầu vào Se (tham khảo hình ảnh):
-                        ---
-                        ${referencePromptContent}
-                        ---
-                        - Đầu vào VO (tham khảo lời thoại):
-                        ---
-                        ${referenceVoiceContent}
-                        ---
                         - Đầu vào Dự án (cốt truyện chính):
                         ---
                         ${referenceScriptContent}
                         ---
-                        - Ý tưởng/Yêu cầu bổ sung từ người dùng: ${ideaValue ? ideaValue : "Hãy kết hợp các yếu tố trên để tạo ra một kịch bản hoàn chỉnh."}
+                        - Ý tưởng/Yêu cầu bổ sung từ người dùng: ${ideaValue ? ideaValue : "Hãy phát triển kịch bản từ Đầu vào Dự án."}
                         - Phong cách: ${styleValue}
                         - Thời lượng dự kiến: ${durationValue} phút
                         ${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
@@ -1056,7 +1049,6 @@
                     
                     if (!generatedScript) throw new Error('Không nhận được nội dung kịch bản chính từ AI.');
 
-                    // Split the result
                     const voiceSeparator = '---VOICE_PART---';
                     const promptSeparator = '---PROMPT_PART---';
                     let promptPart = '';
@@ -1067,7 +1059,6 @@
                         promptPart = parts[0].replace(promptSeparator, '').trim();
                         voicePart = parts[1].trim();
                     } else {
-                        // Fallback if AI fails to follow format
                         promptPart = generatedScript.replace(promptSeparator, '').trim();
                         voicePart = "AI không tách được phần thoại. Vui lòng thử lại.";
                     }
@@ -1083,11 +1074,90 @@
                     updateWordCount(scriptResultVoiceContent, voiceWordCount);
                     
                     scriptResultContainer.classList.remove('hidden');
+                    populateAllInputDropdowns();
 
                 } catch (error) {
                     console.error('Lỗi trong quá trình tạo:', error);
                     alert(`Đã xảy ra lỗi nghiêm trọng: ${error.message}`);
                 }
+            });
+
+            // --- Refine Form Submission ---
+            refineForm.addEventListener('submit', async (e) => {
+                 e.preventDefault();
+                const submitButton = e.target.querySelector('button[type="submit"]');
+
+                const currentPrompt = scriptResultPromptContent.value;
+                const currentVoice = scriptResultVoiceContent.value;
+                const selectedSeId = document.getElementById('refine-input-se').value;
+                const selectedVoId = document.getElementById('refine-input-vo').value;
+
+                if (!selectedSeId && !selectedVoId) {
+                    alert('Vui lòng chọn ít nhất một đầu vào (Se hoặc VO) để tạo tiếp.');
+                    return;
+                }
+
+                 apiKey = localStorage.getItem('apiKey') || '';
+                if (!apiKey) {
+                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
+                    apiKeyBtn.click();
+                    return;
+                }
+
+                try {
+                    const referenceSe = inputPrompts.find(p => p.id == selectedSeId);
+                    const referenceSeContent = referenceSe ? referenceSe.content : "Không có";
+                    
+                    const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
+                    const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
+
+                    const refinePrompt = `Bạn là một biên kịch chuyên nghiệp. Dựa vào kịch bản hiện có dưới đây, hãy tinh chỉnh và phát triển nó bằng cách tích hợp thêm các yếu tố từ "Đầu vào Se" và "Đầu vào VO".
+                    
+                    **Kịch bản hiện tại:**
+                    ---PROMPT_PART---
+                    ${currentPrompt}
+                    ---VOICE_PART---
+                    ${currentVoice}
+                    ---
+
+                    **Đầu vào bổ sung:**
+                    - Đầu vào Se (để tinh chỉnh hình ảnh): ${referenceSeContent}
+                    - Đầu vào VO (để tinh chỉnh lời thoại): ${referenceVoContent}
+
+                    Hãy trả về kịch bản mới đã được cập nhật, vẫn giữ nguyên định dạng hai phần là '---PROMPT_PART---' và '---VOICE_PART---'.`;
+
+                     const generatedScript = await generateAiContent(refinePrompt, submitButton);
+                    
+                    if (!generatedScript) throw new Error('Không nhận được nội dung kịch bản tinh chỉnh từ AI.');
+
+                    const voiceSeparator = '---VOICE_PART---';
+                    const promptSeparator = '---PROMPT_PART---';
+                    let promptPart = '';
+                    let voicePart = '';
+
+                    if (generatedScript.includes(voiceSeparator)) {
+                        const parts = generatedScript.split(voiceSeparator);
+                        promptPart = parts[0].replace(promptSeparator, '').trim();
+                        voicePart = parts[1].trim();
+                    } else {
+                        promptPart = generatedScript.replace(promptSeparator, '').trim();
+                        voicePart = "AI không tách được phần thoại. Vui lòng thử lại.";
+                    }
+                    
+                    scriptResultPromptContent.value = promptPart;
+                    scriptResultVoiceContent.value = voicePart;
+                    
+                    updateWordCount(scriptResultPromptContent, promptWordCount);
+                    updateWordCount(scriptResultVoiceContent, voiceWordCount);
+
+                    alert("Kịch bản đã được tạo tiếp thành công!");
+
+
+                } catch (error) {
+                     console.error('Lỗi trong quá trình tạo tiếp:', error);
+                    alert(`Đã xảy ra lỗi: ${error.message}`);
+                }
+
             });
             
             // --- Segment Form Submission ---

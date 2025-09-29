@@ -102,8 +102,8 @@
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
                         </button>
-                        <button id="prompt-memory-btn" title="Yêu cầu đầu vào Phân đoạn" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
-                            <span class="text-lg font-bold">Se</span>
+                        <button id="prompt-memory-btn" title="Yêu cầu đầu vào Prompt" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
+                            <span class="text-lg font-bold">P</span>
                         </button>
                         <button id="voice-over-memory-btn" title="Yêu cầu đầu vào Voice Off" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
                             <span class="text-sm font-bold">VO</span>
@@ -527,9 +527,9 @@
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             
             // --- Data Store ---
-            let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
-            let prompts = JSON.parse(localStorage.getItem('prompts')) || [];
-            let voiceOvers = JSON.parse(localStorage.getItem('voiceOvers')) || [];
+            let inputScripts = JSON.parse(localStorage.getItem('inputScripts')) || [];
+            let inputPrompts = JSON.parse(localStorage.getItem('inputPrompts')) || [];
+            let inputVoiceOvers = JSON.parse(localStorage.getItem('inputVoiceOvers')) || [];
             let apiKey = localStorage.getItem('apiKey') || '';
             let aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash-image-preview';
             let itemToDelete = null; // {id: '123', type: 'script'}
@@ -585,16 +585,16 @@
 
             // --- Generic Memory Management Functions ---
             function getDataForType(type) {
-                if (type === 'script') return scripts;
-                if (type === 'prompt') return prompts;
-                if (type === 'voiceOver') return voiceOvers;
+                if (type === 'script') return inputScripts;
+                if (type === 'prompt') return inputPrompts;
+                if (type === 'voiceOver') return inputVoiceOvers;
                 return [];
             }
 
             function saveDataToStorage(type) {
-                if (type === 'script') localStorage.setItem('scripts', JSON.stringify(scripts));
-                if (type === 'prompt') localStorage.setItem('prompts', JSON.stringify(prompts));
-                if (type === 'voiceOver') localStorage.setItem('voiceOvers', JSON.stringify(voiceOvers));
+                if (type === 'script') localStorage.setItem('inputScripts', JSON.stringify(inputScripts));
+                if (type === 'prompt') localStorage.setItem('inputPrompts', JSON.stringify(inputPrompts));
+                if (type === 'voiceOver') localStorage.setItem('inputVoiceOvers', JSON.stringify(inputVoiceOvers));
             }
 
             function renderListForType(type) {
@@ -649,9 +649,9 @@
                 const { id, type } = itemToDelete;
                 
                 let data = getDataForType(type);
-                if(type === 'script') scripts = data.filter(item => item.id != id);
-                if(type === 'prompt') prompts = data.filter(item => item.id != id);
-                if(type === 'voiceOver') voiceOvers = data.filter(item => item.id != id);
+                if(type === 'script') inputScripts = data.filter(item => item.id != id);
+                if(type === 'prompt') inputPrompts = data.filter(item => item.id != id);
+                if(type === 'voiceOver') inputVoiceOvers = data.filter(item => item.id != id);
 
                 saveDataToStorage(type);
 
@@ -708,9 +708,9 @@
             }
 
             function populateAllInputDropdowns() {
-                populateDropdown(scriptInputPrompt, prompts, 'Chọn từ Yêu cầu Prompt...');
-                populateDropdown(scriptInputVoice, voiceOvers, 'Chọn từ Yêu cầu Voice...');
-                populateDropdown(scriptInputScript, scripts, 'Chọn từ Đầu vào kịch bản...');
+                populateDropdown(scriptInputPrompt, inputPrompts, 'Chọn từ Yêu cầu Prompt...');
+                populateDropdown(scriptInputVoice, inputVoiceOvers, 'Chọn từ Yêu cầu Voice...');
+                populateDropdown(scriptInputScript, inputScripts, 'Chọn từ Đầu vào kịch bản...');
             }
 
 
@@ -854,9 +854,9 @@
                 const fullContent = `### PHẦN PROMPT / MÔ TẢ HÌNH ẢNH\n\n${promptContent}\n\n### PHẦN THOẠI / VOICE OFF\n\n${voiceContent}`;
                 
                 const newScript = { id: Date.now(), title, content: fullContent };
-                scripts.push(newScript);
+                inputScripts.push(newScript); // Save to the input memory
                 saveDataToStorage('script');
-                alert('Đã lưu kịch bản vào bộ nhớ!');
+                alert('Đã lưu kịch bản vào bộ nhớ đầu vào!');
                 scriptResultContainer.classList.add('hidden');
                 additionalResultsContainer.classList.add('hidden');
             });
@@ -885,7 +885,7 @@
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    btn.closest('.bg-gray-800').classList.add('hidden');
+                    e.target.closest('.bg-gray-800').classList.add('hidden');
                 });
             });
             
@@ -950,13 +950,13 @@
                     let durationValue = scriptDuration.value;
                     if (durationValue === 'custom') durationValue = scriptDurationCustom.value;
                     
-                    const referencePrompt = prompts.find(p => p.id == selectedPromptId);
+                    const referencePrompt = inputPrompts.find(p => p.id == selectedPromptId);
                     const referencePromptContent = referencePrompt ? referencePrompt.content : "Không có";
                     
-                    const referenceVoice = voiceOvers.find(v => v.id == selectedVoiceId);
+                    const referenceVoice = inputVoiceOvers.find(v => v.id == selectedVoiceId);
                     const referenceVoiceContent = referenceVoice ? referenceVoice.content : "Không có";
 
-                    const referenceScript = scripts.find(s => s.id == selectedScriptId);
+                    const referenceScript = inputScripts.find(s => s.id == selectedScriptId);
                     const referenceScriptContent = referenceScript ? referenceScript.content : "Không có";
 
                     const optionPromptVideo = document.getElementById('option-prompt-video').checked;

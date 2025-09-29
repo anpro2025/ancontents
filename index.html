@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+element<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -957,10 +957,10 @@
                         alert('Cần có tiêu đề và nội dung để lưu.');
                         return;
                     }
-                    let mainScripts = JSON.parse(localStorage.getItem('mainScripts')) || []; // Note: This uses a different storage key
+                    let mainScripts = JSON.parse(localStorage.getItem('scripts')) || []; // Corrected storage key
                     const newItem = { id: Date.now(), title: title, content: content };
                     mainScripts.push(newItem);
-                    localStorage.setItem('mainScripts', JSON.stringify(mainScripts));
+                    localStorage.setItem('scripts', JSON.stringify(mainScripts)); // Corrected storage key
                     isCurrentResultSaved = true;
                     showToast('Đã lưu vào Bộ nhớ Scripts (S xanh)!');
                 }
@@ -1106,66 +1106,6 @@
                     console.error('Lỗi trong quá trình tạo:', error);
                     alert(`Đã xảy ra lỗi nghiêm trọng: ${error.message}`);
                 }
-            });
-
-            // --- Refine Form Submission ---
-            refineForm.addEventListener('submit', async (e) => {
-                 e.preventDefault();
-                const submitButton = e.target.querySelector('button[type="submit"]');
-
-                const currentScript = scriptResultContent.value;
-                const selectedSeId = document.getElementById('refine-input-se').value;
-                const selectedVoId = document.getElementById('refine-input-vo').value;
-
-                if (!selectedSeId && !selectedVoId) {
-                    alert('Vui lòng chọn ít nhất một đầu vào (Se hoặc VO) để tạo tiếp.');
-                    return;
-                }
-
-                 apiKey = localStorage.getItem('apiKey') || '';
-                if (!apiKey) {
-                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
-                    apiKeyBtn.click();
-                    return;
-                }
-
-                try {
-                    const referenceSe = inputPrompts.find(p => p.id == selectedSeId);
-                    const referenceSeContent = referenceSe ? referenceSe.content : "Không có";
-                    
-                    const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
-                    const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
-
-                    const refinePrompt = `Bạn là một biên kịch chuyên nghiệp. Dựa vào kịch bản hiện có dưới đây, hãy tinh chỉnh và phát triển nó bằng cách tích hợp thêm các yếu tố từ "Đầu vào Se" và "Đầu vào VO".
-                    
-                    **Kịch bản hiện tại:**
-                    ---
-                    ${currentScript}
-                    ---
-
-                    **Đầu vào bổ sung:**
-                    - Đầu vào Se (để tinh chỉnh hình ảnh): ${referenceSeContent}
-                    - Đầu vào VO (để tinh chỉnh lời thoại): ${referenceVoContent}
-
-                    Hãy trả về kịch bản mới đã được cập nhật và hoàn thiện.`;
-
-                     const generatedScript = await generateAiContent(refinePrompt, submitButton);
-                    
-                    if (!generatedScript) throw new Error('Không nhận được nội dung kịch bản tinh chỉnh từ AI.');
-                    
-                    scriptResultContent.value = generatedScript;
-                    
-                    updateWordCount(scriptResultContent, scriptWordCount);
-                    isCurrentResultSaved = false; // Content has changed
-
-                    alert("Kịch bản đã được tạo tiếp thành công!");
-
-
-                } catch (error) {
-                     console.error('Lỗi trong quá trình tạo tiếp:', error);
-                    alert(`Đã xảy ra lỗi: ${error.message}`);
-                }
-
             });
             
             // --- Segment Form Submission ---

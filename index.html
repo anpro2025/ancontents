@@ -262,7 +262,7 @@
     </div>
     
     <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed top-5 right-5 z-[100] space-y-2"></div>
+    <div id="toast-container" class="fixed top-5 left-5 z-[100] space-y-2"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -353,7 +353,6 @@
                 const toastContainer = document.getElementById('toast-container');
                 const toast = document.createElement('div');
                 toast.className = `text-white py-2 px-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${colors[type] || colors.info}`;
-                toast.textContent = message;
                 toastContainer.appendChild(toast);
                 setTimeout(() => toast.classList.remove('translate-x-full'), 10);
                 setTimeout(() => {
@@ -634,27 +633,6 @@
             document.querySelectorAll('.memory-btn').forEach(btn => {
                 btn.addEventListener('click', () => openMemoryModal(btn.dataset.type));
             });
-
-            // Add listeners to navigation links to auto-save work
-            document.querySelectorAll('a[href^="./"]').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    autoSaveToTrash();
-                    
-                    // Special logic for S2Se to pass current script content
-                    if (link.href.includes('/S2Se/')) {
-                        const content = document.getElementById('script-result-content')?.value;
-                        if (content) {
-                            localStorage.setItem('scriptToProcess', content);
-                        } else {
-                            localStorage.removeItem('scriptToProcess');
-                        }
-                    }
-                    
-                    // Navigate after handling logic
-                    window.location.href = link.href;
-                });
-            });
             
             toggleListBtn.addEventListener('click', () => {
                 const isCollapsed = memoryListColumn.classList.contains('hidden');
@@ -877,45 +855,74 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                             <span id="${type}-word-count" class="text-xs text-gray-400">0 từ</span>
                         </div>
                         <textarea id="${type}-result-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow">${content}</textarea>
-                        <div class="flex justify-end space-x-2 pt-2 flex-shrink-0">
-                            <button type="button" data-target="${type}-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                            <button type="button" data-target="${type}-result-content" data-title="${type}" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        <div class="flex justify-between items-center pt-2 flex-shrink-0">
+                            <div>
+                                ${isScript 
+                                    ? `<a href="./S2Se/" class="nav-link-dynamic bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md">Chuyển sang S2Se</a>`
+                                    : `<a href="./text-to-voice/" class="nav-link-dynamic bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-3 text-sm rounded-md">Tạo Voice TTS</a>`
+                                }
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" data-target="${type}-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                                <button type="button" data-target="${type}-result-content" data-title="${type}" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                            </div>
                         </div>
                     </div>
                     `;
             }
 
             document.body.addEventListener('click', e => {
-                const button = e.target.closest('button');
-                if (!button) return;
-                const { target, title, type } = button.dataset;
-                if (button.classList.contains('copy-btn')) {
-                    const content = document.getElementById(target)?.value;
-                    if (!content) return showToast('Không có nội dung để sao chép.', 'info');
-                    navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
-                } else if (button.classList.contains('export-btn')) {
-                    const content = document.getElementById(target)?.value;
-                    const titleText = document.getElementById(`${title}-result-title`)?.value;
-                    if (!content) return showToast('Không có nội dung để xuất.', 'info');
-                    downloadAsTxt(titleText, content);
-                } else if (button.classList.contains('save-result-btn')) {
-                    const isScript = type === 'mainScripts';
-                    const titleElemId = isScript ? 'script-result-title' : 'vo-result-title';
-                    const contentElemId = isScript ? 'script-result-content' : 'vo-result-content';
-                    const titleText = document.getElementById(titleElemId)?.value.trim();
-                    const content = document.getElementById(contentElemId)?.value.trim();
-                    if (!titleText || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
-                    
-                    state[type].push({ id: Date.now(), title: titleText, content });
-                    saveDataToStorage(type);
-                    
-                    if(isScript) {
-                        state.currentScriptSaved = true;
-                    } else {
-                        state.currentVoSaved = true;
+                const targetElement = e.target;
+                const button = targetElement.closest('button');
+                const navLink = targetElement.closest('a[href^="./"]');
+
+                if (button) {
+                    const { target, title, type } = button.dataset;
+                    if (button.classList.contains('copy-btn')) {
+                        const content = document.getElementById(target)?.value;
+                        if (!content) return showToast('Không có nội dung để sao chép.', 'info');
+                        navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
+                    } else if (button.classList.contains('export-btn')) {
+                        const content = document.getElementById(target)?.value;
+                        const titleText = document.getElementById(`${title}-result-title`)?.value;
+                        if (!content) return showToast('Không có nội dung để xuất.', 'info');
+                        downloadAsTxt(titleText, content);
+                    } else if (button.classList.contains('save-result-btn')) {
+                        const isScript = type === 'mainScripts';
+                        const titleElemId = isScript ? 'script-result-title' : 'vo-result-title';
+                        const contentElemId = isScript ? 'script-result-content' : 'vo-result-content';
+                        const titleText = document.getElementById(titleElemId)?.value.trim();
+                        const content = document.getElementById(contentElemId)?.value.trim();
+                        if (!titleText || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
+                        
+                        state[type].push({ id: Date.now(), title: titleText, content });
+                        saveDataToStorage(type);
+                        
+                        if(isScript) {
+                            state.currentScriptSaved = true;
+                        } else {
+                            state.currentVoSaved = true;
+                        }
+
+                        showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
+                    }
+                }
+
+                if (navLink) {
+                    e.preventDefault();
+                    autoSaveToTrash();
+
+                    if (navLink.href.includes('/S2Se/')) {
+                        const content = document.getElementById('script-result-content')?.value;
+                        localStorage.setItem('scriptToProcess', content || '');
                     }
 
-                    showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
+                    if (navLink.href.includes('/text-to-voice/')) {
+                        const content = document.getElementById('vo-result-content')?.value;
+                        localStorage.setItem('textToVoice', content || '');
+                    }
+
+                    window.location.href = navLink.href;
                 }
             });
             

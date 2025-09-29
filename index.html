@@ -703,7 +703,6 @@ Hãy trình bày kết quả một cách rõ ràng, tách biệt từng phần m
                         const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 20)}...` : `Tập mới của: ${referenceScript.title.substring(0, 20)}...`;
                         scriptResultTitle.value = newTitle;
                         scriptResultContent.value = generatedScript;
-                        scriptFormContainer.classList.add('hidden');
                         scriptResultContainer.classList.remove('hidden');
                     } else { throw new Error('Không nhận được nội dung kịch bản từ AI.'); }
                 } catch (error) {

@@ -182,7 +182,7 @@
             <h2 id="memory-modal-title" class="text-2xl font-bold mb-6 flex-shrink-0">Bộ nhớ</h2>
             <div class="flex space-x-6 flex-grow overflow-hidden">
                 <!-- List -->
-                <div id="memory-list-column" class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
+                <div id="memory-list-column" class="w-1/4 border-r border-gray-700 pr-6 flex flex-col">
                     <div class="flex-shrink-0 flex justify-between items-center mb-4">
                         <h3 class="font-bold text-lg">Danh sách</h3>
                         <div class="flex items-center space-x-2">
@@ -195,21 +195,21 @@
                     <div id="memory-modal-list" class="space-y-2 overflow-y-auto flex-grow"></div>
                 </div>
                 <!-- Editor -->
-                <div id="memory-editor-panel" class="w-2/3 hidden flex-col">
+                <div id="memory-editor-panel" class="w-3/4 hidden flex flex-col">
                     <form id="memory-modal-form" class="space-y-4 flex flex-col flex-grow">
                         <input type="hidden" id="memory-modal-id">
-                        <div>
+                        <div class="flex-shrink-0">
                             <label for="memory-modal-title-input" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
                             <input type="text" id="memory-modal-title-input" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
                         </div>
                         <div class="flex-grow flex flex-col min-h-0">
-                             <div class="flex justify-between items-center">
+                             <div class="flex justify-between items-center flex-shrink-0">
                                 <label for="memory-modal-content-input" class="block text-sm font-medium text-gray-300">Nội dung</label>
                                 <span id="memory-word-count" class="text-xs text-gray-400">0 từ</span>
                             </div>
                             <textarea id="memory-modal-content-input" placeholder="Dán hoặc nhập nội dung..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 flex-grow"></textarea>
                         </div>
-                        <div class="flex justify-end space-x-3 pt-2">
+                        <div class="flex justify-end space-x-3 pt-2 flex-shrink-0">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
                             <button type="button" id="memory-copy-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
                             <button type="button" id="memory-export-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
@@ -522,7 +522,7 @@
                 // Reset list/editor layout on open
                 memoryListColumn.classList.remove('hidden');
                 memoryEditorPanel.classList.remove('w-full');
-                memoryEditorPanel.classList.add('w-2/3');
+                memoryEditorPanel.classList.add('w-3/4');
                 toggleListBtn.innerHTML = collapseIconSVG;
                 toggleListBtn.title = "Thu gọn danh sách";
 
@@ -661,13 +661,13 @@
                 if (isCollapsed) {
                     // Expand
                     memoryListColumn.classList.remove('hidden');
-                    memoryEditorPanel.classList.replace('w-full', 'w-2/3');
+                    memoryEditorPanel.classList.replace('w-full', 'w-3/4');
                     toggleListBtn.innerHTML = collapseIconSVG;
                     toggleListBtn.title = "Thu gọn danh sách";
                 } else {
                     // Collapse
                     memoryListColumn.classList.add('hidden');
-                    memoryEditorPanel.classList.replace('w-2/3', 'w-full');
+                    memoryEditorPanel.classList.replace('w-3/4', 'w-full');
                     toggleListBtn.innerHTML = expandIconSVG;
                     toggleListBtn.title = "Mở rộng danh sách";
 

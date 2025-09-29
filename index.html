@@ -386,6 +386,31 @@
                 URL.revokeObjectURL(url);
             }
             
+            function formatScriptContent(content) {
+                // If it's already a string, just return it.
+                if (typeof content === 'string') {
+                    return content;
+                }
+
+                // If it's an array of objects, format it into a readable script.
+                if (Array.isArray(content)) {
+                    return content.map(item => {
+                        // Map each key-value pair in an object to a "KEY: value" string
+                        return Object.entries(item)
+                            .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`)
+                            .join('\n');
+                    }).join('\n\n---\n\n'); // Separate scenes/parts with a divider
+                }
+
+                // If it's a non-array object, pretty-print it as JSON.
+                if (typeof content === 'object' && content !== null) {
+                    return JSON.stringify(content, null, 2);
+                }
+
+                // Fallback for any other unexpected data type.
+                return String(content);
+            }
+
             function autoSaveToTrash() {
                 if (state.currentResultSaved) return;
                 const titleElement = document.getElementById('script-result-title');
@@ -547,7 +572,7 @@
                     setButtonLoading(submitButton, false);
                 }
             }
-
+            
             // --- Event Listeners Setup ---
 
             createScriptBtn.addEventListener('click', () => {
@@ -569,7 +594,7 @@
                 renderSettingsDisplay();
                 apiKeyContainer.classList.remove('hidden');
             });
-
+            
             apiKeyForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 state.settings.apiKey = apiKeyInput.value.trim();
@@ -740,8 +765,8 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
 
                     const generatedContent = await generateAiContent(prompt, submitButton);
                     const result = JSON.parse(generatedContent);
-                    const scriptPart = result.main_script || "AI không tạo được kịch bản chính.";
-                    const voPart = result.voice_over_script || "AI không tạo được phần VO riêng biệt.";
+                    const scriptPart = formatScriptContent(result.main_script || "AI không tạo được kịch bản chính.");
+                    const voPart = formatScriptContent(result.voice_over_script || "AI không tạo được phần VO riêng biệt.");
                     const newTitle = `Kịch bản cho: ${ideaValue.substring(0, 30)}...`;
                     scriptResultContainer.innerHTML = createResultCardHTML('script', newTitle, scriptPart);
                     voResultContainer.innerHTML = createResultCardHTML('vo', `VO cho: ${newTitle}`, voPart);

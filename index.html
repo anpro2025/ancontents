@@ -545,10 +545,8 @@
             // --- UI Elements ---
             const createScriptBtn = document.getElementById('create-script-btn');
             const createSegmentBtn = document.getElementById('create-segment-btn');
-            const createVoBtn = document.getElementById('create-vo-btn');
             const scriptFormContainer = document.getElementById('script-form-container');
             const segmentFormContainer = document.getElementById('segment-form-container');
-            const voFormContainer = document.getElementById('vo-form-container');
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
             
@@ -565,10 +563,9 @@
             // Result Containers
             const scriptResultContainer = document.getElementById('script-result-container');
             const segmentResultContainer = document.getElementById('segment-result-container');
-            const voResultContainer = document.getElementById('vo-result-container');
-
             
             const scriptForm = document.getElementById('script-form');
+            const refineForm = document.getElementById('refine-form');
             const scriptInputScript = document.getElementById('script-input-script');
             const scriptIdea = document.getElementById('script-idea');
             const scriptDuration = document.getElementById('script-duration');
@@ -578,14 +575,6 @@
             const scriptResultTitle = document.getElementById('script-result-title');
             const scriptResultContent = document.getElementById('script-result-content');
             const scriptWordCount = document.getElementById('script-word-count');
-
-            // VO Form & Result Elements
-            const voForm = document.getElementById('vo-form');
-            const voInputScript = document.getElementById('vo-input-script');
-            const voResultTitle = document.getElementById('vo-result-title');
-            const voResultContent = document.getElementById('vo-result-content');
-            const voWordCount = document.getElementById('vo-word-count');
-
 
             // Segment Elements
             const segmentForm = document.getElementById('segment-form');
@@ -661,8 +650,8 @@
                 scriptResultContainer.classList.add('hidden');
                 segmentFormContainer.classList.add('hidden');
                 segmentResultContainer.classList.add('hidden');
-                voFormContainer.classList.add('hidden');
-                voResultContainer.classList.add('hidden');
+                if(voFormContainer) voFormContainer.classList.add('hidden');
+                if(voResultContainer) voResultContainer.classList.add('hidden');
             }
 
             function hideAllModals() {
@@ -835,9 +824,9 @@
             function populateAllInputDropdowns() {
                 populateDropdown(scriptInputScript, inputScripts, 'Chọn từ Đầu vào Dự án...');
                 populateDropdown(document.getElementById('script-input-voice'), inputVoiceOvers, 'Chọn từ Đầu vào VO...');
-                populateDropdown(voInputScript, mainScripts, 'Chọn kịch bản từ bộ nhớ S...');
-                populateDropdown(segmentInputSe, inputPrompts, 'Chọn từ Đầu vào Se...');
-                populateDropdown(segmentInputVo, inputVoiceOvers, 'Chọn từ Đầu vào VO...');
+                if(voInputScript) populateDropdown(voInputScript, mainScripts, 'Chọn kịch bản từ bộ nhớ S...');
+                if(segmentInputSe) populateDropdown(segmentInputSe, inputPrompts, 'Chọn từ Đầu vào Se...');
+                if(segmentInputVo) populateDropdown(segmentInputVo, inputVoiceOvers, 'Chọn từ Đầu vào VO...');
             }
 
 
@@ -1098,9 +1087,8 @@
             scriptResultTitle.addEventListener('input', () => {
                 isCurrentResultSaved = false;
             });
-            
-            voResultContent.addEventListener('input', () => updateWordCount(voResultContent, voWordCount));
-            segmentResultContent.addEventListener('input', () => updateWordCount(segmentResultContent, segmentWordCount));
+            if(voResultContent) voResultContent.addEventListener('input', () => updateWordCount(voResultContent, voWordCount));
+            if(segmentResultContent) segmentResultContent.addEventListener('input', () => updateWordCount(segmentResultContent, segmentWordCount));
 
 
             // --- Main Script Form Submission ---
@@ -1130,7 +1118,7 @@
                 }
                 
                 scriptResultContainer.classList.add('hidden');
-                voResultContainer.classList.add('hidden');
+                if(voResultContainer) voResultContainer.classList.add('hidden');
 
                 
                 try {
@@ -1187,14 +1175,16 @@
                     scriptResultTitle.value = newTitle;
                     scriptResultContent.value = scriptPart;
                     
-                    voResultTitle.value = `VO cho: ${newTitle}`;
-                    voResultContent.value = voPart;
+                    if (voResultContainer) {
+                        voResultTitle.value = `VO cho: ${newTitle}`;
+                        voResultContent.value = voPart;
+                        updateWordCount(voResultContent, voWordCount);
+                        voResultContainer.classList.remove('hidden');
+                    }
                     
                     updateWordCount(scriptResultContent, scriptWordCount);
-                    updateWordCount(voResultContent, voWordCount);
                     
                     scriptResultContainer.classList.remove('hidden');
-                    voResultContainer.classList.remove('hidden');
 
                     isCurrentResultSaved = false; // New content is not saved yet
                     populateAllInputDropdowns();
@@ -1206,67 +1196,69 @@
             });
             
             // --- Segment Form Submission ---
-             segmentForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const submitButton = e.target.querySelector('button[type="submit"]');
-                const inputScript = segmentInputScript.value;
-                const selectedSeId = segmentInputSe.value;
-                const selectedVoId = segmentInputVo.value;
-                const outputType = document.getElementById('segment-output-type').value;
-                const style = document.getElementById('segment-style').value;
-                const cameraAngle = document.getElementById('segment-camera-angle').value;
-                const setting = document.getElementById('segment-setting').value;
-        
+             if(segmentForm) {
+                segmentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const submitButton = e.target.querySelector('button[type="submit"]');
+                    const inputScript = segmentInputScript.value;
+                    const selectedSeId = segmentInputSe.value;
+                    const selectedVoId = segmentInputVo.value;
+                    const outputType = document.getElementById('segment-output-type').value;
+                    const style = document.getElementById('segment-style').value;
+                    const cameraAngle = document.getElementById('segment-camera-angle').value;
+                    const setting = document.getElementById('segment-setting').value;
+            
 
-                if (!inputScript.trim()) {
-                    alert('Vui lòng nhập thông tin kịch bản đầu vào.');
-                    return;
-                }
-                 apiKey = localStorage.getItem('apiKey') || '';
-                if (!apiKey) {
-                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
-                    apiKeyBtn.click();
-                    return;
-                }
-                
-                const referenceSe = inputPrompts.find(p => p.id == selectedSeId);
-                const referenceSeContent = referenceSe ? referenceSe.content : "Không có";
-                
-                const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
-                const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
+                    if (!inputScript.trim()) {
+                        alert('Vui lòng nhập thông tin kịch bản đầu vào.');
+                        return;
+                    }
+                     apiKey = localStorage.getItem('apiKey') || '';
+                    if (!apiKey) {
+                        alert('Vui lòng nhập API Key trong phần Cài đặt.');
+                        apiKeyBtn.click();
+                        return;
+                    }
+                    
+                    const referenceSe = inputPrompts.find(p => p.id == selectedSeId);
+                    const referenceSeContent = referenceSe ? referenceSe.content : "Không có";
+                    
+                    const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
+                    const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
 
-                // Construct the AI prompt
-                let finalPrompt = `Bạn là một đạo diễn hình ảnh và chuyên gia viết prompt. Dựa trên kịch bản và các yêu cầu dưới đây, hãy tạo ra nội dung chi tiết.
-                
-                **Kịch bản gốc:**
-                ---
-                ${inputScript}
-                ---
+                    // Construct the AI prompt
+                    let finalPrompt = `Bạn là một đạo diễn hình ảnh và chuyên gia viết prompt. Dựa trên kịch bản và các yêu cầu dưới đây, hãy tạo ra nội dung chi tiết.
+                    
+                    **Kịch bản gốc:**
+                    ---
+                    ${inputScript}
+                    ---
 
-                **Đầu vào bổ sung:**
-                 - Đầu vào Se (tham khảo hình ảnh): ${referenceSeContent}
-                 - Đầu vào VO (tham khảo lời thoại): ${referenceVoContent}
+                    **Đầu vào bổ sung:**
+                     - Đầu vào Se (tham khảo hình ảnh): ${referenceSeContent}
+                     - Đầu vào VO (tham khảo lời thoại): ${referenceVoContent}
 
-                **Yêu cầu:**
-                - **Loại đầu ra:** ${outputType}
-                - **Phong cách:** ${style || 'Tự do sáng tạo'}
-                - **Góc máy:** ${cameraAngle || 'Tự do sáng tạo'}
-                - **Bối cảnh:** ${setting || 'Tự do sáng tạo'}
-                
-                Hãy viết một cách chi tiết và gợi hình. Nếu yêu cầu tạo prompt, hãy tạo các prompt phức tạp, giàu chi tiết phù hợp cho các mô hình AI tạo ảnh như Midjourney, Stable Diffusion.`;
+                    **Yêu cầu:**
+                    - **Loại đầu ra:** ${outputType}
+                    - **Phong cách:** ${style || 'Tự do sáng tạo'}
+                    - **Góc máy:** ${cameraAngle || 'Tự do sáng tạo'}
+                    - **Bối cảnh:** ${setting || 'Tự do sáng tạo'}
+                    
+                    Hãy viết một cách chi tiết và gợi hình. Nếu yêu cầu tạo prompt, hãy tạo các prompt phức tạp, giàu chi tiết phù hợp cho các mô hình AI tạo ảnh như Midjourney, Stable Diffusion.`;
 
-                try {
-                    segmentResultContent.value = "Đang xử lý...";
-                    segmentResultContainer.classList.remove('hidden'); // Show the result container
-                    const result = await generateAiContent(finalPrompt, submitButton);
-                    segmentResultContent.value = result;
-                    updateWordCount(segmentResultContent, segmentWordCount);
-                } catch (error) {
-                    segmentResultContent.value = `Lỗi: ${error.message}`;
-                    console.error('Lỗi khi tạo phân đoạn:', error);
-                }
-            });
+                    try {
+                        segmentResultContent.value = "Đang xử lý...";
+                        segmentResultContainer.classList.remove('hidden'); // Show the result container
+                        const result = await generateAiContent(finalPrompt, submitButton);
+                        segmentResultContent.value = result;
+                        updateWordCount(segmentResultContent, segmentWordCount);
+                    } catch (error) {
+                        segmentResultContent.value = `Lỗi: ${error.message}`;
+                        console.error('Lỗi khi tạo phân đoạn:', error);
+                    }
+                });
+             }
         });
     </script>
 </body>

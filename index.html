@@ -731,7 +731,12 @@
                 }
                 
                 hideAllWorkspaceColumns();
-                mainWorkspace.innerHTML += `<div id="loading-indicator" class="absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50"><div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div></div>`;
+                
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.id = 'loading-indicator';
+                loadingOverlay.className = 'fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-75 z-50';
+                loadingOverlay.innerHTML = `<div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>`;
+                document.body.appendChild(loadingOverlay);
 
                 try {
                     const styleValue = document.getElementById('script-style').value;
@@ -744,10 +749,31 @@
                     let newTitle;
 
                     if (hasCreativeInput) {
-                        prompt = `Bạn là một biên kịch chuyên nghiệp...`; // Omitting for brevity
+                        prompt = `Bạn là một biên kịch chuyên nghiệp.
+Nhiệm vụ: Viết một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt dựa trên các thông tin được cung cấp.
+Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
+
+Sử dụng các thông tin sau:
+${ideaValue ? `- Ý tưởng/Yêu cầu chính: ${ideaValue}\n` : ''}
+${referenceScript ? `- Kịch bản tham khảo (cốt truyện): --- ${referenceScript.content} ---\n` : ''}
+${referenceVo ? `- Lời thoại tham khảo (VO): --- ${referenceVo.content} ---\n` : ''}
+${styleValue ? `- Phong cách: ${styleValue}\n` : ''}
+- Thời lượng dự kiến: ${durationValue} phút
+${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
+
+Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
                         newTitle = `Kịch bản cho: ${(ideaValue || referenceScript?.title || 'dữ liệu vào').substring(0, 30)}...`;
                     } else {
-                        prompt = `Bạn là một biên kịch chuyên nghiệp... Sáng tạo ngẫu nhiên...`; // Omitting for brevity
+                        prompt = `Bạn là một biên kịch chuyên nghiệp.
+Nhiệm vụ: Hãy sáng tạo ngẫu nhiên một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt.
+Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
+
+Yêu cầu về kịch bản:
+${styleValue ? `- Phong cách: ${styleValue}\n` : '- Phong cách: Hãy tự do sáng tạo một phong cách thú vị.\n'}
+- Thời lượng dự kiến: ${durationValue} phút
+${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
+
+Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
                         newTitle = `Kịch bản ngẫu nhiên (${durationValue} phút)`;
                     }
 
@@ -757,12 +783,14 @@
                     state.windows.script = {
                         title: newTitle,
                         content: formatScriptContent(result.main_script || "AI không tạo được kịch bản chính."),
-                        status: 'open'
+                        status: 'open',
+                        saved: false
                     };
                     state.windows.vo = {
                         title: `VO cho: ${newTitle}`,
                         content: formatScriptContent(result.voice_over_script || "AI không tạo được phần VO riêng biệt."),
-                        status: 'open'
+                        status: 'open',
+                        saved: false
                     };
                     
                     renderApp();
@@ -823,7 +851,7 @@
             document.body.addEventListener('click', e => {
                 const targetElement = e.target;
                 const button = targetElement.closest('button');
-                const navLink = targetElement.closest('a[href^="./"]');
+                const navLink = targetElement.closest('a');
 
                 if (button) {
                     const { target, title, type, windowType } = button.dataset;
@@ -835,6 +863,22 @@
                         }
                     } else if (button.classList.contains('close-btn')) {
                         if (state.windows[windowType]) {
+                            const win = state.windows[windowType];
+                            if (!win.saved) {
+                                const title = document.getElementById(`${windowType}-result-title`)?.value.trim();
+                                const content = document.getElementById(`${windowType}-result-content`)?.value.trim();
+                                if (title || content) {
+                                    const now = new Date();
+                                    state.trash.push({
+                                        id: now.getTime() + (windowType === 'vo' ? 1 : 0),
+                                        title: `Tự động lưu (Đóng cửa sổ): ${title || 'Chưa có tiêu đề'}`,
+                                        content: content,
+                                        savedAt: now.toLocaleString('vi-VN')
+                                    });
+                                    saveDataToStorage('trash');
+                                    showToast('Nội dung chưa lưu đã được chuyển vào Rác.');
+                                }
+                            }
                             state.windows[windowType] = null;
                             renderApp();
                         }
@@ -863,14 +907,14 @@
                         state[type].push({ id: Date.now(), title: titleText, content });
                         saveDataToStorage(type);
                         
-                        if(isScript) state.windows.script.saved = true;
-                        else state.windows.vo.saved = true;
+                        if(isScript) { if(state.windows.script) state.windows.script.saved = true; } 
+                        else { if(state.windows.vo) state.windows.vo.saved = true; }
 
                         showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
                     }
                 }
 
-                if (navLink) {
+                if (navLink && navLink.href.includes('./')) {
                     e.preventDefault();
                     if (navLink.href.includes('/S2Se/')) {
                         const content = document.getElementById('script-result-content')?.value;
@@ -881,6 +925,16 @@
                         localStorage.setItem('textToVoice', content || '');
                     }
                     window.location.href = navLink.href;
+                }
+            });
+            
+            // Listen for changes in result textareas to update saved state
+            document.body.addEventListener('input', e => {
+                const targetId = e.target.id;
+                if (targetId === 'script-result-content' || targetId === 'script-result-title') {
+                    if (state.windows.script) state.windows.script.saved = false;
+                } else if (targetId === 'vo-result-content' || targetId === 'vo-result-title') {
+                    if (state.windows.vo) state.windows.vo.saved = false;
                 }
             });
 

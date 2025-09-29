@@ -58,6 +58,11 @@
         ::-webkit-scrollbar-track { background: #111827; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* Toast Notification */
+        #toast-notification {
+            transition: opacity 0.5s, transform 0.5s;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen flex flex-col">
@@ -615,6 +620,23 @@
                 Object.values(memoryElements).forEach(elements => elements.container.classList.add('hidden'));
                 apiKeyContainer.classList.add('hidden');
             }
+            
+            function showToast(message) {
+                const toast = document.getElementById('toast-notification');
+                if (!toast) return;
+                toast.textContent = message;
+                toast.classList.remove('hidden', 'opacity-0', 'translate-y-2');
+                toast.classList.add('opacity-100', 'translate-y-0');
+
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => {
+                         toast.classList.add('hidden');
+                    }, 500); // Wait for fade out transition
+                }, 3000); // Toast visible for 3 seconds
+            }
+
 
             function autoSaveToTrash() {
                  if (!isCurrentResultSaved && !scriptResultContainer.classList.contains('hidden')) {
@@ -629,7 +651,7 @@
                         };
                         trashItems.push(newItem);
                         localStorage.setItem('trashItems', JSON.stringify(trashItems));
-                        alert('Nội dung chưa lưu đã được tự động chuyển vào Bộ nhớ Rác.');
+                        showToast('Nội dung chưa lưu đã được tự động chuyển vào Bộ nhớ Rác.');
                     }
                 }
                 isCurrentResultSaved = true; // Reset for the new task
@@ -914,6 +936,7 @@
                 if (!button) return;
                 
                 if (button.id === 'go-to-segment-btn') {
+                    autoSaveToTrash();
                     const content = scriptResultContent.value;
                     hideAllContainers();
                     segmentInputScript.value = content;
@@ -959,6 +982,7 @@
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    autoSaveToTrash();
                     e.target.closest('.bg-gray-800').classList.add('hidden');
                 });
             });
@@ -1002,7 +1026,7 @@
             }
 
             scriptResultContent.addEventListener('input', () => {
-                updateWordCount(scriptResultContent, scriptWordCount)
+                updateWordCount(scriptResultContent, scriptWordCount);
                 isCurrentResultSaved = false;
             });
             scriptResultTitle.addEventListener('input', () => {

@@ -155,6 +155,24 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300">Tùy chọn bổ sung</label>
+                        <div class="mt-2 space-y-2">
+                            <div class="flex items-center">
+                                <input id="option-prompt-video" name="additional-options" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-blue-600 focus:ring-blue-500">
+                                <label for="option-prompt-video" class="ml-3 block text-sm text-gray-300">TỔNG HỢP PROMPT VIDEO</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="option-voice-script" name="additional-options" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-blue-600 focus:ring-blue-500">
+                                <label for="option-voice-script" class="ml-3 block text-sm text-gray-300">TỔNG HỢP THOẠI (VOICE SCRIPT)</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="option-description" name="additional-options" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-blue-600 focus:ring-blue-500">
+                                <label for="option-description" class="ml-3 block text-sm text-gray-300">Tạo mô tả Youtube, Tiktok</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="flex justify-end space-x-4 pt-4">
                         <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
                         <button type="submit" id="generate-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
@@ -623,7 +641,7 @@
                 apiKey = localStorage.getItem('apiKey') || '';
                 if (!apiKey) {
                     alert('Vui lòng nhập API Key trong phần Cài đặt.');
-                    openSettings();
+                    apiKeyBtn.click(); // Programmatically open the settings modal
                     return;
                 }
                 
@@ -640,20 +658,34 @@
                 
                 const referenceScript = scripts.find(s => s.id == selectedScriptId);
                 const referenceContent = referenceScript ? referenceScript.content : "Không có";
-                
-                const finalPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới dựa trên các thông tin sau:
 
-**1. Kịch bản tham khảo (Để học hỏi văn phong, nhân vật, bối cảnh và định dạng):**
+                const optionPromptVideo = document.getElementById('option-prompt-video').checked;
+                const optionVoiceScript = document.getElementById('option-voice-script').checked;
+                const optionDescription = document.getElementById('option-description').checked;
+
+                let additionalTasks = [];
+                if (optionPromptVideo) additionalTasks.push("- Tổng hợp PROMPT VIDEO: Từ kịch bản đã tạo, hãy tạo ra các câu lệnh (prompt) chi tiết cho AI tạo ảnh để hình dung hóa từng cảnh quay. Mỗi prompt phải mô tả rõ bối cảnh, nhân vật, hành động, góc máy, và cảm xúc.");
+                if (optionVoiceScript) additionalTasks.push("- Tổng hợp THOẠI (VOICE SCRIPT): Trích xuất toàn bộ lời thoại của các nhân vật thành một kịch bản lồng tiếng riêng biệt, ghi rõ tên nhân vật trước mỗi câu thoại.");
+                if (optionDescription) additionalTasks.push("- Tạo mô tả cho Youtube, Tiktok: Viết một đoạn mô tả ngắn gọn, hấp dẫn cho video (khoảng 150-200 từ), kèm theo 5-10 hashtags phù hợp với nội dung.");
+                
+                const finalPrompt = `Bạn là một biên kịch chuyên nghiệp và trợ lý sản xuất AI. Nhiệm vụ của bạn là thực hiện các yêu cầu sau:
+
+**1. Viết kịch bản phim mới:**
+- **Kịch bản tham khảo (Để học hỏi văn phong, nhân vật, bối cảnh và định dạng):**
 ---
 ${referenceContent}
 ---
+- **Yêu cầu cho kịch bản mới:**
+  - **Ý tưởng chính:** ${ideaValue ? ideaValue : "Hãy sáng tạo một tập mới tiếp nối câu chuyện từ kịch bản tham khảo, hoặc tạo một câu chuyện mới với cùng nhân vật và bối cảnh."}
+  - **Phong cách:** ${styleValue}
+  - **Thời lượng dự kiến:** ${durationValue} phút
 
-**2. Yêu cầu cho kịch bản mới:**
-- **Ý tưởng chính:** ${ideaValue ? ideaValue : "Hãy sáng tạo một tập mới tiếp nối câu chuyện từ kịch bản tham khảo, hoặc tạo một câu chuyện mới với cùng nhân vật và bối cảnh."}
-- **Phong cách:** ${styleValue}
-- **Thời lượng dự kiến:** ${durationValue} phút
+Hãy viết kịch bản mới theo đúng các yêu cầu trên, giữ vững tinh thần và văn phong của kịch bản tham khảo.
 
-Hãy viết kịch bản mới theo đúng các yêu cầu trên, giữ vững tinh thần và văn phong của kịch bản tham khảo.`;
+**2. Thực hiện các tác vụ bổ sung (nếu có):**
+${additionalTasks.length > 0 ? additionalTasks.join('\n') : "Không có yêu cầu bổ sung."}
+
+Hãy trình bày kết quả một cách rõ ràng, tách biệt từng phần một cách khoa học.`;
 
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`, {
@@ -671,6 +703,7 @@ Hãy viết kịch bản mới theo đúng các yêu cầu trên, giữ vững t
                         const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 20)}...` : `Tập mới của: ${referenceScript.title.substring(0, 20)}...`;
                         scriptResultTitle.value = newTitle;
                         scriptResultContent.value = generatedScript;
+                        scriptFormContainer.classList.add('hidden');
                         scriptResultContainer.classList.remove('hidden');
                     } else { throw new Error('Không nhận được nội dung kịch bản từ AI.'); }
                 } catch (error) {
@@ -686,3 +719,4 @@ Hãy viết kịch bản mới theo đúng các yêu cầu trên, giữ vững t
     </script>
 </body>
 </html>
+

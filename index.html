@@ -184,7 +184,7 @@
             </div>
             
              <!-- Script Result Column -->
-            <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg">
+            <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-lg flex-shrink-0">
                 <h2 class="text-2xl font-bold mb-6">Kịch bản được tạo bởi AI</h2>
                 <form id="script-result-form" class="space-y-4">
                     <div>
@@ -201,6 +201,41 @@
                         <button type="button" id="export-result-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
                     </div>
                 </form>
+            </div>
+
+             <!-- Additional Results Column -->
+            <div id="additional-results-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col space-y-6 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-0 text-yellow-400">Kết quả bổ sung</h2>
+                
+                <!-- Prompt Video Result -->
+                <div id="prompt-video-result-wrapper" class="hidden">
+                    <h3 class="text-lg font-semibold mb-2">PROMPTS Video</h3>
+                    <textarea id="prompt-video-result-content" rows="6" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" data-target="prompt-video-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 text-sm rounded-md">Copy</button>
+                        <button type="button" data-target="prompt-video-result-content" data-title="prompts_video" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 text-sm rounded-md">Xuất TXT</button>
+                    </div>
+                </div>
+
+                <!-- Voice Script Result -->
+                <div id="voice-script-result-wrapper" class="hidden">
+                    <h3 class="text-lg font-semibold mb-2">Kịch bản thoại (Voice Script)</h3>
+                    <textarea id="voice-script-result-content" rows="6" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" data-target="voice-script-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 text-sm rounded-md">Copy</button>
+                        <button type="button" data-target="voice-script-result-content" data-title="voice_script" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 text-sm rounded-md">Xuất TXT</button>
+                    </div>
+                </div>
+
+                <!-- Description Result -->
+                <div id="description-result-wrapper" class="hidden">
+                    <h3 class="text-lg font-semibold mb-2">Mô tả Youtube, Tiktok</h3>
+                    <textarea id="description-result-content" rows="6" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" data-target="description-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 text-sm rounded-md">Copy</button>
+                        <button type="button" data-target="description-result-content" data-title="description" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 text-sm rounded-md">Xuất TXT</button>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -309,7 +344,13 @@
             const scriptMemoryContainer = document.getElementById('script-memory-container');
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
+            
+            // --- Result Containers ---
             const scriptResultContainer = document.getElementById('script-result-container');
+            const additionalResultsContainer = document.getElementById('additional-results-container');
+            const promptVideoResultWrapper = document.getElementById('prompt-video-result-wrapper');
+            const voiceScriptResultWrapper = document.getElementById('voice-script-result-wrapper');
+            const descriptionResultWrapper = document.getElementById('description-result-wrapper');
             
             const scriptForm = document.getElementById('script-form');
             const scriptInputType = document.getElementById('script-input-type');
@@ -337,6 +378,11 @@
             const scriptResultTitle = document.getElementById('script-result-title');
             const scriptResultContent = document.getElementById('script-result-content');
             
+            // --- Additional Result Content Elements ---
+            const promptVideoResultContent = document.getElementById('prompt-video-result-content');
+            const voiceScriptResultContent = document.getElementById('voice-script-result-content');
+            const descriptionResultContent = document.getElementById('description-result-content');
+
             // --- API Key Elements ---
             const apiKeyForm = document.getElementById('api-key-form');
             const apiKeyInput = document.getElementById('api-key-input');
@@ -359,6 +405,7 @@
                 // Main workspace containers
                 scriptFormContainer.classList.add('hidden');
                 scriptResultContainer.classList.add('hidden');
+                additionalResultsContainer.classList.add('hidden');
             }
 
              function hideModals() {
@@ -592,6 +639,7 @@
                 saveScriptsToStorage();
                 alert('Đã lưu kịch bản vào bộ nhớ!');
                 scriptResultContainer.classList.add('hidden');
+                additionalResultsContainer.classList.add('hidden');
             });
 
             copyResultBtn.addEventListener('click', () => {
@@ -608,6 +656,29 @@
                 if (!content) { alert('Không có nội dung để xuất file.'); return; }
                 downloadAsTxt(title || 'kich_ban_khong_tieu_de', content);
             });
+            
+            // Generic listeners for new result boxes
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.target;
+                    const contentToCopy = document.getElementById(targetId).value;
+                    if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
+                    navigator.clipboard.writeText(contentToCopy).then(() => {
+                        alert('Đã sao chép vào clipboard!');
+                    }).catch(err => alert('Sao chép thất bại!'));
+                });
+            });
+
+            document.querySelectorAll('.export-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.target;
+                    const title = e.target.dataset.title || 'untitled';
+                    const content = document.getElementById(targetId).value;
+                    if (!content) { alert('Không có nội dung để xuất file.'); return; }
+                    downloadAsTxt(title, content);
+                });
+            });
+
 
             cancelDeleteBtn.addEventListener('click', closeDeleteModal);
             confirmDeleteBtn.addEventListener('click', performDelete);
@@ -670,7 +741,7 @@
                 
                 const finalPrompt = `Bạn là một biên kịch chuyên nghiệp và trợ lý sản xuất AI. Nhiệm vụ của bạn là thực hiện các yêu cầu sau:
 
-**1. Viết kịch bản phim mới:**
+**YÊU CẦU 1: VIẾT KỊCH BẢN PHIM MỚI**
 - **Kịch bản tham khảo (Để học hỏi văn phong, nhân vật, bối cảnh và định dạng):**
 ---
 ${referenceContent}
@@ -679,13 +750,18 @@ ${referenceContent}
   - **Ý tưởng chính:** ${ideaValue ? ideaValue : "Hãy sáng tạo một tập mới tiếp nối câu chuyện từ kịch bản tham khảo, hoặc tạo một câu chuyện mới với cùng nhân vật và bối cảnh."}
   - **Phong cách:** ${styleValue}
   - **Thời lượng dự kiến:** ${durationValue} phút
+Hãy viết kịch bản mới theo đúng các yêu cầu trên.
 
-Hãy viết kịch bản mới theo đúng các yêu cầu trên, giữ vững tinh thần và văn phong của kịch bản tham khảo.
-
-**2. Thực hiện các tác vụ bổ sung (nếu có):**
+**YÊU CẦU 2: THỰC HIỆN CÁC TÁC VỤ BỔ SUNG**
 ${additionalTasks.length > 0 ? additionalTasks.join('\n') : "Không có yêu cầu bổ sung."}
 
-Hãy trình bày kết quả một cách rõ ràng, tách biệt từng phần một cách khoa học.`;
+**HƯỚNG DẪN TRÌNH BÀY:**
+Hãy trả lời trong một khối văn bản duy nhất.
+1. Bắt đầu bằng kịch bản chính.
+2. Sau khi kịch bản chính kết thúc, sử dụng các tiêu đề sau để phân tách các phần bổ sung. Mỗi tiêu đề phải nằm trên một dòng riêng biệt:
+- ### TỔNG HỢP PROMPT VIDEO ###
+- ### TỔNG HỢP THOẠI (VOICE SCRIPT) ###
+- ### MÔ TẢ YOUTUBE, TIKTOK ###`;
 
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`, {
@@ -698,13 +774,49 @@ Hãy trình bày kết quả một cách rõ ràng, tách biệt từng phần m
                         throw new Error(errorData.error.message || `Lỗi HTTP: ${response.status}`);
                     }
                     const result = await response.json();
-                    const generatedScript = result.candidates[0]?.content?.parts[0]?.text;
-                    if (generatedScript) {
-                        const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 20)}...` : `Tập mới của: ${referenceScript.title.substring(0, 20)}...`;
-                        scriptResultTitle.value = newTitle;
-                        scriptResultContent.value = generatedScript;
-                        scriptResultContainer.classList.remove('hidden');
-                    } else { throw new Error('Không nhận được nội dung kịch bản từ AI.'); }
+                    const generatedText = result.candidates[0]?.content?.parts[0]?.text || "";
+
+                    // Hide all result containers before showing new ones
+                    scriptResultContainer.classList.add('hidden');
+                    additionalResultsContainer.classList.add('hidden');
+                    promptVideoResultWrapper.classList.add('hidden');
+                    voiceScriptResultWrapper.classList.add('hidden');
+                    descriptionResultWrapper.classList.add('hidden');
+
+                    const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 20)}...` : `Tập mới của: ${referenceScript.title.substring(0, 20)}...`;
+
+                    // Regex to split the response by the custom headers
+                    const parts = generatedText.split(/### (.*?) ###\n?/);
+
+                    const mainScript = parts[0] ? parts[0].trim() : "";
+                    scriptResultTitle.value = newTitle;
+                    scriptResultContent.value = mainScript;
+                    scriptResultContainer.classList.remove('hidden');
+
+                    let hasAdditionalContent = false;
+                    for (let i = 1; i < parts.length; i += 2) {
+                        const title = parts[i].trim();
+                        const content = parts[i + 1] ? parts[i + 1].trim() : "";
+                        
+                        if (title === "TỔNG HỢP PROMPT VIDEO" && optionPromptVideo) {
+                            promptVideoResultContent.value = content;
+                            promptVideoResultWrapper.classList.remove('hidden');
+                            hasAdditionalContent = true;
+                        } else if (title === "TỔNG HỢP THOẠI (VOICE SCRIPT)" && optionVoiceScript) {
+                            voiceScriptResultContent.value = content;
+                            voiceScriptResultWrapper.classList.remove('hidden');
+                            hasAdditionalContent = true;
+                        } else if (title === "MÔ TẢ YOUTUBE, TIKTOK" && optionDescription) {
+                            descriptionResultContent.value = content;
+                            descriptionResultWrapper.classList.remove('hidden');
+                            hasAdditionalContent = true;
+                        }
+                    }
+
+                    if (hasAdditionalContent) {
+                        additionalResultsContainer.classList.remove('hidden');
+                    }
+
                 } catch (error) {
                     console.error('Lỗi khi tạo kịch bản:', error);
                     alert(`Đã xảy ra lỗi: ${error.message}`);

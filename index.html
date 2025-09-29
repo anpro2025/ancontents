@@ -141,7 +141,7 @@
         <!-- Main Content Area -->
         <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto">
             <!-- Initial Input Column -->
-            <div id="script-form-container" class="hidden w-[450px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
+            <div id="script-form-container" class="hidden w-[400px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold mb-6">Nhập đầu vào</h2>
                 <form id="script-form" class="space-y-4">
                     <div>
@@ -198,22 +198,24 @@
              <!-- Refinement Column -->
             <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
                 <h2 class="text-2xl font-bold mb-4">Kịch bản được tạo từ đầu vào</h2>
-                <form id="refine-form" class="space-y-4 border-b border-gray-700 pb-4 mb-4">
-                     <div>
-                        <label for="refine-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se</label>
-                        <select id="refine-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <!-- Options will be dynamically populated -->
-                        </select>
+                <form id="refine-form" class="border-b border-gray-700 pb-4 mb-4 flex items-end justify-between gap-4">
+                    <div class="flex-grow space-y-2">
+                        <div>
+                            <label for="refine-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se</label>
+                            <select id="refine-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="refine-input-vo" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
+                            <select id="refine-input-vo" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label for="refine-input-vo" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
-                        <select id="refine-input-vo" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <!-- Options will be dynamically populated -->
-                        </select>
-                    </div>
-                     <div class="flex justify-end">
-                         <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
-                            <span class="btn-text">Tạo tiếp từ đầu vào</span>
+                     <div class="flex-shrink-0">
+                         <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center h-10">
+                            <span class="btn-text">Tạo tiếp</span>
                             <span class="loader hidden ml-2"></span>
                         </button>
                      </div>
@@ -752,11 +754,9 @@
             }
 
             function populateAllInputDropdowns() {
-                populateDropdown(scriptInputPrompt, inputPrompts, 'Chọn từ Đầu vào Se...');
-                populateDropdown(scriptInputVoice, inputVoiceOvers, 'Chọn từ Đầu vào VO...');
-                populateDropdown(scriptInputScript, inputScripts, 'Chọn từ Đầu vào Dự án...');
                 populateDropdown(document.getElementById('refine-input-se'), inputPrompts, 'Chọn từ Đầu vào Se...');
                 populateDropdown(document.getElementById('refine-input-vo'), inputVoiceOvers, 'Chọn từ Đầu vào VO...');
+                populateDropdown(scriptInputScript, inputScripts, 'Chọn từ Đầu vào Dự án...');
             }
 
 

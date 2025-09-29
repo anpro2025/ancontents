@@ -13,7 +13,7 @@
             font-family: 'Inter', sans-serif;
         }
         .hidden {
-            display: none !important; /* Use important to ensure override */
+            display: none !important;
         }
         .script-item {
             display: flex;
@@ -56,16 +56,16 @@
         .workspace-column {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
-        .workspace-column.hidden {
+        .workspace-column.hidden-transition {
             opacity: 0;
             transform: scale(0.95);
             pointer-events: none;
-            position: absolute; /* Prevent layout shift */
+            position: absolute;
         }
         .modal-overlay {
             transition: opacity 0.3s ease;
         }
-         .modal-overlay.hidden {
+        .modal-overlay.hidden {
             opacity: 0;
             pointer-events: none;
         }
@@ -99,16 +99,16 @@
                     </div>
                     <!-- Blue Memory Links -->
                      <div class="flex flex-wrap gap-2">
-                        <a href="./bo-nho-scripts/" title="Bộ nhớ Scripts" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">S</span></a>
-                        <a href="./bo-nho-sections/" title="Bộ nhớ Sections" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">Se</span></a>
-                        <a href="./bo-nho-prompts/" title="Bộ nhớ Prompts" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">P</span></a>
-                        <a href="./bo-nho-voice/" title="Bộ nhớ Voice Off" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">VO</span></a>
-                        <a href="./bo-nho-rac/" title="Bộ nhớ Rác" class="bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></a>
+                        <button data-type="mainScripts" title="Bộ nhớ Scripts" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">S</span></button>
+                        <button data-type="sections" title="Bộ nhớ Sections" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">Se</span></button>
+                        <button data-type="mainPrompts" title="Bộ nhớ Prompts" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">P</span></button>
+                        <button data-type="mainVoiceOvers" title="Bộ nhớ Voice Off" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">VO</span></button>
+                        <button data-type="trash" title="Bộ nhớ Rác" class="memory-btn bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
                     </div>
                 </div>
                 <div class="border-t border-gray-600 pt-4"></div>
                 <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">P2S</button>
-                <a href="./S2Se/" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">S2Se</a>
+                <a href="./S2Se/" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">S2Se</a>
             </div>
         </aside>
 
@@ -119,16 +119,16 @@
                 <h2 class="text-2xl font-bold mb-6">Nhập đầu vào</h2>
                 <form id="script-form" class="space-y-4">
                     <div>
-                        <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Tùy chọn)</label>
-                        <textarea id="script-idea" rows="4" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></textarea>
+                        <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Bắt buộc)</label>
+                        <textarea id="script-idea" rows="4" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></textarea>
                     </div>
                     <div class="space-y-4">
                         <div>
-                            <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Đầu vào Dự án</label>
+                            <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Đầu vào Dự án (Tham khảo)</label>
                             <select id="script-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
                         </div>
                          <div>
-                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
+                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO (Tham khảo)</label>
                             <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
                         </div>
                         <div>
@@ -165,7 +165,7 @@
             </div>
             
             <!-- VO Result Column -->
-            <div id="vo-result-container" class="workspace-column hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
+            <div id="vo-result-container" class="workspace-column hidden w-[600px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col">
                  <!-- This will be populated by JS -->
             </div>
         </main>
@@ -227,6 +227,7 @@
                 <div>
                     <label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label>
                     <select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                        <option value="gemini-2.5-flash-preview-05-20">Gemini 2.5 Flash</option>
                         <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Mới nhất)</option>
                         <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Mới nhất)</option>
                         <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
@@ -240,10 +241,10 @@
     </div>
     
     <!-- Delete Confirmation Modal -->
-    <div id="delete-confirm-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div id="delete-confirm-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
         <div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md">
             <h2 class="text-xl font-bold mb-4">Xác nhận xóa</h2>
-            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa mục này không? Thao tác này không thể hoàn tác.</p>
+            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa mục này không? Mục này sẽ được chuyển vào Thùng rác.</p>
             <div class="flex justify-end space-x-4">
                 <button type="button" id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
                 <button type="button" id="confirm-delete-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md">Xóa</button>
@@ -297,49 +298,50 @@
             const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C3.732 4.943 7.523 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-7.523 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`;
             const eyeOffIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 8.517 16.635 7.412 14.722 6.708l-1.414-1.414A10.009 10.009 0 0010 3C7.523 3 5.268 4.943 2.458 10a11.97 11.97 0 003.876 3.655l-2.227-2.228a1 1 0 00-1.414-1.414L.293 8.293a1 1 0 000 1.414l2 2a1 1 0 001.414 0l1.293-1.293A8.003 8.003 0 0110 7a8 8 0 012.828.532l1.432-1.432A9.98 9.98 0 0010 5c-2.477 0-4.732 1.943-7.542 7 .57 1.1 1.254 2.063 2.07 2.912l-1.42-1.42a1 1 0 00-1.414-1.414L.293 15.707a1 1 0 001.414 1.414l14-14a1 1 0 00-1.414-1.414L3.707 2.293z" clip-rule="evenodd" /><path d="M10.707 10.293a1 1 0 10-1.414-1.414 1 1 0 001.414 1.414z" /></svg>`;
 
-            // --- State Management ---
-            const state = {
-                script: JSON.parse(localStorage.getItem('inputScripts')) || [],
-                prompt: JSON.parse(localStorage.getItem('inputPrompts')) || [],
-                voiceOver: JSON.parse(localStorage.getItem('inputVoiceOvers')) || [],
-                mainScripts: JSON.parse(localStorage.getItem('scripts')) || [],
-                settings: {
-                    apiKey: localStorage.getItem('apiKey') || '',
-                    aiModel: localStorage.getItem('aiModel') || 'gemini-1.5-flash-latest'
-                },
-                itemToDelete: null, // {id: '123', type: 'script'}
-                currentResultSaved: true,
-                currentMemoryType: null, // 'script', 'prompt', or 'voiceOver'
-            };
-
             const memoryConfig = {
-                script: { title: 'Đầu vào Dự án', storageKey: 'inputScripts' },
-                prompt: { title: 'Đầu vào Se', storageKey: 'inputPrompts' },
-                voiceOver: { title: 'Đầu vào VO', storageKey: 'inputVoiceOvers' }
+                // Inputs
+                script: { title: 'Đầu vào Dự án', storageKey: 'input_scripts' },
+                prompt: { title: 'Đầu vào Se', storageKey: 'input_prompts' },
+                voiceOver: { title: 'Đầu vào VO', storageKey: 'input_voiceOvers' },
+                // Saved Results
+                mainScripts: { title: 'Bộ nhớ Scripts', storageKey: 'memory_mainScripts' },
+                sections: { title: 'Bộ nhớ Sections', storageKey: 'memory_sections' },
+                mainPrompts: { title: 'Bộ nhớ Prompts', storageKey: 'memory_mainPrompts' },
+                mainVoiceOvers: { title: 'Bộ nhớ Voice Off', storageKey: 'memory_mainVoiceOvers' },
+                trash: { title: 'Bộ nhớ Rác', storageKey: 'memory_trash' }
             };
             
+            // --- State Management ---
+            const state = {
+                // All memories loaded from localStorage
+                script: JSON.parse(localStorage.getItem(memoryConfig.script.storageKey)) || [],
+                prompt: JSON.parse(localStorage.getItem(memoryConfig.prompt.storageKey)) || [],
+                voiceOver: JSON.parse(localStorage.getItem(memoryConfig.voiceOver.storageKey)) || [],
+                mainScripts: JSON.parse(localStorage.getItem(memoryConfig.mainScripts.storageKey)) || [],
+                sections: JSON.parse(localStorage.getItem(memoryConfig.sections.storageKey)) || [],
+                mainPrompts: JSON.parse(localStorage.getItem(memoryConfig.mainPrompts.storageKey)) || [],
+                mainVoiceOvers: JSON.parse(localStorage.getItem(memoryConfig.mainVoiceOvers.storageKey)) || [],
+                trash: JSON.parse(localStorage.getItem(memoryConfig.trash.storageKey)) || [],
+                // App settings
+                settings: {
+                    apiKey: localStorage.getItem('apiKey') || '',
+                    aiModel: localStorage.getItem('aiModel') || 'gemini-2.5-flash-preview-05-20'
+                },
+                itemToDelete: null,
+                currentResultSaved: true,
+                currentMemoryType: null,
+            };
+
             // --- UI Helper Functions ---
             
             function showToast(message, type = 'info') {
-                const colors = {
-                    success: 'bg-green-600',
-                    error: 'bg-red-600',
-                    info: 'bg-blue-600'
-                };
+                const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-blue-600' };
                 const toastContainer = document.getElementById('toast-container');
                 const toast = document.createElement('div');
-                toast.className = `text-white py-2 px-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
-                toast.classList.add(colors[type] || colors.info);
+                toast.className = `text-white py-2 px-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full ${colors[type] || colors.info}`;
                 toast.textContent = message;
-
                 toastContainer.appendChild(toast);
-                
-                // Animate in
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-full');
-                }, 10);
-                
-                // Animate out and remove
+                setTimeout(() => toast.classList.remove('translate-x-full'), 10);
                 setTimeout(() => {
                     toast.classList.add('translate-x-full');
                     toast.addEventListener('transitionend', () => toast.remove());
@@ -347,22 +349,18 @@
             }
             
             function setButtonLoading(button, isLoading) {
+                if (!button) return;
                 const btnText = button.querySelector('.btn-text');
                 const loader = button.querySelector('.loader');
-                if (isLoading) {
-                    btnText.textContent = 'Đang tạo...';
-                    loader.classList.remove('hidden');
-                    button.disabled = true;
-                } else {
-                    btnText.textContent = 'Tạo';
-                    loader.classList.add('hidden');
-                    button.disabled = false;
-                }
+                button.disabled = isLoading;
+                if (btnText) btnText.textContent = isLoading ? 'Đang tạo...' : 'Tạo';
+                if (loader) loader.classList.toggle('hidden', !isLoading);
             }
 
             function updateWordCount(textArea, countElement) {
+                if (!textArea || !countElement) return;
                 const text = textArea.value.trim();
-                const wordCount = text === '' ? 0 : text.split(/\s+/).filter(Boolean).length;
+                const wordCount = text ? text.split(/\s+/).filter(Boolean).length : 0;
                 countElement.textContent = `${wordCount} từ`;
             }
 
@@ -370,7 +368,7 @@
                 const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                const fileName = (title || 'untitled').toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50) + '.txt';
+                const fileName = `${(title || 'untitled').toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50)}.txt`;
                 link.href = url;
                 link.download = fileName;
                 document.body.appendChild(link);
@@ -381,27 +379,41 @@
             
             function autoSaveToTrash() {
                 if (state.currentResultSaved) return;
-
-                const title = document.getElementById('script-result-title')?.value.trim();
-                const content = document.getElementById('script-result-content')?.value.trim();
-                
-                if (title || content) {
-                    let trashItems = JSON.parse(localStorage.getItem('trashItems')) || [];
-                    const now = new Date();
-                    trashItems.push({
-                        id: now.getTime(),
-                        title: `Tự động lưu: ${title || 'Chưa có tiêu đề'}`,
-                        dateTime: now.toLocaleString('vi-VN'),
-                        content: content
-                    });
-                    localStorage.setItem('trashItems', JSON.stringify(trashItems));
-                    showToast('Nội dung chưa lưu đã được chuyển vào Bộ nhớ Rác.');
+                const titleElement = document.getElementById('script-result-title');
+                const contentElement = document.getElementById('script-result-content');
+                if (titleElement && contentElement) {
+                    const title = titleElement.value.trim();
+                    const content = contentElement.value.trim();
+                    if (title || content) {
+                        const now = new Date();
+                        state.trash.push({
+                            id: now.getTime(),
+                            title: `Tự động lưu: ${title || 'Chưa có tiêu đề'}`,
+                            content: content,
+                            savedAt: now.toLocaleString('vi-VN')
+                        });
+                        saveDataToStorage('trash');
+                        showToast('Nội dung chưa lưu đã được chuyển vào Bộ nhớ Rác.');
+                    }
                 }
-                state.currentResultSaved = true; // Reset for the next task
+                state.currentResultSaved = true;
             }
 
             function hideAllWorkspaceColumns() {
-                document.querySelectorAll('.workspace-column').forEach(c => c.classList.add('hidden'));
+                document.querySelectorAll('.workspace-column').forEach(c => {
+                    if (!c.classList.contains('hidden')) {
+                        c.classList.add('hidden-transition');
+                        setTimeout(() => {
+                           c.classList.add('hidden');
+                           c.classList.remove('hidden-transition');
+                        }, 300);
+                    }
+                });
+            }
+
+            function showWorkspaceColumn(element) {
+                 hideAllWorkspaceColumns();
+                 element.classList.remove('hidden', 'hidden-transition');
             }
 
             function hideAllModals() {
@@ -411,17 +423,16 @@
             // --- Generic Memory Management ---
 
             function saveDataToStorage(type) {
-                const key = memoryConfig[type].storageKey;
-                localStorage.setItem(key, JSON.stringify(state[type]));
+                const key = memoryConfig[type]?.storageKey;
+                if (key) localStorage.setItem(key, JSON.stringify(state[type]));
             }
 
             function renderMemoryList() {
                 const type = state.currentMemoryType;
-                const data = state[type];
+                const data = state[type] || [];
                 const currentId = memoryModalIdInput.value;
                 memoryModalList.innerHTML = '';
-                
-                data.forEach(item => {
+                [...data].sort((a, b) => b.id - a.id).forEach(item => {
                     const div = document.createElement('div');
                     div.className = `w-full text-left p-3 rounded-md transition-colors script-item cursor-pointer ${item.id == currentId ? 'active' : 'hover:bg-gray-700'}`;
                     div.dataset.id = item.id;
@@ -445,17 +456,19 @@
                 autoSaveToTrash();
                 hideAllWorkspaceColumns();
                 hideAllModals();
-                
                 state.currentMemoryType = type;
-                memoryModalTitle.textContent = `Bộ nhớ ${memoryConfig[type].title}`;
+                const config = memoryConfig[type];
+                if (!config) return;
+                memoryModalTitle.textContent = config.title;
                 memoryModalContainer.classList.remove('hidden');
                 memoryEditorPanel.classList.add('hidden');
+                memoryNewItemBtn.classList.toggle('hidden', type === 'trash');
                 clearMemoryForm();
             }
 
             function loadItemIntoMemoryForm(id) {
                 const type = state.currentMemoryType;
-                const item = state[type].find(i => i.id == id);
+                const item = state[type]?.find(i => i.id == id);
                 if (item) {
                     memoryModalIdInput.value = item.id;
                     memoryModalTitleInput.value = item.title;
@@ -466,7 +479,6 @@
             }
 
             // --- Settings Management ---
-            
             function saveSettings() {
                 localStorage.setItem('apiKey', state.settings.apiKey);
                 localStorage.setItem('aiModel', state.settings.aiModel);
@@ -485,7 +497,7 @@
                     const select = document.getElementById(selectId);
                     if (!select) return;
                     select.innerHTML = `<option value="">${placeholder}</option>`;
-                    data.forEach(item => {
+                    [...data].sort((a, b) => b.id - a.id).forEach(item => {
                         select.innerHTML += `<option value="${item.id}">${item.title}</option>`;
                     });
                 };
@@ -493,25 +505,26 @@
                 populate('script-input-voice', state.voiceOver, 'Chọn từ Đầu vào VO...');
             }
 
-
             // --- API Calls ---
             async function generateAiContent(prompt, submitButton) {
                 setButtonLoading(submitButton, true);
+                if (!state.settings.apiKey) throw new Error('Vui lòng nhập API Key trong Cài đặt.');
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${state.settings.aiModel}:generateContent?key=${state.settings.apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                        body: JSON.stringify({
+                             contents: [{ parts: [{ text: prompt }] }],
+                             generationConfig: { responseMimeType: "application/json" }
+                        })
                     });
                     if (!response.ok) {
                         const errorData = await response.json();
-                        throw new Error(errorData.error.message || `Lỗi HTTP: ${response.status}`);
+                        throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
                     }
                     const result = await response.json();
                     const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!text) {
-                       throw new Error("Không nhận được phản hồi hợp lệ từ AI. Vui lòng thử lại.");
-                    }
+                    if (!text) throw new Error("Không nhận được phản hồi hợp lệ từ AI.");
                     return text;
                 } finally {
                     setButtonLoading(submitButton, false);
@@ -520,21 +533,18 @@
 
             // --- Event Listeners Setup ---
 
-            // Main Actions
             createScriptBtn.addEventListener('click', () => {
                 autoSaveToTrash();
                 scriptForm.reset();
                 populateAllInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
-                hideAllWorkspaceColumns();
-                scriptFormContainer.classList.remove('hidden');
+                showWorkspaceColumn(scriptFormContainer);
             });
 
             scriptDuration.addEventListener('change', (e) => {
                 scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
             });
             
-            // Settings Modal
             apiKeyBtn.addEventListener('click', () => {
                 autoSaveToTrash();
                 hideAllModals();
@@ -548,22 +558,16 @@
                 state.settings.apiKey = apiKeyInput.value.trim();
                 state.settings.aiModel = aiModelSelect.value;
                 saveSettings();
-                renderSettingsDisplay();
                 showToast('Đã lưu Cài đặt thành công!', 'success');
                 apiKeyContainer.classList.add('hidden');
             });
 
             toggleApiKeyVisibilityBtn.addEventListener('click', () => {
-                if (apiKeyInput.type === 'password') {
-                    apiKeyInput.type = 'text';
-                    toggleApiKeyVisibilityBtn.innerHTML = eyeOffIconSVG;
-                } else {
-                    apiKeyInput.type = 'password';
-                    toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
-                }
+                const isPassword = apiKeyInput.type === 'password';
+                apiKeyInput.type = isPassword ? 'text' : 'password';
+                toggleApiKeyVisibilityBtn.innerHTML = isPassword ? eyeOffIconSVG : eyeIconSVG;
             });
 
-            // Generic Memory Modal Listeners
             document.querySelectorAll('.memory-btn').forEach(btn => {
                 btn.addEventListener('click', () => openMemoryModal(btn.dataset.type));
             });
@@ -591,14 +595,11 @@
             memoryModalForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const type = state.currentMemoryType;
+                if (type === 'trash') return showToast('Không thể chỉnh sửa trong thùng rác.', 'error');
                 const id = memoryModalIdInput.value;
                 const title = memoryModalTitleInput.value.trim();
                 const content = memoryModalContentInput.value.trim();
-                if (!title || !content) {
-                    showToast('Tiêu đề và nội dung không được để trống.', 'error');
-                    return;
-                }
-                
+                if (!title || !content) return showToast('Tiêu đề và nội dung không được để trống.', 'error');
                 if (id) {
                     const index = state[type].findIndex(i => i.id == id);
                     if (index > -1) state[type][index] = { ...state[type][index], title, content };
@@ -607,7 +608,6 @@
                     state[type].push(newItem);
                     memoryModalIdInput.value = newItem.id;
                 }
-                
                 saveDataToStorage(type);
                 renderMemoryList();
                 showToast('Đã lưu thành công!', 'success');
@@ -626,63 +626,47 @@
                 downloadAsTxt(title, content);
             });
 
-
-            // Delete Modal Logic
             cancelDeleteBtn.addEventListener('click', () => deleteConfirmModal.classList.add('hidden'));
             confirmDeleteBtn.addEventListener('click', () => {
                 if (!state.itemToDelete) return;
                 const { id, type } = state.itemToDelete;
-                
+                const itemToMove = state[type].find(item => item.id == id);
+                if (itemToMove && type !== 'trash') {
+                     state.trash.push({ ...itemToMove, originalType: type, deletedAt: new Date().toLocaleString('vi-VN') });
+                     saveDataToStorage('trash');
+                }
                 state[type] = state[type].filter(item => item.id != id);
                 saveDataToStorage(type);
-                
-                // If we are in the memory modal for the deleted item type, refresh it
                 if (type === state.currentMemoryType) {
                     if (memoryModalIdInput.value == id) {
                         clearMemoryForm();
+                        memoryEditorPanel.classList.add('hidden');
                     } else {
                         renderMemoryList();
                     }
                 }
-                
                 state.itemToDelete = null;
                 deleteConfirmModal.classList.add('hidden');
                 showToast('Đã xóa thành công.', 'success');
             });
             
-            // General Close Buttons
             document.querySelectorAll('.close-modal-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => e.target.closest('.modal-overlay').classList.add('hidden'));
             });
-             document.querySelectorAll('.cancel-btn').forEach(btn => {
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     autoSaveToTrash();
                     e.target.closest('.workspace-column').classList.add('hidden');
                 });
             });
 
-            // Main Script Form Submission
             scriptForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (!state.settings.apiKey) {
-                    showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
-                    apiKeyBtn.click();
-                    return;
-                }
-                
                 const submitButton = e.target.querySelector('button[type="submit"]');
                 const ideaValue = document.getElementById('script-idea').value.trim();
-                const selectedScriptId = document.getElementById('script-input-script').value;
-                const styleValue = document.getElementById('script-style').value;
-                const selectedVoId = document.getElementById('script-input-voice').value;
-
-                if (!selectedScriptId && !ideaValue) return showToast('Cung cấp "Đầu vào Dự án" hoặc "Ý tưởng".', 'error');
-                if (!styleValue) return showToast('Vui lòng chọn phong cách.', 'error');
-
+                if (!document.getElementById('script-style').value) return showToast('Vui lòng chọn phong cách.', 'error');
                 autoSaveToTrash();
                 hideAllWorkspaceColumns();
-
-                // Show loading state in result containers
                 const loadingHTML = `<div class="flex justify-center items-center h-full"><div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div></div>`;
                 scriptResultContainer.innerHTML = loadingHTML;
                 voResultContainer.innerHTML = loadingHTML;
@@ -690,48 +674,42 @@
                 voResultContainer.classList.remove('hidden');
 
                 try {
+                    const selectedScriptId = document.getElementById('script-input-script').value;
+                    const selectedVoId = document.getElementById('script-input-voice').value;
+                    const styleValue = document.getElementById('script-style').value;
                     let durationValue = scriptDuration.value === 'custom' ? scriptDurationCustom.value : scriptDuration.value;
                     const wordLimit = document.getElementById('word-limit').value;
-                    
                     const referenceScript = state.script.find(s => s.id == selectedScriptId);
                     const referenceVo = state.voiceOver.find(v => v.id == selectedVoId);
 
-                    const prompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới và một kịch bản lồng tiếng (voice-over) riêng biệt. Hãy cấu trúc câu trả lời của bạn thành hai phần rõ ràng, phân tách bởi '---VO_PART---'.
-                        Phần đầu tiên sẽ là kịch bản chính hoàn chỉnh (bao gồm mô tả hình ảnh và lời thoại nhân vật).
-                        Phần thứ hai, bắt đầu bằng '---VO_PART---', sẽ chỉ chứa phần kịch bản lồng tiếng (voice-over).
+                    const prompt = `Bạn là một biên kịch chuyên nghiệp.
+Nhiệm vụ: Viết một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt.
+Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
 
-                        Sử dụng các thông tin sau:
-                        - Đầu vào Dự án (cốt truyện chính): --- ${referenceScript?.content || "Không có"} ---
-                        - Đầu vào VO (tham khảo lời thoại): --- ${referenceVo?.content || "Không có"} ---
-                        - Ý tưởng/Yêu cầu bổ sung: ${ideaValue || "Hãy phát triển kịch bản từ Đầu vào Dự án."}
-                        - Phong cách: ${styleValue}
-                        - Thời lượng dự kiến: ${durationValue} phút
-                        ${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
-                        Hãy đảm bảo bạn tuân thủ đúng định dạng đầu ra đã yêu cầu.`;
+Sử dụng các thông tin sau:
+- Ý tưởng/Yêu cầu chính: ${ideaValue}
+- Kịch bản tham khảo (cốt truyện): --- ${referenceScript?.content || "Không có"} ---
+- Lời thoại tham khảo (VO): --- ${referenceVo?.content || "Không có"} ---
+- Phong cách: ${styleValue}
+- Thời lượng dự kiến: ${durationValue} phút
+${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
+
+Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
 
                     const generatedContent = await generateAiContent(prompt, submitButton);
-                    
-                    const [scriptPart, voPart] = generatedContent.includes('---VO_PART---') 
-                        ? generatedContent.split('---VO_PART---').map(p => p.trim())
-                        : [generatedContent.trim(), "AI không tạo được phần VO riêng biệt."];
-
-                    const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 30)}...` : `Kịch bản từ: ${referenceScript?.title.substring(0, 20) || 'dữ liệu vào'}...`;
-                    
-                    // Populate result containers with final HTML
+                    const result = JSON.parse(generatedContent);
+                    const scriptPart = result.main_script || "AI không tạo được kịch bản chính.";
+                    const voPart = result.voice_over_script || "AI không tạo được phần VO riêng biệt.";
+                    const newTitle = `Kịch bản cho: ${ideaValue.substring(0, 30)}...`;
                     scriptResultContainer.innerHTML = createResultCardHTML('script', newTitle, scriptPart);
                     voResultContainer.innerHTML = createResultCardHTML('vo', `VO cho: ${newTitle}`, voPart);
-                    
-                    // Add listeners and update word count for the new elements
-                    document.getElementById('script-result-content').addEventListener('input', () => updateWordCount(document.getElementById('script-result-content'), document.getElementById('script-word-count')));
-                    document.getElementById('vo-result-content').addEventListener('input', () => updateWordCount(document.getElementById('vo-result-content'), document.getElementById('vo-word-count')));
                     updateWordCount(document.getElementById('script-result-content'), document.getElementById('script-word-count'));
                     updateWordCount(document.getElementById('vo-result-content'), document.getElementById('vo-word-count'));
-                    
                     state.currentResultSaved = false;
                 } catch (error) {
                     console.error('Lỗi trong quá trình tạo:', error);
                     showToast(`Lỗi: ${error.message}`, 'error');
-                    scriptResultContainer.innerHTML = `<p class="text-red-400">Đã xảy ra lỗi: ${error.message}</p>`;
+                    scriptResultContainer.innerHTML = `<p class="text-red-400 p-4">Đã xảy ra lỗi: ${error.message}</p>`;
                     voResultContainer.classList.add('hidden');
                 }
             });
@@ -742,14 +720,9 @@
                     <h2 class="text-2xl font-bold mb-4">${isScript ? 'Kịch bản được tạo' : 'VO được tạo'}</h2>
                     <div class="space-y-4 flex-grow flex flex-col">
                         <div class="flex justify-between items-center">
-                            <label for="${type}-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                            <div class="flex space-x-2">
-                                ${isScript ? `
-                                <button type="button" id="save-to-s-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào S</button>
-                                <button type="button" id="go-to-segment-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md">S2Se</button>
-                                ` : `
-                                <button type="button" id="save-vo-to-vo-blue-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào VO xanh</button>
-                                `}
+                             <label for="${type}-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                             <div class="flex space-x-2">
+                                <button type="button" data-type="${isScript ? 'mainScripts' : 'mainVoiceOvers'}" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào ${isScript ? 'S' : 'VO'}</button>
                             </div>
                         </div>
                         <input type="text" id="${type}-result-title" required class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" value="${title}">
@@ -767,43 +740,32 @@
                     </div>`;
             }
 
-            // Delegated event listener for dynamically created result buttons
-            document.getElementById('main-workspace').addEventListener('click', e => {
+            document.body.addEventListener('click', e => {
                 const button = e.target.closest('button');
                 if (!button) return;
-                
+                const { target, title, type } = button.dataset;
                 if (button.classList.contains('copy-btn')) {
-                    const content = document.getElementById(button.dataset.target)?.value;
+                    const content = document.getElementById(target)?.value;
                     if (!content) return showToast('Không có nội dung để sao chép.', 'info');
                     navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
                 } else if (button.classList.contains('export-btn')) {
-                    const content = document.getElementById(button.dataset.target)?.value;
-                    const title = document.getElementById(`${button.dataset.title}-result-title`)?.value;
+                    const content = document.getElementById(target)?.value;
+                    const titleText = document.getElementById(`${title}-result-title`)?.value;
                     if (!content) return showToast('Không có nội dung để xuất.', 'info');
-                    downloadAsTxt(title, content);
-                } else if (button.id === 'go-to-segment-btn') {
-                    const content = document.getElementById('script-result-content')?.value;
-                    localStorage.setItem('scriptToProcess', content);
-                    window.location.href = './S2Se/';
-                } else if (button.id === 'save-to-s-btn') {
-                    const title = document.getElementById('script-result-title')?.value.trim();
-                    const content = document.getElementById('script-result-content')?.value.trim();
-                    if (!title || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
-                    state.mainScripts.push({ id: Date.now(), title, content });
-                    localStorage.setItem('scripts', JSON.stringify(state.mainScripts));
-                    state.currentResultSaved = true;
-                    showToast('Đã lưu vào Bộ nhớ Scripts (S xanh)!', 'success');
-                } else if (button.id === 'save-vo-to-vo-blue-btn') {
-                     const title = document.getElementById('vo-result-title')?.value.trim();
-                    const content = document.getElementById('vo-result-content')?.value.trim();
-                    if (!title || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
-                    let voiceMemory = JSON.parse(localStorage.getItem('voiceOvers_blue')) || [];
-                    voiceMemory.push({ id: Date.now(), title, content });
-                    localStorage.setItem('voiceOvers_blue', JSON.stringify(voiceMemory));
-                    showToast('Đã lưu vào Bộ nhớ Voice Off (VO xanh)!', 'success');
+                    downloadAsTxt(titleText, content);
+                } else if (button.classList.contains('save-result-btn')) {
+                    const isScript = type === 'mainScripts';
+                    const titleElemId = isScript ? 'script-result-title' : 'vo-result-title';
+                    const contentElemId = isScript ? 'script-result-content' : 'vo-result-content';
+                    const titleText = document.getElementById(titleElemId)?.value.trim();
+                    const content = document.getElementById(contentElemId)?.value.trim();
+                    if (!titleText || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
+                    state[type].push({ id: Date.now(), title: titleText, content });
+                    saveDataToStorage(type);
+                    if(isScript) state.currentResultSaved = true;
+                    showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
                 }
             });
-
 
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
@@ -812,3 +774,5 @@
     </script>
 </body>
 </html>
+
+

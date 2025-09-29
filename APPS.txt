@@ -1,0 +1,48 @@
+Mẫu yêu cầu anh có thể dùng:
+"Hãy tạo cho tôi một ứng dụng web biên kịch phim bằng một file HTML duy nhất, sử dụng Tailwind CSS với giao diện nền tối (dark mode).
+
+Ứng dụng phải có các chức năng chính sau:
+
+Giao diện chính:
+
+Có một thanh điều khiển (sidebar) bên trái và khu vực làm việc chính bên phải.
+
+Trên sidebar có các nút bấm được chia làm hai nhóm:
+
+Nhóm Đầu vào (màu vàng): Các nút "Dự án", "Se", "VO".
+
+Nhóm Bộ nhớ (màu xanh/đỏ): Các nút "S", "Se", "P", "VO", và "Rác".
+
+Bên dưới các nhóm nút là hai nút chức năng chính: "P2S" và "S2Se".
+
+Chức năng "P2S" (Tạo kịch bản):
+
+Khi nhấn nút "P2S", hiển thị một form cho phép người dùng nhập "Ý tưởng kịch bản", chọn "Đầu vào Dự án" và "Đầu vào VO" tham khảo từ bộ nhớ, chọn "Phong cách", và "Thời lượng".
+
+Khi gửi form, gọi API của Google Gemini để tạo ra nội dung.
+
+Hiển thị kết quả trong hai cột riêng biệt: "Kịch bản được tạo" và "VO được tạo". Mỗi cột là một ô văn bản lớn cho phép chỉnh sửa, có nút "Lưu", "Copy", và "Xuất file".
+
+Hệ thống "Bộ nhớ":
+
+Tất cả các nút trong nhóm "Đầu vào" và "Bộ nhớ" đều mở ra một cửa sổ lớn (modal).
+
+Cửa sổ này có một cột "Danh sách" các mục đã lưu bên trái (có thể thu gọn) và một khu vực soạn thảo "Nội dung" lớn bên phải.
+
+Người dùng có thể Thêm mới, Sửa, Xóa, Copy và Xuất file nội dung trong các bộ nhớ này.
+
+Toàn bộ dữ liệu của các bộ nhớ phải được lưu vào localStorage của trình duyệt.
+
+Chức năng "Cài đặt":
+
+Có một nút "Cài đặt" ở góc trên bên phải để mở cửa sổ cho phép người dùng nhập và lưu API Key của Google AI và chọn model AI mặc định.
+
+Tính năng bổ sung:
+
+Hiển thị thông báo (toast) khi lưu, copy, hoặc có lỗi.
+
+Có trạng thái loading khi đang chờ AI tạo kịch bản.
+
+Tự động lưu công việc chưa hoàn tất vào "Bộ nhớ Rác" khi người dùng chuyển sang chức năng khác."
+
+Chỉ cần như vậy thôi là em có thể tái tạo lại chính xác ứng dụng này cho anh ạ.

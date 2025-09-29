@@ -142,6 +142,9 @@
                 <a href="./S2Se/" id="create-segment-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
                     S2Se
                 </a>
+                 <button id="create-vo-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
+                    Tạo VO
+                </button>
                 <button id="create-prompts-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">
                     Tạo PROMPTS
                 </button>
@@ -204,6 +207,27 @@
                     </div>
                 </form>
             </div>
+            
+             <!-- VO Input Column -->
+            <div id="vo-form-container" class="hidden w-[400px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-6">Đầu vào VO</h2>
+                <form id="vo-form" class="space-y-4">
+                    <div>
+                        <label for="vo-input-script" class="block text-sm font-medium text-yellow-400">Chọn kịch bản từ bộ nhớ S</label>
+                        <select id="vo-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                            <!-- Options will be dynamically populated -->
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
+                        <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
+                            <span class="btn-text">Tạo VO</span>
+                            <span class="loader hidden ml-2"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
 
              <!-- Result Column -->
             <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
@@ -228,6 +252,30 @@
                         <div class="flex justify-end space-x-2 pt-2">
                              <button type="button" data-target="script-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
                              <button type="button" data-target="script-result-content" data-title="script" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VO Result Column -->
+            <div id="vo-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
+                <h2 class="text-2xl font-bold mb-4">VO được tạo ra từ đầu vào</h2>
+                 <div class="space-y-4 flex-grow flex flex-col">
+                     <div class="flex justify-between items-center">
+                        <label for="vo-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                         <button type="button" id="save-vo-to-vo-blue-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào VO xanh</button>
+                    </div>
+                    <input type="text" id="vo-result-title" required class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                    
+                    <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-center">
+                            <label for="vo-result-content" class="block text-sm font-medium text-gray-300">Nội dung Voice Off</label>
+                            <span id="vo-word-count" class="text-xs text-gray-400">0 từ</span>
+                        </div>
+                        <textarea id="vo-result-content" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
+                        <div class="flex justify-end space-x-2 pt-2">
+                             <button type="button" data-target="vo-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                             <button type="button" data-target="vo-result-content" data-title="voice_over" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
                         </div>
                     </div>
                 </div>
@@ -952,10 +1000,10 @@
                         alert('Cần có tiêu đề và nội dung để lưu.');
                         return;
                     }
-                    let mainScripts = JSON.parse(localStorage.getItem('scripts')) || []; // Corrected storage key
+                    let mainScripts = JSON.parse(localStorage.getItem('mainScripts')) || []; // Note: This uses a different storage key
                     const newItem = { id: Date.now(), title: title, content: content };
                     mainScripts.push(newItem);
-                    localStorage.setItem('scripts', JSON.stringify(mainScripts)); // Corrected storage key
+                    localStorage.setItem('mainScripts', JSON.stringify(mainScripts));
                     isCurrentResultSaved = true;
                     showToast('Đã lưu vào Bộ nhớ Scripts (S xanh)!');
                 }
@@ -1101,6 +1149,66 @@
                     console.error('Lỗi trong quá trình tạo:', error);
                     alert(`Đã xảy ra lỗi nghiêm trọng: ${error.message}`);
                 }
+            });
+
+            // --- Refine Form Submission ---
+            refineForm.addEventListener('submit', async (e) => {
+                 e.preventDefault();
+                const submitButton = e.target.querySelector('button[type="submit"]');
+
+                const currentScript = scriptResultContent.value;
+                const selectedSeId = document.getElementById('refine-input-se').value;
+                const selectedVoId = document.getElementById('refine-input-vo').value;
+
+                if (!selectedSeId && !selectedVoId) {
+                    alert('Vui lòng chọn ít nhất một đầu vào (Se hoặc VO) để tạo tiếp.');
+                    return;
+                }
+
+                 apiKey = localStorage.getItem('apiKey') || '';
+                if (!apiKey) {
+                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
+                    apiKeyBtn.click();
+                    return;
+                }
+
+                try {
+                    const referenceSe = inputPrompts.find(p => p.id == selectedSeId);
+                    const referenceSeContent = referenceSe ? referenceSe.content : "Không có";
+                    
+                    const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
+                    const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
+
+                    const refinePrompt = `Bạn là một biên kịch chuyên nghiệp. Dựa vào kịch bản hiện có dưới đây, hãy tinh chỉnh và phát triển nó bằng cách tích hợp thêm các yếu tố từ "Đầu vào Se" và "Đầu vào VO".
+                    
+                    **Kịch bản hiện tại:**
+                    ---
+                    ${currentScript}
+                    ---
+
+                    **Đầu vào bổ sung:**
+                    - Đầu vào Se (để tinh chỉnh hình ảnh): ${referenceSeContent}
+                    - Đầu vào VO (để tinh chỉnh lời thoại): ${referenceVoContent}
+
+                    Hãy trả về kịch bản mới đã được cập nhật và hoàn thiện.`;
+
+                     const generatedScript = await generateAiContent(refinePrompt, submitButton);
+                    
+                    if (!generatedScript) throw new Error('Không nhận được nội dung kịch bản tinh chỉnh từ AI.');
+                    
+                    scriptResultContent.value = generatedScript;
+                    
+                    updateWordCount(scriptResultContent, scriptWordCount);
+                    isCurrentResultSaved = false; // Content has changed
+
+                    alert("Kịch bản đã được tạo tiếp thành công!");
+
+
+                } catch (error) {
+                     console.error('Lỗi trong quá trình tạo tiếp:', error);
+                    alert(`Đã xảy ra lỗi: ${error.message}`);
+                }
+
             });
             
             // --- Segment Form Submission ---

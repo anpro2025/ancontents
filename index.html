@@ -166,6 +166,12 @@
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
+                         <div>
+                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
+                            <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
                         <div>
                             <label for="script-style" class="block text-sm font-medium text-gray-300">Phong cách</label>
                             <select id="script-style" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
@@ -204,27 +210,6 @@
                     </div>
                 </form>
             </div>
-            
-            <!-- VO Input Column -->
-            <div id="vo-form-container" class="hidden w-[400px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-6">Đầu vào VO</h2>
-                <form id="vo-form" class="space-y-4">
-                    <div>
-                        <label for="vo-input-script" class="block text-sm font-medium text-yellow-400">Chọn kịch bản từ bộ nhớ S</label>
-                        <select id="vo-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <!-- Options will be dynamically populated -->
-                        </select>
-                    </div>
-                    <div class="flex justify-end space-x-4 pt-4">
-                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
-                        <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
-                            <span class="btn-text">Tạo VO</span>
-                            <span class="loader hidden ml-2"></span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
 
              <!-- Result Column -->
             <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
@@ -584,7 +569,6 @@
 
             
             const scriptForm = document.getElementById('script-form');
-            const refineForm = document.getElementById('refine-form');
             const scriptInputScript = document.getElementById('script-input-script');
             const scriptIdea = document.getElementById('script-idea');
             const scriptDuration = document.getElementById('script-duration');
@@ -628,7 +612,7 @@
             let inputScripts = JSON.parse(localStorage.getItem('inputScripts')) || [];
             let inputPrompts = JSON.parse(localStorage.getItem('inputPrompts')) || [];
             let inputVoiceOvers = JSON.parse(localStorage.getItem('inputVoiceOvers')) || [];
-            let mainScripts = JSON.parse(localStorage.getItem('mainScripts')) || [];
+            let mainScripts = JSON.parse(localStorage.getItem('scripts')) || [];
             let apiKey = localStorage.getItem('apiKey') || '';
             let aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash-image-preview';
             let itemToDelete = null; // {id: '123', type: 'script'}
@@ -850,6 +834,7 @@
 
             function populateAllInputDropdowns() {
                 populateDropdown(scriptInputScript, inputScripts, 'Chọn từ Đầu vào Dự án...');
+                populateDropdown(document.getElementById('script-input-voice'), inputVoiceOvers, 'Chọn từ Đầu vào VO...');
                 populateDropdown(voInputScript, mainScripts, 'Chọn kịch bản từ bộ nhớ S...');
                 populateDropdown(segmentInputSe, inputPrompts, 'Chọn từ Đầu vào Se...');
                 populateDropdown(segmentInputVo, inputVoiceOvers, 'Chọn từ Đầu vào VO...');
@@ -862,20 +847,22 @@
             // --- Event Listeners ---
             createScriptBtn.addEventListener('click', () => {
                 autoSaveToTrash();
-                // hideAllContainers();
                 scriptForm.reset();
                 populateAllInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
                 scriptFormContainer.classList.remove('hidden');
             });
             
-            createVoBtn.addEventListener('click', () => {
-                autoSaveToTrash();
-                voForm.reset();
-                populateAllInputDropdowns();
-                voFormContainer.classList.remove('hidden');
-                voResultContainer.classList.add('hidden');
-            });
+            if(createVoBtn){
+                createVoBtn.addEventListener('click', () => {
+                    autoSaveToTrash();
+                    voForm.reset();
+                    populateAllInputDropdowns();
+                    voFormContainer.classList.remove('hidden');
+                    voResultContainer.classList.add('hidden');
+                });
+            }
+
 
             createSegmentBtn.addEventListener('click', (e) => {
                 e.preventDefault(); // Prevent default link behavior
@@ -1019,24 +1006,23 @@
                         alert('Cần có tiêu đề và nội dung để lưu.');
                         return;
                     }
-                    let mainScripts = JSON.parse(localStorage.getItem('scripts')) || []; // Corrected storage key
-                    const newItem = { id: Date.now(), title: title, content: content };
-                    mainScripts.push(newItem);
-                    localStorage.setItem('scripts', JSON.stringify(mainScripts)); // Corrected storage key
+                    mainScripts.push({ id: Date.now(), title: title, content: content });
+                    localStorage.setItem('scripts', JSON.stringify(mainScripts));
                     isCurrentResultSaved = true;
                     showToast('Đã lưu vào Bộ nhớ Scripts (S xanh)!');
                 }
-                 if (button.id === 'save-vo-to-vo-blue-btn') {
+                
+                if (button.id === 'save-vo-to-vo-blue-btn') {
                     const title = voResultTitle.value.trim();
                     const content = voResultContent.value.trim();
                     if (!title || !content) {
                         alert('Cần có tiêu đề và nội dung để lưu.');
                         return;
                     }
-                    let voiceMemory = JSON.parse(localStorage.getItem('voiceOvers')) || [];
+                    let voiceMemory = JSON.parse(localStorage.getItem('voiceOvers_blue')) || [];
                     const newItem = { id: Date.now(), title: title, content: content };
                     voiceMemory.push(newItem);
-                    localStorage.setItem('voiceOvers', JSON.stringify(voiceMemory));
+                    localStorage.setItem('voiceOvers_blue', JSON.stringify(voiceMemory));
                     showToast('Đã lưu vào Bộ nhớ Voice Off (VO xanh)!');
                 }
                 
@@ -1125,6 +1111,8 @@
                 const selectedScriptId = scriptInputScript.value;
                 const ideaValue = scriptIdea.value.trim();
                 const styleValue = document.getElementById('script-style').value;
+                const selectedVoId = document.getElementById('script-input-voice').value;
+
 
                 if (!selectedScriptId && !ideaValue) {
                     alert('Vui lòng cung cấp "Đầu vào Dự án" hoặc nhập "Ý tưởng" mới.');
@@ -1142,6 +1130,8 @@
                 }
                 
                 scriptResultContainer.classList.add('hidden');
+                voResultContainer.classList.add('hidden');
+
                 
                 try {
                     let durationValue = scriptDuration.value;
@@ -1150,32 +1140,62 @@
 
                     const referenceScript = inputScripts.find(s => s.id == selectedScriptId);
                     const referenceScriptContent = referenceScript ? referenceScript.content : "Không có";
+                    
+                    const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
+                    const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
 
-                    const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới.
-                        Sử dụng các thông tin sau để tạo kịch bản:
+                    const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới và một kịch bản lồng tiếng (voice-over) riêng biệt. Hãy cấu trúc câu trả lời của bạn thành hai phần rõ ràng, phân tách bởi '---VO_PART---'.
+                        
+                        Phần đầu tiên sẽ là kịch bản chính hoàn chỉnh (bao gồm mô tả hình ảnh và lời thoại nhân vật).
+                        Phần thứ hai, bắt đầu bằng '---VO_PART---', sẽ chỉ chứa phần kịch bản lồng tiếng (voice-over).
+
+                        Sử dụng các thông tin sau:
                         - Đầu vào Dự án (cốt truyện chính):
                         ---
                         ${referenceScriptContent}
+                        ---
+                        - Đầu vào VO (tham khảo lời thoại cho phần voice-over):
+                        ---
+                        ${referenceVoContent}
                         ---
                         - Ý tưởng/Yêu cầu bổ sung từ người dùng: ${ideaValue ? ideaValue : "Hãy phát triển kịch bản từ Đầu vào Dự án."}
                         - Phong cách: ${styleValue}
                         - Thời lượng dự kiến: ${durationValue} phút
                         ${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
-                        Chỉ trả về nội dung kịch bản hoàn chỉnh, bao gồm cả mô tả và lời thoại.`;
+                        Hãy đảm bảo bạn tuân thủ đúng định dạng đầu ra đã yêu cầu.`;
                     
-                    const generatedScript = await generateAiContent(mainScriptPrompt, submitButton);
+                    const generatedContent = await generateAiContent(mainScriptPrompt, submitButton);
                     
-                    if (!generatedScript) throw new Error('Không nhận được nội dung kịch bản chính từ AI.');
+                    if (!generatedContent) throw new Error('Không nhận được nội dung từ AI.');
+                    
+                    const voSeparator = '---VO_PART---';
+                    let scriptPart = '';
+                    let voPart = '';
+
+                    if(generatedContent.includes(voSeparator)) {
+                        const parts = generatedContent.split(voSeparator);
+                        scriptPart = parts[0].trim();
+                        voPart = parts[1].trim();
+                    } else {
+                        scriptPart = generatedContent;
+                        voPart = "AI không tạo được phần VO riêng biệt."
+                    }
                     
                     const newTitle = ideaValue 
                         ? `Kịch bản cho: ${ideaValue.substring(0, 30)}...` 
                         : `Kịch bản từ: ${referenceScript?.title.substring(0, 20) || 'dữ liệu vào'}...`;
                     scriptResultTitle.value = newTitle;
-                    scriptResultContent.value = generatedScript;
+                    scriptResultContent.value = scriptPart;
+                    
+                    voResultTitle.value = `VO cho: ${newTitle}`;
+                    voResultContent.value = voPart;
                     
                     updateWordCount(scriptResultContent, scriptWordCount);
+                    updateWordCount(voResultContent, voWordCount);
                     
                     scriptResultContainer.classList.remove('hidden');
+                    voResultContainer.classList.remove('hidden');
+
                     isCurrentResultSaved = false; // New content is not saved yet
                     populateAllInputDropdowns();
 
@@ -1184,50 +1204,6 @@
                     alert(`Đã xảy ra lỗi nghiêm trọng: ${error.message}`);
                 }
             });
-            
-            // --- VO Form Submission ---
-            voForm.addEventListener('submit', async (e) => {
-                 e.preventDefault();
-                const submitButton = e.target.querySelector('button[type="submit"]');
-                const selectedScriptId = voInputScript.value;
-
-                if (!selectedScriptId) {
-                    alert('Vui lòng chọn một kịch bản từ bộ nhớ S.');
-                    return;
-                }
-
-                 apiKey = localStorage.getItem('apiKey') || '';
-                if (!apiKey) {
-                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
-                    apiKeyBtn.click();
-                    return;
-                }
-                
-                voResultContainer.classList.add('hidden');
-
-                try {
-                    const sourceScript = mainScripts.find(s => s.id == selectedScriptId);
-                    if (!sourceScript) throw new Error('Không tìm thấy kịch bản nguồn.');
-                    
-                    const voPrompt = `Bạn là một chuyên gia về kịch bản. Từ kịch bản đầy đủ sau đây, hãy trích xuất toàn bộ lời thoại (voice-over) và lời thoại của các nhân vật thành một kịch bản lồng tiếng (Voice Script). Giữ nguyên tên nhân vật trước mỗi câu thoại.\n\nKỊCH BẢN GỐC:\n---\n${sourceScript.content}\n---`;
-
-                    const generatedVO = await generateAiContent(voPrompt, submitButton);
-                    
-                    if (!generatedVO) throw new Error('Không nhận được nội dung VO từ AI.');
-                    
-                    voResultTitle.value = `VO cho: ${sourceScript.title}`;
-                    voResultContent.value = generatedVO;
-                    
-                    updateWordCount(voResultContent, voWordCount);
-                    
-                    voResultContainer.classList.remove('hidden');
-
-                } catch (error) {
-                     console.error('Lỗi trong quá trình tạo VO:', error);
-                    alert(`Đã xảy ra lỗi: ${error.message}`);
-                }
-            });
-
             
             // --- Segment Form Submission ---
              segmentForm.addEventListener('submit', async (e) => {

@@ -504,6 +504,11 @@
             </div>
         </div>
     </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="hidden fixed top-5 right-5 bg-blue-600 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transform translate-y-2 transition-all duration-300">
+        <!-- Message will be inserted here -->
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -644,9 +649,11 @@
                     const content = scriptResultContent.value.trim();
                     if (title || content) {
                         let trashItems = JSON.parse(localStorage.getItem('trashItems')) || [];
+                        const now = new Date();
                         const newItem = {
-                            id: Date.now(),
-                            title: `Tự động lưu: ${title || new Date().toLocaleString()}`,
+                            id: now.getTime(),
+                            title: `Tự động lưu: ${title || 'Chưa có tiêu đề'}`,
+                            dateTime: now.toLocaleString('vi-VN'),
                             content: content
                         };
                         trashItems.push(newItem);
@@ -957,7 +964,7 @@
                     mainScripts.push(newItem);
                     localStorage.setItem('mainScripts', JSON.stringify(mainScripts));
                     isCurrentResultSaved = true;
-                    alert('Đã lưu vào Bộ nhớ Scripts (S xanh)!');
+                    showToast('Đã lưu vào Bộ nhớ Scripts (S xanh)!');
                 }
                 
                 else if (button.classList.contains('copy-btn')) {
@@ -982,7 +989,7 @@
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    autoSaveToTrash();
+                     autoSaveToTrash();
                     e.target.closest('.bg-gray-800').classList.add('hidden');
                 });
             });

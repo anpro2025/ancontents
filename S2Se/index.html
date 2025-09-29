@@ -448,6 +448,7 @@
                 toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             }
             
+            
             // --- API Calls ---
             async function generateAiContent(prompt, submitButton) {
                 setButtonLoading(submitButton, true);
@@ -682,7 +683,7 @@
                 if (e.target.id === 's2se-form') {
                     const submitButton = e.target.querySelector('button[type="submit"]');
                     const sourceScript = state.windows.source.content;
-                    if (!sourceScript) {
+                    if (!sourceScript || sourceScript.startsWith("Không có kịch bản")) {
                         showToast('Không có kịch bản gốc để xử lý.', 'error');
                         return;
                     }
@@ -694,10 +695,12 @@
 
                     const sectionCount = document.getElementById('section-count').value;
                     const extraInstructions = document.getElementById('extra-instructions').value.trim();
-
-                    const sectionsResultContainer = document.getElementById('sections-result-container');
-                    sectionsResultContainer.classList.remove('hidden');
-                    sectionsResultContainer.querySelector('textarea').value = 'Đang tạo, vui lòng chờ...';
+                    
+                    const loadingOverlay = document.createElement('div');
+                    loadingOverlay.id = 'loading-indicator';
+                    loadingOverlay.className = 'fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-75 z-50';
+                    loadingOverlay.innerHTML = `<div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>`;
+                    document.body.appendChild(loadingOverlay);
 
                     try {
                          const prompt = `Bạn là một biên tập viên kịch bản. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections).
@@ -730,6 +733,8 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                             state.windows.sections.content = `Đã xảy ra lỗi: ${error.message}`;
                             renderApp();
                         }
+                    } finally {
+                        document.getElementById('loading-indicator')?.remove();
                     }
                 }
             });
@@ -737,6 +742,33 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
             function createS2SWindowHTML(type, windowData) {
                 const { title, content } = windowData;
                 const isSource = type === 'source';
+                let bottomBarHTML = '';
+
+                if (isSource) {
+                     bottomBarHTML = `
+                        <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-b-lg">
+                            <form id="s2se-form" class="flex items-center space-x-4 w-full">
+                                <input type="number" id="section-count" placeholder="Số sections" class="w-28 px-2 py-1 bg-gray-800 border border-gray-600 rounded-md text-sm">
+                                <input type="text" id="extra-instructions" placeholder="Yêu cầu thêm (tùy chọn)" class="flex-grow px-2 py-1 bg-gray-800 border border-gray-600 rounded-md text-sm">
+                                <button type="submit" id="generate-sections-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md min-w-[100px] flex justify-center items-center">
+                                    <span class="btn-text">Tạo Sections</span><span class="loader hidden ml-2"></span>
+                                </button>
+                            </form>
+                        </div>`;
+                } else { // It's the sections window
+                    bottomBarHTML = `
+                        <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-b-lg">
+                            <div class="flex items-center">
+                                <button data-type="sections" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se</button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button data-target="sections-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                                <button data-target="sections-result-content" data-title="sections" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                            </div>
+                        </div>`;
+                }
+
+
                 return `
                 <div class="bg-gray-800 rounded-lg flex flex-col h-full shadow-2xl">
                     <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-t-lg select-none">
@@ -747,22 +779,9 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                         </div>
                     </div>
                     <div class="p-4 flex-grow flex flex-col min-h-0">
-                        ${isSource 
-                            ? `<div class="flex-grow flex flex-col min-h-0">
-                                <textarea id="source-script-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" readonly>${content}</textarea>
-                               </div>`
-                            : `<div class="flex-shrink-0 mb-4">
-                                    <div class="flex justify-between items-center">
-                                        <label for="sections-result-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                                        <button data-type="sections" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se</button>
-                                    </div>
-                                    <input type="text" id="sections-result-title" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md" value="${title}">
-                                </div>
-                                <div class="flex-grow flex flex-col min-h-0">
-                                    <textarea id="sections-result-content" class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md flex-grow p-3">${content}</textarea>
-                                </div>`
-                        }
+                        <textarea id="${type}-result-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" ${isSource ? 'readonly' : ''}>${content}</textarea>
                     </div>
+                    ${bottomBarHTML}
                 </div>`;
             }
             
@@ -790,10 +809,19 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                             state.windows[windowType].status = 'open';
                             renderApp();
                         }
+                    } else if (button.classList.contains('copy-btn')) {
+                        const content = document.getElementById(target)?.value;
+                        if (!content) return showToast('Không có nội dung để sao chép.', 'info');
+                        navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép vào clipboard!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
+                    } else if (button.classList.contains('export-btn')) {
+                        const content = document.getElementById(target)?.value;
+                        const titleText = state.windows[title]?.title || 'sections';
+                        if (!content) return showToast('Không có nội dung để xuất.', 'info');
+                        downloadAsTxt(titleText, content);
                     } else if (button.classList.contains('save-result-btn')) {
-                        const titleText = document.getElementById('sections-result-title')?.value.trim();
+                        const titleText = state.windows.sections?.title;
                         const content = document.getElementById('sections-result-content')?.value.trim();
-                        if (!titleText || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
+                        if (!titleText || !content) return showToast('Cần có nội dung để lưu.', 'error');
                         
                         state[type].push({ id: Date.now(), title: titleText, content });
                         saveDataToStorage(type);
@@ -810,6 +838,14 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 }
             });
             
+            // Listen for changes in result textareas to update saved state
+            document.body.addEventListener('input', e => {
+                const targetId = e.target.id;
+                if (targetId === 'sections-result-content') {
+                    if (state.windows.sections) state.windows.sections.saved = false;
+                }
+            });
+
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             renderApp(); // Initial render for S2Se page

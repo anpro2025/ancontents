@@ -123,8 +123,8 @@
                 <h2 class="text-2xl font-bold mb-6">Nhập đầu vào</h2>
                 <form id="script-form" class="space-y-4">
                     <div>
-                        <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Bắt buộc)</label>
-                        <textarea id="script-idea" rows="4" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></textarea>
+                        <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Tùy chọn)</label>
+                        <textarea id="script-idea" rows="4" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></textarea>
                     </div>
                     <div class="space-y-4">
                         <div>
@@ -136,10 +136,10 @@
                             <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
                         </div>
                         <div>
-                            <label for="script-style" class="block text-sm font-medium text-gray-300">Phong cách</label>
-                            <select id="script-style" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                                <option value="" disabled selected>Chọn phong cách</option>
-                                <option>Mặc định</option><option>Storytelling</option><option>Hài hước</option><option>Chính kịch</option><option>Hành động</option><option>Kinh dị</option><option>Kịch câm</option>
+                            <label for="script-style" class="block text-sm font-medium text-gray-300">Phong cách (Tùy chọn)</label>
+                            <select id="script-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <option value="">Mặc định</option>
+                                <option>Storytelling</option><option>Hài hước</option><option>Chính kịch</option><option>Hành động</option><option>Kinh dị</option><option>Kịch câm</option>
                             </select>
                         </div>
                         <div>
@@ -772,8 +772,25 @@
             scriptForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitButton = e.target.querySelector('button[type="submit"]');
+                
+                // Get all values from the form
                 const ideaValue = document.getElementById('script-idea').value.trim();
-                if (!document.getElementById('script-style').value) return showToast('Vui lòng chọn phong cách.', 'error');
+                const selectedScriptId = document.getElementById('script-input-script').value;
+                const selectedVoId = document.getElementById('script-input-voice').value;
+                const styleValue = document.getElementById('script-style').value;
+                let durationValue = scriptDuration.value === 'custom' ? scriptDurationCustom.value : scriptDuration.value;
+                const wordLimit = document.getElementById('word-limit').value;
+
+                // Check for API Key first
+                if (!state.settings.apiKey) {
+                    showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
+                    apiKeyBtn.click();
+                    return;
+                }
+                
+                // Check if there are any creative inputs to base the script on
+                const hasCreativeInput = ideaValue || selectedScriptId || selectedVoId;
+
                 autoSaveToTrash();
                 hideAllWorkspaceColumns();
                 const loadingHTML = `<div class="flex justify-center items-center h-full"><div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div></div>`;
@@ -783,33 +800,48 @@
                 voResultContainer.classList.remove('hidden');
 
                 try {
-                    const selectedScriptId = document.getElementById('script-input-script').value;
-                    const selectedVoId = document.getElementById('script-input-voice').value;
-                    const styleValue = document.getElementById('script-style').value;
-                    let durationValue = scriptDuration.value === 'custom' ? scriptDurationCustom.value : scriptDuration.value;
-                    const wordLimit = document.getElementById('word-limit').value;
                     const referenceScript = state.script.find(s => s.id == selectedScriptId);
                     const referenceVo = state.voiceOver.find(v => v.id == selectedVoId);
 
-                    const prompt = `Bạn là một biên kịch chuyên nghiệp.
-Nhiệm vụ: Viết một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt.
+                    let prompt;
+                    let newTitle;
+
+                    if (hasCreativeInput) {
+                        // Build the prompt based on provided inputs
+                        prompt = `Bạn là một biên kịch chuyên nghiệp.
+Nhiệm vụ: Viết một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt dựa trên các thông tin được cung cấp.
 Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
 
 Sử dụng các thông tin sau:
-- Ý tưởng/Yêu cầu chính: ${ideaValue}
-- Kịch bản tham khảo (cốt truyện): --- ${referenceScript?.content || "Không có"} ---
-- Lời thoại tham khảo (VO): --- ${referenceVo?.content || "Không có"} ---
-- Phong cách: ${styleValue}
+${ideaValue ? `- Ý tưởng/Yêu cầu chính: ${ideaValue}\n` : ''}
+${referenceScript ? `- Kịch bản tham khảo (cốt truyện): --- ${referenceScript.content} ---\n` : ''}
+${referenceVo ? `- Lời thoại tham khảo (VO): --- ${referenceVo.content} ---\n` : ''}
+${styleValue ? `- Phong cách: ${styleValue}\n` : ''}
 - Thời lượng dự kiến: ${durationValue} phút
 ${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
 
 Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
+                        newTitle = `Kịch bản cho: ${(ideaValue || referenceScript?.title || 'dữ liệu vào').substring(0, 30)}...`;
+                    } else {
+                        // Build the prompt for a random script if no inputs are provided
+                        prompt = `Bạn là một biên kịch chuyên nghiệp.
+Nhiệm vụ: Hãy sáng tạo ngẫu nhiên một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt.
+Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
+
+Yêu cầu về kịch bản:
+${styleValue ? `- Phong cách: ${styleValue}\n` : '- Phong cách: Hãy tự do sáng tạo một phong cách thú vị.\n'}
+- Thời lượng dự kiến: ${durationValue} phút
+${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''}
+
+Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
+                        newTitle = `Kịch bản ngẫu nhiên (${durationValue} phút)`;
+                    }
 
                     const generatedContent = await generateAiContent(prompt, submitButton);
                     const result = JSON.parse(generatedContent);
                     const scriptPart = formatScriptContent(result.main_script || "AI không tạo được kịch bản chính.");
                     const voPart = formatScriptContent(result.voice_over_script || "AI không tạo được phần VO riêng biệt.");
-                    const newTitle = `Kịch bản cho: ${ideaValue.substring(0, 30)}...`;
+                    
                     scriptResultContainer.innerHTML = createResultCardHTML('script', newTitle, scriptPart);
                     voResultContainer.innerHTML = createResultCardHTML('vo', `VO cho: ${newTitle}`, voPart);
                     updateWordCount(document.getElementById('script-result-content'), document.getElementById('script-word-count'));

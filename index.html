@@ -69,6 +69,10 @@
             opacity: 0;
             pointer-events: none;
         }
+        /* Make textareas non-resizable and take full height */
+        textarea {
+            resize: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen flex flex-col">
@@ -160,12 +164,12 @@
             </div>
 
             <!-- Result Column -->
-            <div id="script-result-container" class="workspace-column hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
+            <div id="script-result-container" class="workspace-column hidden w-[800px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col">
                  <!-- This will be populated by JS -->
             </div>
             
             <!-- VO Result Column -->
-            <div id="vo-result-container" class="workspace-column hidden flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
+            <div id="vo-result-container" class="workspace-column hidden w-[800px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col">
                  <!-- This will be populated by JS -->
             </div>
         </main>
@@ -337,7 +341,8 @@
                     aiModel: localStorage.getItem('aiModel') || 'gemini-2.5-flash-preview-05-20'
                 },
                 itemToDelete: null,
-                currentResultSaved: true,
+                currentScriptSaved: true,
+                currentVoSaved: true,
                 currentMemoryType: null,
             };
 
@@ -387,50 +392,66 @@
             }
             
             function formatScriptContent(content) {
-                // If it's already a string, just return it.
-                if (typeof content === 'string') {
-                    return content;
-                }
-
-                // If it's an array of objects, format it into a readable script.
+                if (typeof content === 'string') return content;
                 if (Array.isArray(content)) {
-                    return content.map(item => {
-                        // Map each key-value pair in an object to a "KEY: value" string
-                        return Object.entries(item)
-                            .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`)
-                            .join('\n');
-                    }).join('\n\n---\n\n'); // Separate scenes/parts with a divider
+                    return content.map(item => Object.entries(item).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n')).join('\n\n---\n\n');
                 }
-
-                // If it's a non-array object, pretty-print it as JSON.
                 if (typeof content === 'object' && content !== null) {
                     return JSON.stringify(content, null, 2);
                 }
-
-                // Fallback for any other unexpected data type.
                 return String(content);
             }
 
             function autoSaveToTrash() {
-                if (state.currentResultSaved) return;
-                const titleElement = document.getElementById('script-result-title');
-                const contentElement = document.getElementById('script-result-content');
-                if (titleElement && contentElement) {
-                    const title = titleElement.value.trim();
-                    const content = contentElement.value.trim();
-                    if (title || content) {
-                        const now = new Date();
-                        state.trash.push({
-                            id: now.getTime(),
-                            title: `Tự động lưu: ${title || 'Chưa có tiêu đề'}`,
-                            content: content,
-                            savedAt: now.toLocaleString('vi-VN')
-                        });
-                        saveDataToStorage('trash');
-                        showToast('Nội dung chưa lưu đã được chuyển vào Bộ nhớ Rác.');
+                let savedSomething = false;
+
+                // Check Script Result
+                if (!state.currentScriptSaved) {
+                    const scriptTitleElement = document.getElementById('script-result-title');
+                    const scriptContentElement = document.getElementById('script-result-content');
+                    if (scriptTitleElement && scriptContentElement) {
+                        const title = scriptTitleElement.value.trim();
+                        const content = scriptContentElement.value.trim();
+                        if (title || content) {
+                            const now = new Date();
+                            state.trash.push({
+                                id: now.getTime(),
+                                title: `Tự động lưu (Kịch bản): ${title || 'Chưa có tiêu đề'}`,
+                                content: content,
+                                savedAt: now.toLocaleString('vi-VN')
+                            });
+                            savedSomething = true;
+                        }
                     }
                 }
-                state.currentResultSaved = true;
+
+                // Check VO Result
+                if (!state.currentVoSaved) {
+                    const voTitleElement = document.getElementById('vo-result-title');
+                    const voContentElement = document.getElementById('vo-result-content');
+                    if (voTitleElement && voContentElement) {
+                        const title = voTitleElement.value.trim();
+                        const content = voContentElement.value.trim();
+                        if (title || content) {
+                            const now = new Date();
+                            state.trash.push({
+                                id: now.getTime() + 1,
+                                title: `Tự động lưu (VO): ${title || 'Chưa có tiêu đề'}`,
+                                content: content,
+                                savedAt: now.toLocaleString('vi-VN')
+                            });
+                            savedSomething = true;
+                        }
+                    }
+                }
+
+                if (savedSomething) {
+                    saveDataToStorage('trash');
+                    showToast('Nội dung chưa lưu đã được chuyển vào Bộ nhớ Rác.');
+                }
+                
+                state.currentScriptSaved = true;
+                state.currentVoSaved = true;
             }
 
             function hideAllWorkspaceColumns() {
@@ -793,7 +814,8 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     voResultContainer.innerHTML = createResultCardHTML('vo', `VO cho: ${newTitle}`, voPart);
                     updateWordCount(document.getElementById('script-result-content'), document.getElementById('script-word-count'));
                     updateWordCount(document.getElementById('vo-result-content'), document.getElementById('vo-word-count'));
-                    state.currentResultSaved = false;
+                    state.currentScriptSaved = false;
+                    state.currentVoSaved = false;
                 } catch (error) {
                     console.error('Lỗi trong quá trình tạo:', error);
                     showToast(`Lỗi: ${error.message}`, 'error');
@@ -848,9 +870,16 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     const titleText = document.getElementById(titleElemId)?.value.trim();
                     const content = document.getElementById(contentElemId)?.value.trim();
                     if (!titleText || !content) return showToast('Cần tiêu đề và nội dung để lưu.', 'error');
+                    
                     state[type].push({ id: Date.now(), title: titleText, content });
                     saveDataToStorage(type);
-                    if(isScript) state.currentResultSaved = true;
+                    
+                    if(isScript) {
+                        state.currentScriptSaved = true;
+                    } else {
+                        state.currentVoSaved = true;
+                    }
+
                     showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
                 }
             });

@@ -23,12 +23,12 @@
         .script-item.active {
             background-color: #3b82f6;
         }
-        .delete-script-btn {
+        .delete-btn { /* More generic delete button class */
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .script-item:hover .delete-script-btn {
+        .script-item:hover .delete-btn {
             visibility: visible;
             opacity: 1;
         }
@@ -90,6 +90,12 @@
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
                         </button>
+                        <button id="prompt-memory-btn" title="Bộ nhớ PROMPT" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
+                            <span class="text-lg font-bold">P</span>
+                        </button>
+                        <button id="voice-over-memory-btn" title="Bộ nhớ Voice Off" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
+                            <span class="text-sm font-bold">VO</span>
+                        </button>
                         <a href="./text-to-voice/" title="Tạo Voice (TTS)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -134,8 +140,14 @@
                     
                     <div class="space-y-4">
                         <div>
-                            <label for="script-input-type" class="block text-sm font-medium text-gray-300">Đầu vào kịch bản (từ bộ nhớ)</label>
-                            <select id="script-input-type" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                            <label for="script-input-type-1" class="block text-sm font-medium text-gray-300">Kịch bản tham khảo 1 (Cốt truyện chính)</label>
+                            <select id="script-input-type-1" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="script-input-type-2" class="block text-sm font-medium text-gray-300">Kịch bản tham khảo 2 (Phong cách) (Tùy chọn)</label>
+                            <select id="script-input-type-2" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
                                 <!-- Options will be dynamically populated -->
                             </select>
                         </div>
@@ -219,7 +231,7 @@
                 <div id="prompt-video-result-wrapper" class="hidden">
                     <div class="flex items-center mb-2">
                         <h3 class="text-lg font-semibold">PROMPTS Video</h3>
-                        <div class="sub-loader ml-3"></div>
+                        <div class="sub-loader ml-3 hidden"></div>
                     </div>
                     <textarea id="prompt-video-result-content" rows="6" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
                     <div class="flex justify-end space-x-3 pt-2">
@@ -232,7 +244,7 @@
                 <div id="voice-script-result-wrapper" class="hidden">
                     <div class="flex items-center mb-2">
                         <h3 class="text-lg font-semibold">Kịch bản thoại (Voice Script)</h3>
-                        <div class="sub-loader ml-3"></div>
+                        <div class="sub-loader ml-3 hidden"></div>
                     </div>
                     <textarea id="voice-script-result-content" rows="6" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
                     <div class="flex justify-end space-x-3 pt-2">
@@ -245,7 +257,7 @@
                 <div id="description-result-wrapper" class="hidden">
                     <div class="flex items-center mb-2">
                         <h3 class="text-lg font-semibold">Mô tả Youtube, Tiktok</h3>
-                        <div class="sub-loader ml-3"></div>
+                        <div class="sub-loader ml-3 hidden"></div>
                     </div>
                     <textarea id="description-result-content" rows="6" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"></textarea>
                     <div class="flex justify-end space-x-3 pt-2">
@@ -260,38 +272,36 @@
     <!-- Script Memory Modal -->
     <div id="script-memory-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
         <div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-4xl h-[80vh] flex flex-col">
-            <button id="close-memory-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+            <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 id="script-memory-header" class="text-2xl font-bold mb-6 flex-shrink-0">Đầu vào kịch bản</h2>
+            <h2 class="text-2xl font-bold mb-6 flex-shrink-0">Đầu vào kịch bản</h2>
             <div class="flex space-x-6 flex-grow overflow-hidden">
-                <!-- Script List -->
+                <!-- List -->
                 <div class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
                     <div class="flex-shrink-0 flex justify-between items-center mb-4">
                         <h3 class="font-bold text-lg">Danh sách</h3>
-                        <button id="new-script-btn" title="Kịch bản mới" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
+                        <button data-type="script" class="new-item-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                         </button>
                     </div>
-                    <div id="script-list" class="space-y-2 overflow-y-auto flex-grow">
-                        <!-- Saved scripts will be listed here -->
-                    </div>
+                    <div id="script-list" class="space-y-2 overflow-y-auto flex-grow"></div>
                 </div>
-                <!-- Script Editor -->
+                <!-- Editor -->
                 <div id="script-editor-panel" class="w-2/3 hidden flex-col">
                     <form id="script-memory-form" class="space-y-4 flex flex-col flex-grow">
                         <input type="hidden" id="script-memory-id">
                         <div>
                             <label for="script-memory-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
-                            <input type="text" id="script-memory-title" placeholder="Nhập tiêu đề cho kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
+                            <input type="text" id="script-memory-title" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500">
                         </div>
                         <div class="flex-grow flex flex-col">
-                            <label for="script-memory-input" class="block text-sm font-medium text-gray-300">Nội dung kịch bản</label>
-                            <textarea id="script-memory-input" placeholder="Dán hoặc nhập kịch bản..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 flex-grow"></textarea>
+                            <label for="script-memory-input" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                            <textarea id="script-memory-input" placeholder="Dán hoặc nhập nội dung..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 flex-grow"></textarea>
                         </div>
                         <div class="flex justify-end space-x-3 pt-2">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
@@ -304,10 +314,92 @@
         </div>
     </div>
 
+    <!-- Prompt Memory Modal -->
+    <div id="prompt-memory-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-4xl h-[80vh] flex flex-col">
+            <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-6 flex-shrink-0">Bộ nhớ PROMPT</h2>
+            <div class="flex space-x-6 flex-grow overflow-hidden">
+                <!-- List -->
+                <div class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
+                    <div class="flex-shrink-0 flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">Danh sách</h3>
+                        <button data-type="prompt" class="new-item-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </button>
+                    </div>
+                    <div id="prompt-list" class="space-y-2 overflow-y-auto flex-grow"></div>
+                </div>
+                <!-- Editor -->
+                <div id="prompt-editor-panel" class="w-2/3 hidden flex-col">
+                    <form id="prompt-memory-form" class="space-y-4 flex flex-col flex-grow">
+                        <input type="hidden" id="prompt-memory-id">
+                        <div>
+                            <label for="prompt-memory-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                            <input type="text" id="prompt-memory-title" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                        </div>
+                        <div class="flex-grow flex flex-col">
+                            <label for="prompt-memory-input" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                            <textarea id="prompt-memory-input" placeholder="Dán hoặc nhập nội dung..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md flex-grow"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                            <button type="button" id="copy-prompt-memory-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
+                            <button type="button" id="export-prompt-memory-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Over Memory Modal -->
+    <div id="voice-over-memory-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-4xl h-[80vh] flex flex-col">
+            <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-6 flex-shrink-0">Bộ nhớ Voice Off</h2>
+            <div class="flex space-x-6 flex-grow overflow-hidden">
+                <!-- List -->
+                <div class="w-1/3 border-r border-gray-700 pr-6 flex flex-col">
+                    <div class="flex-shrink-0 flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg">Danh sách</h3>
+                        <button data-type="voiceOver" class="new-item-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </button>
+                    </div>
+                    <div id="voice-over-list" class="space-y-2 overflow-y-auto flex-grow"></div>
+                </div>
+                <!-- Editor -->
+                <div id="voice-over-editor-panel" class="w-2/3 hidden flex-col">
+                    <form id="voice-over-memory-form" class="space-y-4 flex flex-col flex-grow">
+                        <input type="hidden" id="voice-over-memory-id">
+                        <div>
+                            <label for="voice-over-memory-title" class="block text-sm font-medium text-gray-300">Tiêu đề</label>
+                            <input type="text" id="voice-over-memory-title" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
+                        </div>
+                        <div class="flex-grow flex flex-col">
+                            <label for="voice-over-memory-input" class="block text-sm font-medium text-gray-300">Nội dung</label>
+                            <textarea id="voice-over-memory-input" placeholder="Dán hoặc nhập nội dung..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md flex-grow"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button>
+                            <button type="button" id="copy-voice-over-memory-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">Copy</button>
+                            <button type="button" id="export-voice-over-memory-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Xuất TXT</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- API Key Modal -->
     <div id="api-key-container" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
          <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full relative">
-             <button id="close-api-key-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+             <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -345,7 +437,7 @@
     <div id="delete-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
          <div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md">
             <h2 class="text-xl font-bold mb-4">Xác nhận xóa</h2>
-            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa kịch bản này không?</p>
+            <p class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa mục này không?</p>
             <div class="flex justify-end space-x-4">
                 <button type="button" id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Hủy</button>
                 <button type="button" id="confirm-delete-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md">Xóa</button>
@@ -355,14 +447,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- UI Elements ---
             const createScriptBtn = document.getElementById('create-script-btn');
             const scriptFormContainer = document.getElementById('script-form-container');
-            const scriptMemoryBtn = document.getElementById('script-memory-btn');
-            const scriptMemoryContainer = document.getElementById('script-memory-container');
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
             
-            // --- Result Containers ---
+            // Memory Buttons
+            const scriptMemoryBtn = document.getElementById('script-memory-btn');
+            const promptMemoryBtn = document.getElementById('prompt-memory-btn');
+            const voiceOverMemoryBtn = document.getElementById('voice-over-memory-btn');
+            
+            // Memory Modals
+            const scriptMemoryContainer = document.getElementById('script-memory-container');
+            const promptMemoryContainer = document.getElementById('prompt-memory-container');
+            const voiceOverMemoryContainer = document.getElementById('voice-over-memory-container');
+            
+            // Result Containers
             const scriptResultContainer = document.getElementById('script-result-container');
             const additionalResultsContainer = document.getElementById('additional-results-container');
             const promptVideoResultWrapper = document.getElementById('prompt-video-result-wrapper');
@@ -370,68 +471,179 @@
             const descriptionResultWrapper = document.getElementById('description-result-wrapper');
             
             const scriptForm = document.getElementById('script-form');
-            const scriptInputType = document.getElementById('script-input-type');
+            const scriptInputType1 = document.getElementById('script-input-type-1');
+            const scriptInputType2 = document.getElementById('script-input-type-2');
             const scriptIdea = document.getElementById('script-idea');
             const scriptDuration = document.getElementById('script-duration');
             const scriptDurationCustom = document.getElementById('script-duration-custom');
             
-            // --- Script Memory Elements ---
-            const scriptList = document.getElementById('script-list');
-            const newScriptBtn = document.getElementById('new-script-btn');
-            const scriptEditorPanel = document.getElementById('script-editor-panel');
-            const scriptMemoryForm = document.getElementById('script-memory-form');
-            const scriptMemoryId = document.getElementById('script-memory-id');
-            const scriptMemoryTitle = document.getElementById('script-memory-title');
-            const scriptMemoryInput = document.getElementById('script-memory-input');
-            const copyScriptMemoryBtn = document.getElementById('copy-script-memory-btn');
-            const exportScriptMemoryBtn = document.getElementById('export-script-memory-btn');
-            const scriptMemoryHeader = document.getElementById('script-memory-header');
-            const closeMemoryBtn = document.getElementById('close-memory-btn');
-            
-            // --- Script Result Elements ---
+            // --- Script Result Elements (FIXED DECLARATION) ---
             const saveResultBtn = document.getElementById('save-result-btn');
             const copyResultBtn = document.getElementById('copy-result-btn');
             const exportResultBtn = document.getElementById('export-result-btn');
             const scriptResultTitle = document.getElementById('script-result-title');
             const scriptResultContent = document.getElementById('script-result-content');
-            
-            // --- Additional Result Content Elements ---
-            const promptVideoResultContent = document.getElementById('prompt-video-result-content');
-            const voiceScriptResultContent = document.getElementById('voice-script-result-content');
-            const descriptionResultContent = document.getElementById('description-result-content');
 
-            // --- API Key Elements ---
+            // API Key Elements
             const apiKeyForm = document.getElementById('api-key-form');
             const apiKeyInput = document.getElementById('api-key-input');
             const toggleApiKeyVisibilityBtn = document.getElementById('toggle-api-key-visibility');
             const aiModelSelect = document.getElementById('ai-model-select');
-            const closeApiKeyBtn = document.getElementById('close-api-key-btn');
             const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C3.732 4.943 7.523 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-7.523 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`;
             const eyeOffIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 8.517 16.635 7.412 14.722 6.708l-1.414-1.414A10.009 10.009 0 0010 3C7.523 3 5.268 4.943 2.458 10a11.97 11.97 0 003.876 3.655l-2.227-2.228a1 1 0 00-1.414-1.414L.293 8.293a1 1 0 000 1.414l2 2a1 1 0 001.414 0l1.293-1.293A8.003 8.003 0 0110 7a8 8 0 012.828.532l1.432-1.432A9.98 9.98 0 0010 5c-2.477 0-4.732 1.943-7.542 7 .57 1.1 1.254 2.063 2.07 2.912l-1.42-1.42a1 1 0 00-1.414-1.414L.293 15.707a1 1 0 001.414 1.414l14-14a1 1 0 00-1.414-1.414L3.707 2.293z" clip-rule="evenodd" /><path d="M10.707 10.293a1 1 0 10-1.414-1.414 1 1 0 001.414 1.414z" /></svg>`;
 
+            // Delete Modal
             const deleteConfirmModal = document.getElementById('delete-confirm-modal');
             const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             
+            // --- Data Store ---
             let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+            let prompts = JSON.parse(localStorage.getItem('prompts')) || [];
+            let voiceOvers = JSON.parse(localStorage.getItem('voiceOvers')) || [];
             let apiKey = localStorage.getItem('apiKey') || '';
             let aiModel = localStorage.getItem('aiModel') || 'gemini-2.5-flash-image-preview';
-            let scriptIdToDelete = null;
+            let itemToDelete = null; // {id: '123', type: 'script'}
 
+            // --- Generic Memory Modal Elements ---
+            // This is a map to easily get elements based on type ('script', 'prompt', 'voiceOver')
+            const memoryElements = {
+                script: {
+                    container: scriptMemoryContainer,
+                    list: document.getElementById('script-list'),
+                    editorPanel: document.getElementById('script-editor-panel'),
+                    form: document.getElementById('script-memory-form'),
+                    idInput: document.getElementById('script-memory-id'),
+                    titleInput: document.getElementById('script-memory-title'),
+                    contentInput: document.getElementById('script-memory-input'),
+                    copyBtn: document.getElementById('copy-script-memory-btn'),
+                    exportBtn: document.getElementById('export-script-memory-btn'),
+                },
+                prompt: {
+                    container: promptMemoryContainer,
+                    list: document.getElementById('prompt-list'),
+                    editorPanel: document.getElementById('prompt-editor-panel'),
+                    form: document.getElementById('prompt-memory-form'),
+                    idInput: document.getElementById('prompt-memory-id'),
+                    titleInput: document.getElementById('prompt-memory-title'),
+                    contentInput: document.getElementById('prompt-memory-input'),
+                    copyBtn: document.getElementById('copy-prompt-memory-btn'),
+                    exportBtn: document.getElementById('export-prompt-memory-btn'),
+                },
+                voiceOver: {
+                    container: voiceOverMemoryContainer,
+                    list: document.getElementById('voice-over-list'),
+                    editorPanel: document.getElementById('voice-over-editor-panel'),
+                    form: document.getElementById('voice-over-memory-form'),
+                    idInput: document.getElementById('voice-over-memory-id'),
+                    titleInput: document.getElementById('voice-over-memory-title'),
+                    contentInput: document.getElementById('voice-over-memory-input'),
+                    copyBtn: document.getElementById('copy-voice-over-memory-btn'),
+                    exportBtn: document.getElementById('export-voice-over-memory-btn'),
+                }
+            };
+
+            // --- General Functions ---
             function hideAllContainers() {
-                // Main workspace containers
                 scriptFormContainer.classList.add('hidden');
                 scriptResultContainer.classList.add('hidden');
                 additionalResultsContainer.classList.add('hidden');
             }
 
-             function hideModals() {
+            function hideAllModals() {
                 scriptMemoryContainer.classList.add('hidden');
+                promptMemoryContainer.classList.add('hidden');
+                voiceOverMemoryContainer.classList.add('hidden');
                 apiKeyContainer.classList.add('hidden');
             }
 
+            // --- Generic Memory Management Functions ---
+            
+            function getDataForType(type) {
+                if (type === 'script') return scripts;
+                if (type === 'prompt') return prompts;
+                if (type === 'voiceOver') return voiceOvers;
+                return [];
+            }
 
-            // --- Settings Functions ---
+            function saveDataToStorage(type) {
+                if (type === 'script') localStorage.setItem('scripts', JSON.stringify(scripts));
+                if (type === 'prompt') localStorage.setItem('prompts', JSON.stringify(prompts));
+                if (type === 'voiceOver') localStorage.setItem('voiceOvers', JSON.stringify(voiceOvers));
+            }
+
+            function renderListForType(type) {
+                const elements = memoryElements[type];
+                const data = getDataForType(type);
+                elements.list.innerHTML = '';
+                const currentId = elements.idInput.value;
+
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = `w-full text-left p-3 rounded-md transition-colors script-item cursor-pointer ${item.id == currentId ? 'active' : 'hover:bg-gray-700'}`;
+                    div.dataset.id = item.id;
+                    div.dataset.type = type; // Important for click listener
+                    div.innerHTML = `
+                        <span class="truncate pointer-events-none">${item.title}</span>
+                        <button class="delete-btn text-gray-400 hover:text-red-500 p-1 rounded-full" data-id="${item.id}" data-type="${type}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    `;
+                    elements.list.appendChild(div);
+                });
+            }
+
+            function clearFormForType(type) {
+                const elements = memoryElements[type];
+                elements.form.reset();
+                elements.idInput.value = '';
+                renderListForType(type);
+            }
+
+            function loadItemIntoForm(id, type) {
+                const elements = memoryElements[type];
+                const data = getDataForType(type);
+                const item = data.find(i => i.id == id);
+                if (item) {
+                    elements.idInput.value = item.id;
+                    elements.titleInput.value = item.title;
+                    elements.contentInput.value = item.content;
+                }
+                renderListForType(type);
+            }
+
+            function openDeleteModal(id, type) {
+                itemToDelete = { id, type };
+                deleteConfirmModal.classList.remove('hidden');
+            }
+
+            function performDelete() {
+                if (!itemToDelete) return;
+                const { id, type } = itemToDelete;
+                
+                let data = getDataForType(type);
+                data = data.filter(item => item.id != id);
+
+                if (type === 'script') scripts = data;
+                if (type === 'prompt') prompts = data;
+                if (type === 'voiceOver') voiceOvers = data;
+
+                saveDataToStorage(type);
+
+                const elements = memoryElements[type];
+                if (elements.idInput.value == id) {
+                    clearFormForType(type);
+                } else {
+                    renderListForType(type);
+                }
+                
+                itemToDelete = null;
+                deleteConfirmModal.classList.add('hidden');
+            }
+
+            // --- Settings & Dropdown Functions ---
             function saveSettings() {
                 localStorage.setItem('apiKey', apiKey);
                 localStorage.setItem('aiModel', aiModel);
@@ -442,67 +654,6 @@
                 apiKeyInput.type = 'password';
                 toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
                 aiModelSelect.value = aiModel;
-            }
-
-            // --- Script Memory Functions ---
-            function saveScriptsToStorage() {
-                localStorage.setItem('scripts', JSON.stringify(scripts));
-            }
-
-            function renderScriptList() {
-                scriptList.innerHTML = '';
-                const currentId = scriptMemoryId.value;
-                scripts.forEach(script => {
-                    const item = document.createElement('div');
-                    item.className = `w-full text-left p-3 rounded-md transition-colors script-item cursor-pointer ${script.id == currentId ? 'active' : 'hover:bg-gray-700'}`;
-                    item.dataset.id = script.id;
-                    item.innerHTML = `
-                        <span class="truncate pointer-events-none">${script.title}</span>
-                        <button class="delete-script-btn text-gray-400 hover:text-red-500 p-1 rounded-full" data-id="${script.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pointer-events-none" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    `;
-                    scriptList.appendChild(item);
-                });
-            }
-            
-            function clearScriptForm() {
-                scriptMemoryForm.reset();
-                scriptMemoryId.value = '';
-                scriptMemoryHeader.textContent = 'Đầu vào công việc mới';
-                renderScriptList();
-            }
-
-            function loadScriptIntoForm(id) {
-                const script = scripts.find(s => s.id == id);
-                if (script) {
-                    scriptMemoryId.value = script.id;
-                    scriptMemoryTitle.value = script.title;
-                    scriptMemoryInput.value = script.content;
-                    scriptMemoryHeader.textContent = `Đầu vào công việc: ${script.title}`;
-                }
-                renderScriptList();
-            }
-
-            function openDeleteModal(id) {
-                scriptIdToDelete = id;
-                deleteConfirmModal.classList.remove('hidden');
-            }
-
-            function closeDeleteModal() {
-                scriptIdToDelete = null;
-                deleteConfirmModal.classList.add('hidden');
-            }
-
-            function performDelete() {
-                if (!scriptIdToDelete) return;
-                scripts = scripts.filter(s => s.id != scriptIdToDelete);
-                saveScriptsToStorage();
-                if (scriptMemoryId.value == scriptIdToDelete) clearScriptForm();
-                else renderScriptList();
-                closeDeleteModal();
             }
             
             function downloadAsTxt(title, content) {
@@ -518,17 +669,20 @@
                 URL.revokeObjectURL(url);
             }
 
-            function populateScriptInputDropdown() {
-                scriptInputType.innerHTML = '';
-                const placeholderOption = document.createElement('option');
-                placeholderOption.textContent = 'Chọn từ kịch bản đã lưu...';
-                placeholderOption.value = '';
-                scriptInputType.appendChild(placeholderOption);
-                scripts.forEach(script => {
-                    const option = document.createElement('option');
-                    option.value = script.id;
-                    option.textContent = script.title;
-                    scriptInputType.appendChild(option);
+            function populateScriptInputDropdowns() {
+                [scriptInputType1, scriptInputType2].forEach(select => {
+                    select.innerHTML = '';
+                    const placeholderOption = document.createElement('option');
+                    placeholderOption.textContent = select === scriptInputType1 ? 'Chọn kịch bản cho cốt truyện...' : 'Chọn kịch bản cho phong cách...';
+                    placeholderOption.value = '';
+                    select.appendChild(placeholderOption);
+
+                    scripts.forEach(script => {
+                        const option = document.createElement('option');
+                        option.value = script.id;
+                        option.textContent = script.title;
+                        select.appendChild(option.cloneNode(true));
+                    });
                 });
             }
 
@@ -538,41 +692,125 @@
             // --- Event Listeners ---
             createScriptBtn.addEventListener('click', () => {
                 hideAllContainers();
+                hideAllModals();
                 scriptForm.reset();
-                populateScriptInputDropdown();
+                populateScriptInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
                 scriptFormContainer.classList.remove('hidden');
-            });
-
-            scriptInputType.addEventListener('change', (e) => {
-                 // No auto-fill action
             });
 
             scriptDuration.addEventListener('change', (e) => {
                 scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
             });
 
+            // Memory Buttons
             scriptMemoryBtn.addEventListener('click', () => {
                 hideAllContainers();
-                scriptMemoryContainer.classList.remove('hidden');
-                renderScriptList();
-                clearScriptForm();
-                scriptEditorPanel.classList.add('hidden'); 
+                hideAllModals();
+                memoryElements.script.container.classList.remove('hidden');
+                renderListForType('script');
+                clearFormForType('script');
+                memoryElements.script.editorPanel.classList.add('hidden');
             });
 
+            promptMemoryBtn.addEventListener('click', () => {
+                hideAllContainers();
+                hideAllModals();
+                memoryElements.prompt.container.classList.remove('hidden');
+                renderListForType('prompt');
+                clearFormForType('prompt');
+                memoryElements.prompt.editorPanel.classList.add('hidden');
+            });
+            
+            voiceOverMemoryBtn.addEventListener('click', () => {
+                hideAllContainers();
+                hideAllModals();
+                memoryElements.voiceOver.container.classList.remove('hidden');
+                renderListForType('voiceOver');
+                clearFormForType('voiceOver');
+                memoryElements.voiceOver.editorPanel.classList.add('hidden');
+            });
+            
             apiKeyBtn.addEventListener('click', () => {
                 hideAllContainers();
+                hideAllModals();
                 renderSettingsDisplay();
                 apiKeyContainer.classList.remove('hidden');
             });
             
-            closeMemoryBtn.addEventListener('click', () => {
-                 scriptMemoryContainer.classList.add('hidden');
+            document.querySelectorAll('.close-modal-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.target.closest('.fixed').classList.add('hidden');
+                });
             });
-            
-            closeApiKeyBtn.addEventListener('click', () => {
-                apiKeyContainer.classList.add('hidden');
+
+            // Generic listeners for all memory modals
+            Object.keys(memoryElements).forEach(type => {
+                const elements = memoryElements[type];
+                
+                // List click (to load or delete)
+                elements.list.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    const itemDiv = e.target.closest('.script-item');
+                    if (deleteBtn) {
+                        openDeleteModal(deleteBtn.dataset.id, deleteBtn.dataset.type);
+                    } else if (itemDiv) {
+                        elements.editorPanel.classList.remove('hidden');
+                        loadItemIntoForm(itemDiv.dataset.id, itemDiv.dataset.type);
+                    }
+                });
+
+                // Form submission
+                elements.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const id = elements.idInput.value;
+                    const title = elements.titleInput.value.trim();
+                    const content = elements.contentInput.value.trim();
+                    if (!title || !content) {
+                        alert('Tiêu đề và nội dung không được để trống.');
+                        return;
+                    }
+                    
+                    let data = getDataForType(type);
+                    if (id) { // Existing item
+                        const index = data.findIndex(i => i.id == id);
+                        if (index > -1) data[index] = { ...data[index], title, content };
+                    } else { // New item
+                        const newItem = { id: Date.now(), title, content };
+                        data.push(newItem);
+                        elements.idInput.value = newItem.id;
+                    }
+                    
+                    saveDataToStorage(type);
+                    renderListForType(type);
+                    alert('Đã lưu thành công!');
+                });
+
+                // Copy and Export buttons
+                elements.copyBtn.addEventListener('click', () => {
+                    const contentToCopy = elements.contentInput.value;
+                    if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
+                    navigator.clipboard.writeText(contentToCopy).then(() => {
+                        alert('Đã sao chép vào clipboard!');
+                    }).catch(err => alert('Sao chép thất bại!'));
+                });
+
+                elements.exportBtn.addEventListener('click', () => {
+                    const title = elements.titleInput.value;
+                    const content = elements.contentInput.value;
+                    if (!content) { alert('Không có nội dung để xuất file.'); return; }
+                    downloadAsTxt(title || `${type}_khong_tieu_de`, content);
+                });
             });
+
+            document.querySelectorAll('.new-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const type = e.currentTarget.dataset.type;
+                    clearFormForType(type);
+                    memoryElements[type].editorPanel.classList.remove('hidden');
+                });
+            });
+
 
             apiKeyForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -594,56 +832,7 @@
                 }
             });
 
-            newScriptBtn.addEventListener('click', () => {
-                clearScriptForm();
-                scriptEditorPanel.classList.remove('hidden');
-            });
-
-            scriptList.addEventListener('click', (e) => {
-                const deleteBtn = e.target.closest('.delete-script-btn');
-                const scriptItem = e.target.closest('.script-item');
-                if (deleteBtn) {
-                    openDeleteModal(deleteBtn.dataset.id);
-                } else if (scriptItem) {
-                    scriptEditorPanel.classList.remove('hidden');
-                    loadScriptIntoForm(scriptItem.dataset.id);
-                }
-            });
-
-            scriptMemoryForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const id = scriptMemoryId.value;
-                const title = scriptMemoryTitle.value;
-                const content = scriptMemoryInput.value;
-                if (id) {
-                    const index = scripts.findIndex(s => s.id == id);
-                    if (index > -1) scripts[index] = { ...scripts[index], title, content };
-                } else {
-                    const newScript = { id: Date.now(), title, content };
-                    scripts.push(newScript);
-                    scriptMemoryId.value = newScript.id;
-                }
-                saveScriptsToStorage();
-                renderScriptList();
-                alert('Đã lưu kịch bản!');
-            });
-            
-            copyScriptMemoryBtn.addEventListener('click', () => {
-                 const contentToCopy = scriptMemoryInput.value;
-                 if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
-                navigator.clipboard.writeText(contentToCopy).then(() => {
-                    alert('Đã sao chép vào clipboard!');
-                }).catch(err => alert('Sao chép thất bại!'));
-            });
-
-            exportScriptMemoryBtn.addEventListener('click', () => {
-                const title = scriptMemoryTitle.value;
-                const content = scriptMemoryInput.value;
-                if (!content) { alert('Không có nội dung để xuất file.'); return; }
-                downloadAsTxt(title || 'kich_ban_khong_tieu_de', content);
-            });
-
-            // --- Result Container Listeners ---
+            // --- Result Container Listeners (FIXED) ---
             saveResultBtn.addEventListener('click', () => {
                 const title = scriptResultTitle.value.trim();
                 const content = scriptResultContent.value.trim();
@@ -653,7 +842,7 @@
                 }
                 const newScript = { id: Date.now(), title, content };
                 scripts.push(newScript);
-                saveScriptsToStorage();
+                saveDataToStorage('script');
                 alert('Đã lưu kịch bản vào bộ nhớ!');
                 scriptResultContainer.classList.add('hidden');
                 additionalResultsContainer.classList.add('hidden');
@@ -668,13 +857,12 @@
             });
 
             exportResultBtn.addEventListener('click', () => {
-                 const title = scriptResultTitle.value;
+                const title = scriptResultTitle.value;
                 const content = scriptResultContent.value;
                 if (!content) { alert('Không có nội dung để xuất file.'); return; }
                 downloadAsTxt(title || 'kich_ban_khong_tieu_de', content);
             });
             
-            // Generic listeners for new result boxes
             document.querySelectorAll('.copy-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const targetId = e.target.dataset.target;
@@ -697,7 +885,7 @@
             });
 
 
-            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            cancelDeleteBtn.addEventListener('click', () => deleteConfirmModal.classList.add('hidden'));
             confirmDeleteBtn.addEventListener('click', performDelete);
 
             document.querySelectorAll('.cancel-btn').forEach(btn => {
@@ -715,11 +903,13 @@
                 const loader = submitButton.querySelector('.loader');
 
                 // --- Input Validation ---
-                const selectedScriptId = scriptInputType.value;
+                const selectedScriptId1 = scriptInputType1.value;
+                const selectedScriptId2 = scriptInputType2.value;
                 const ideaValue = scriptIdea.value.trim();
                 const styleValue = document.getElementById('script-style').value;
-                if (!selectedScriptId && !ideaValue) {
-                    alert('Vui lòng chọn một kịch bản từ bộ nhớ hoặc nhập ý tưởng mới.');
+
+                if (!selectedScriptId1 && !ideaValue) {
+                    alert('Vui lòng chọn Kịch bản tham khảo 1 hoặc nhập ý tưởng mới.');
                     return;
                 }
                 if (!styleValue) {
@@ -761,16 +951,28 @@
                     // --- Prepare Data ---
                     let durationValue = scriptDuration.value;
                     if (durationValue === 'custom') durationValue = scriptDurationCustom.value;
-                    const referenceScript = scripts.find(s => s.id == selectedScriptId);
-                    const referenceContent = referenceScript ? referenceScript.content : "Không có";
+                    
+                    const referenceScript1 = scripts.find(s => s.id == selectedScriptId1);
+                    const referenceContent1 = referenceScript1 ? referenceScript1.content : "Không có";
+                    
+                    const referenceScript2 = scripts.find(s => s.id == selectedScriptId2);
+                    const referenceContent2 = referenceScript2 ? referenceScript2.content : "Không có";
+
                     const optionPromptVideo = document.getElementById('option-prompt-video').checked;
                     const optionVoiceScript = document.getElementById('option-voice-script').checked;
                     const optionDescription = document.getElementById('option-description').checked;
 
                     // --- STEP 1: Generate Main Script ---
                     const mainScriptPrompt = `Bạn là một biên kịch chuyên nghiệp. Nhiệm vụ của bạn là viết một kịch bản phim mới dựa trên các thông tin sau:
-                        - Kịch bản tham khảo: ${referenceContent}
-                        - Ý tưởng chính: ${ideaValue ? ideaValue : "Sáng tạo một tập mới tiếp nối câu chuyện từ kịch bản tham khảo."}
+                        - Kịch bản tham khảo 1 (Sử dụng làm nền tảng cho cốt truyện, bối cảnh):
+                        ---
+                        ${referenceContent1}
+                        ---
+                        - Kịch bản tham khảo 2 (Học hỏi văn phong, lời thoại, phát triển nhân vật từ đây. Nếu "Không có" thì bỏ qua):
+                        ---
+                        ${referenceContent2}
+                        ---
+                        - Ý tưởng chính: ${ideaValue ? ideaValue : "Kết hợp những yếu tố hay nhất từ (các) kịch bản tham khảo để tạo ra một câu chuyện mới."}
                         - Phong cách: ${styleValue}
                         - Thời lượng dự kiến: ${durationValue} phút
                         Hãy chỉ viết kịch bản mới, không thêm bất kỳ lời giải thích hay tiêu đề nào khác.`;
@@ -782,7 +984,7 @@
                     }
 
                     // --- Display Main Script Result ---
-                    const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 20)}...` : `Tập mới của: ${referenceScript.title.substring(0, 20)}...`;
+                    const newTitle = ideaValue ? `Kịch bản cho: ${ideaValue.substring(0, 30)}...` : `Kết hợp từ: ${referenceScript1?.title.substring(0, 20)}...`;
                     scriptResultTitle.value = newTitle;
                     scriptResultContent.value = generatedScript;
                     scriptResultContainer.classList.remove('hidden');
@@ -793,39 +995,31 @@
                         additionalResultsContainer.classList.remove('hidden');
                     }
 
-                    if (optionPromptVideo) {
-                        const wrapper = promptVideoResultWrapper;
+                    const taskRunner = async (option, wrapper, contentEl, promptFn) => {
+                        if (!option) return;
                         wrapper.classList.remove('hidden');
-                        wrapper.querySelector('.sub-loader').classList.remove('hidden');
-                        const prompt = `Dựa vào kịch bản sau:\n\n---\n${generatedScript}\n---\n\nHãy tạo ra các câu lệnh (prompt) chi tiết cho AI tạo ảnh để hình dung hóa từng cảnh quay.`;
-                        const content = await generateAiContent(prompt);
-                        promptVideoResultContent.value = content;
-                        wrapper.querySelector('.sub-loader').classList.add('hidden');
-                    }
+                        const loader = wrapper.querySelector('.sub-loader');
+                        loader.classList.remove('hidden');
+                        try {
+                            const prompt = promptFn(generatedScript);
+                            const content = await generateAiContent(prompt);
+                            contentEl.value = content;
+                        } catch (taskError) {
+                            contentEl.value = `Lỗi: ${taskError.message}`;
+                        } finally {
+                            loader.classList.add('hidden');
+                        }
+                    };
 
-                    if (optionVoiceScript) {
-                        const wrapper = voiceScriptResultWrapper;
-                        wrapper.classList.remove('hidden');
-                        wrapper.querySelector('.sub-loader').classList.remove('hidden');
-                        const prompt = `Từ kịch bản sau:\n\n---\n${generatedScript}\n---\n\nHãy trích xuất toàn bộ lời thoại thành một kịch bản lồng tiếng (Voice Script), ghi rõ tên nhân vật trước mỗi câu thoại.`;
-                        const content = await generateAiContent(prompt);
-                        voiceScriptResultContent.value = content;
-                        wrapper.querySelector('.sub-loader').classList.add('hidden');
-                    }
-
-                    if (optionDescription) {
-                        const wrapper = descriptionResultWrapper;
-                        wrapper.classList.remove('hidden');
-                        wrapper.querySelector('.sub-loader').classList.remove('hidden');
-                        const prompt = `Dựa vào nội dung kịch bản sau:\n\n---\n${generatedScript}\n---\n\nHãy viết một đoạn mô tả ngắn gọn, hấp dẫn cho video Youtube/Tiktok (khoảng 150-200 từ), kèm theo 5-10 hashtags phù hợp.`;
-                        const content = await generateAiContent(prompt);
-                        descriptionResultContent.value = content;
-                        wrapper.querySelector('.sub-loader').classList.add('hidden');
-                    }
+                    await Promise.all([
+                        taskRunner(optionPromptVideo, promptVideoResultWrapper, document.getElementById('prompt-video-result-content'), (script) => `Dựa vào kịch bản sau:\n\n---\n${script}\n---\n\nHãy tạo ra các câu lệnh (prompt) chi tiết cho AI tạo ảnh để hình dung hóa từng cảnh quay.`),
+                        taskRunner(optionVoiceScript, voiceScriptResultWrapper, document.getElementById('voice-script-result-content'), (script) => `Từ kịch bản sau:\n\n---\n${script}\n---\n\nHãy trích xuất toàn bộ lời thoại thành một kịch bản lồng tiếng (Voice Script), ghi rõ tên nhân vật trước mỗi câu thoại.`),
+                        taskRunner(optionDescription, descriptionResultWrapper, document.getElementById('description-result-content'), (script) => `Dựa vào nội dung kịch bản sau:\n\n---\n${script}\n---\n\nHãy viết một đoạn mô tả ngắn gọn, hấp dẫn cho video Youtube/Tiktok (khoảng 150-200 từ), kèm theo 5-10 hashtags phù hợp.`)
+                    ]);
 
                 } catch (error) {
                     console.error('Lỗi trong quá trình tạo:', error);
-                    alert(`Đã xảy ra lỗi: ${error.message}`);
+                    alert(`Đã xảy ra lỗi nghiêm trọng: ${error.message}`);
                 } finally {
                     // --- UI State Update: End Loading ---
                     btnText.textContent = 'Tạo';

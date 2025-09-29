@@ -58,57 +58,12 @@
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="segment-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se</label>
-                        <select id="segment-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <!-- Options will be dynamically populated -->
-                        </select>
+                        <label for="segment-count" class="block text-sm font-medium text-gray-300">Số lượng Se (phân cảnh)</label>
+                        <input type="number" id="segment-count" value="3" min="1" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                     </div>
                      <div>
-                        <label for="segment-input-vo" class="block text-sm font-medium text-yellow-400">Đầu vào VO</label>
-                        <select id="segment-input-vo" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <!-- Options will be dynamically populated -->
-                        </select>
-                    </div>
-                    <div>
-                        <label for="segment-output-type" class="block text-sm font-medium text-gray-300">Loại đầu ra</label>
-                        <select id="segment-output-type" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <option value="all">Mô tả & Prompts chi tiết</option>
-                            <option value="description">Chỉ mô tả chi tiết</option>
-                            <option value="prompts">Chỉ Prompts cho AI Image</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="segment-style" class="block text-sm font-medium text-gray-300">Phong cách</label>
-                        <select id="segment-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <option value="">AI tự sáng tạo</option>
-                            <option>Tả thực (Photorealistic)</option>
-                            <option>Điện ảnh (Cinematic)</option>
-                            <option>Tranh sơn dầu (Oil Painting)</option>
-                            <option>Hoạt hình 3D (3D Animation)</option>
-                            <option>Anime</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="segment-camera-angle" class="block text-sm font-medium text-gray-300">Góc máy</label>
-                         <select id="segment-camera-angle" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <option value="">AI tự chọn</option>
-                            <option>Toàn cảnh (Wide shot)</option>
-                            <option>Trung cảnh (Medium shot)</option>
-                            <option>Cận cảnh (Close-up shot)</option>
-                            <option>Góc máy từ trên xuống (High-angle shot)</option>
-                            <option>Góc máy từ dưới lên (Low-angle shot)</option>
-                        </select>
-                    </div>
-                     <div>
-                        <label for="segment-setting" class="block text-sm font-medium text-gray-300">Bối cảnh</label>
-                        <select id="segment-setting" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
-                            <option value="">Không xác định</option>
-                            <option>Trong nhà (Interior)</option>
-                            <option>Ngoài trời - Thành phố (Exterior - City)</option>
-                            <option>Ngoài trời - Thiên nhiên (Exterior - Nature)</option>
-                            <option>Không gian vũ trụ (Outer Space)</option>
-                            <option>Kỳ ảo (Fantasy)</option>
-                        </select>
+                        <label for="prompt-count" class="block text-sm font-medium text-gray-300">Số lượng Prompts / Se</label>
+                        <input type="number" id="prompt-count" value="2" min="1" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                     </div>
                 </div>
 
@@ -122,20 +77,10 @@
         </div>
         
         <!-- Result Column -->
-        <div id="segment-result-container" class="w-1/2 flex-grow bg-gray-800 p-6 rounded-lg flex flex-col">
-            <h2 class="text-2xl font-bold mb-4">Kết quả Phân đoạn</h2>
-            <div class="space-y-4 flex-grow flex flex-col">
-                <div class="flex-grow flex flex-col">
-                    <div class="flex justify-between items-center">
-                        <label for="segment-result-content" class="block text-sm font-medium text-gray-300">Nội dung chi tiết</label>
-                        <span id="segment-word-count" class="text-xs text-gray-400">0 từ</span>
-                    </div>
-                    <textarea id="segment-result-content" readonly class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
-                    <div class="flex justify-end space-x-2 pt-2">
-                         <button type="button" data-target="segment-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                         <button type="button" data-target="segment-result-content" data-title="segment_detail" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                    </div>
-                </div>
+        <div id="segment-result-container" class="w-1/2 flex-grow bg-gray-800 p-6 rounded-lg flex flex-col overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-4 flex-shrink-0">Kết quả Phân đoạn</h2>
+            <div id="segment-result-list" class="space-y-4">
+                <!-- Segment cards will be rendered here -->
             </div>
         </div>
     </main>
@@ -145,38 +90,23 @@
             // --- UI Elements ---
             const segmentForm = document.getElementById('segment-form');
             const segmentInputScript = document.getElementById('segment-input-script');
-            const segmentInputSe = document.getElementById('segment-input-se');
-            const segmentInputVo = document.getElementById('segment-input-vo');
-            const segmentResultContent = document.getElementById('segment-result-content');
-            const segmentWordCount = document.getElementById('segment-word-count');
-
+            const segmentResultList = document.getElementById('segment-result-list');
+            
             // --- Data Store ---
-            let inputPrompts = JSON.parse(localStorage.getItem('inputPrompts')) || [];
-            let inputVoiceOvers = JSON.parse(localStorage.getItem('inputVoiceOvers')) || [];
-            let apiKey = localStorage.getItem('apiKey') || 'YOUR_API_KEY'; // Replace with a way to get the key
+            let apiKey = localStorage.getItem('apiKey') || ''; // Fetch API key from parent's storage
 
             // --- Functions ---
-            function populateDropdown(selectElement, data, placeholderText) {
-                if (!selectElement) return;
-                selectElement.innerHTML = '';
-                const placeholderOption = document.createElement('option');
-                placeholderOption.textContent = placeholderText;
-                placeholderOption.value = '';
-                selectElement.appendChild(placeholderOption);
-
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.title;
-                    selectElement.appendChild(option.cloneNode(true));
-                });
-            }
-
-            function updateWordCount(textArea, countElement) {
-                if (!textArea || !countElement) return;
-                const text = textArea.value.trim();
-                const wordCount = text === '' ? 0 : text.split(/\s+/).filter(Boolean).length;
-                countElement.textContent = `${wordCount} từ`;
+            function downloadAsTxt(title, content) {
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const fileName = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50) + '.txt';
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             }
 
             async function generateAiContent(prompt, submitButton) {
@@ -188,17 +118,57 @@
                  submitButton.disabled = true;
 
                 try {
-                    // This is a placeholder for your actual API call
-                    // You would replace this with a fetch call to the Gemini API
-                    console.log("Sending to AI:", prompt);
-                    // Mock response for testing
-                    await new Promise(resolve => setTimeout(resolve, 1500)); 
-                    return `Đây là kết quả chi tiết được tạo bởi AI dựa trên yêu cầu của bạn. \n\nPrompt chi tiết:\n\n1. (Chi tiết prompt 1)\n2. (Chi tiết prompt 2)`;
+                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error.message || `Lỗi HTTP: ${response.status}`);
+                    }
+                    const result = await response.json();
+                    return result.candidates[0]?.content?.parts[0]?.text || "";
                 } finally {
                     btnText.textContent = 'Tạo';
                     loader.classList.add('hidden');
                     submitButton.disabled = false;
                 }
+            }
+
+            function renderResults(results) {
+                segmentResultList.innerHTML = ''; // Clear previous results
+                if (!Array.isArray(results)) {
+                    segmentResultList.innerHTML = `<p class="text-red-400">Lỗi: AI không trả về định dạng mong muốn.</p>`;
+                    return;
+                }
+
+                results.forEach(scene => {
+                    const sceneCard = document.createElement('div');
+                    sceneCard.className = 'bg-gray-900 p-4 rounded-lg space-y-3';
+                    sceneCard.dataset.sceneId = scene.scene;
+
+                    const promptsHtml = scene.prompts.map(p => `<li class="text-sm text-gray-300">${p}</li>`).join('');
+
+                    sceneCard.innerHTML = `
+                        <h3 class="text-lg font-bold text-yellow-400">Phân cảnh ${scene.scene}</h3>
+                        <div>
+                            <h4 class="font-semibold text-gray-300 mb-1">Mô tả chi tiết:</h4>
+                            <p class="text-gray-400 text-sm whitespace-pre-wrap">${scene.description}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-300 mb-2">Prompts đề xuất (cho video 8 giây):</h4>
+                            <ul class="list-disc list-inside space-y-2 pl-2">
+                                ${promptsHtml}
+                            </ul>
+                        </div>
+                        <div class="flex justify-end space-x-2 pt-2">
+                             <button data-content-type="scene" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                             <button data-content-type="scene" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        </div>
+                    `;
+                    segmentResultList.appendChild(sceneCard);
+                });
             }
             
             // --- Initial Load ---
@@ -207,28 +177,28 @@
                 segmentInputScript.value = scriptToProcess;
                 localStorage.removeItem('scriptToProcess'); // Clear after use
             }
-            populateDropdown(segmentInputSe, inputPrompts, 'Chọn từ Đầu vào Se...');
-            populateDropdown(segmentInputVo, inputVoiceOvers, 'Chọn từ Đầu vào VO...');
 
             // --- Event Listeners ---
-            segmentResultContent.addEventListener('input', () => updateWordCount(segmentResultContent, segmentWordCount));
             document.body.addEventListener('click', e => {
                  const button = e.target.closest('button');
                 if (!button) return;
 
                 if (button.classList.contains('copy-btn')) {
-                    const targetId = button.dataset.target;
-                    const contentToCopy = document.getElementById(targetId).value;
-                    if(!contentToCopy) { alert('Không có nội dung để sao chép.'); return; }
-                    navigator.clipboard.writeText(contentToCopy).then(() => alert('Đã sao chép vào clipboard!')).catch(err => alert('Sao chép thất bại!'));
+                    const card = button.closest('.bg-gray-900');
+                    const title = card.querySelector('h3').textContent;
+                    const description = card.querySelector('p').textContent;
+                    const prompts = Array.from(card.querySelectorAll('li')).map(li => `- ${li.textContent}`).join('\n');
+                    const contentToCopy = `${title}\n\nMô tả:\n${description}\n\nPrompts:\n${prompts}`;
+                    navigator.clipboard.writeText(contentToCopy).then(() => alert('Đã sao chép nội dung phân cảnh!')).catch(err => alert('Sao chép thất bại!'));
                 }
                 
                 if (button.classList.contains('export-btn')) {
-                    const targetId = button.dataset.target;
-                    const title = button.dataset.title || 'untitled';
-                    const content = document.getElementById(targetId).value;
-                    if (!content) { alert('Không có nội dung để xuất file.'); return; }
-                    downloadAsTxt(title, content);
+                    const card = button.closest('.bg-gray-900');
+                    const title = card.querySelector('h3').textContent;
+                    const description = card.querySelector('p').textContent;
+                    const prompts = Array.from(card.querySelectorAll('li')).map(li => `- ${li.textContent}`).join('\n');
+                    const contentToExport = `${title}\n\nMô tả:\n${description}\n\nPrompts:\n${prompts}`;
+                    downloadAsTxt(title, contentToExport);
                 }
             });
 
@@ -237,50 +207,51 @@
                 
                 const submitButton = e.target.querySelector('button[type="submit"]');
                 const inputScript = segmentInputScript.value;
-                const selectedSeId = segmentInputSe.value;
-                const selectedVoId = segmentInputVo.value;
-                const outputType = document.getElementById('segment-output-type').value;
-                const style = document.getElementById('segment-style').value;
-                const cameraAngle = document.getElementById('segment-camera-angle').value;
-                const setting = document.getElementById('segment-setting').value;
+                const sceneCount = document.getElementById('segment-count').value;
+                const promptCount = document.getElementById('prompt-count').value;
         
                 if (!inputScript.trim()) {
                     alert('Vui lòng nhập thông tin kịch bản đầu vào.');
                     return;
                 }
                 
-                const referenceSe = inputPrompts.find(p => p.id == selectedSeId);
-                const referenceSeContent = referenceSe ? referenceSe.content : "Không có";
-                
-                const referenceVo = inputVoiceOvers.find(v => v.id == selectedVoId);
-                const referenceVoContent = referenceVo ? referenceVo.content : "Không có";
+                let finalPrompt = `Bạn là một biên kịch và chuyên gia prompt video. Dựa trên kịch bản gốc dưới đây, hãy thực hiện các yêu cầu sau:
 
-                let finalPrompt = `Bạn là một đạo diễn hình ảnh và chuyên gia viết prompt. Dựa trên kịch bản và các yêu cầu dưới đây, hãy tạo ra nội dung chi tiết.
-                
                 **Kịch bản gốc:**
                 ---
                 ${inputScript}
                 ---
 
-                **Đầu vào bổ sung:**
-                 - Đầu vào Se (tham khảo hình ảnh): ${referenceSeContent}
-                 - Đầu vào VO (tham khảo lời thoại): ${referenceVoContent}
-
                 **Yêu cầu:**
-                - **Loại đầu ra:** ${outputType}
-                - **Phong cách:** ${style || 'Tự do sáng tạo'}
-                - **Góc máy:** ${cameraAngle || 'Tự do sáng tạo'}
-                - **Bối cảnh:** ${setting || 'Tự do sáng tạo'}
-                
-                Hãy viết một cách chi tiết và gợi hình. Nếu yêu cầu tạo prompt, hãy tạo các prompt phức tạp, giàu chi tiết phù hợp cho các mô hình AI tạo ảnh như Midjourney, Stable Diffusion.`;
+                1. Chia kịch bản gốc thành **${sceneCount}** phân cảnh (Se) riêng biệt.
+                2. Với mỗi phân cảnh, hãy viết một mô tả chi tiết về hình ảnh và hành động.
+                3. Với mỗi phân cảnh, hãy tạo ra **${promptCount}** prompts chi tiết, độc đáo, theo phong cách điện ảnh, dành cho mô hình AI text-to-video như Google Veo để tạo ra một video clip dài 8 giây. Mỗi prompt phải tập trung vào một khía cạnh khác nhau của phân cảnh (ví dụ: một prompt tập trung vào nhân vật, một prompt vào bối cảnh, một vào hành động cụ thể).
+
+                **Định dạng đầu ra:**
+                Vui lòng trả lời bằng một chuỗi JSON hợp lệ. Chuỗi JSON phải là một mảng (array) các đối tượng (object). Mỗi đối tượng đại diện cho một phân cảnh và phải có cấu trúc sau:
+                {
+                  "scene": "số thứ tự phân cảnh (ví dụ: 1)",
+                  "description": "Mô tả chi tiết phân cảnh ở đây.",
+                  "prompts": [
+                    "prompt chi tiết thứ nhất.",
+                    "prompt chi tiết thứ hai.",
+                    "..."
+                  ]
+                }
+
+                Không thêm bất kỳ văn bản nào khác ngoài chuỗi JSON.`;
 
                 try {
-                    segmentResultContent.value = "Đang xử lý...";
-                    const result = await generateAiContent(finalPrompt, submitButton);
-                    segmentResultContent.value = result;
-                    updateWordCount(segmentResultContent, segmentWordCount);
+                    segmentResultList.innerHTML = '<div class="loader mx-auto"></div>';
+                    const resultJsonString = await generateAiContent(finalPrompt, submitButton);
+                    
+                    if (!resultJsonString) throw new Error("AI không trả về kết quả.");
+
+                    const results = JSON.parse(resultJsonString);
+                    renderResults(results);
+
                 } catch (error) {
-                    segmentResultContent.value = `Lỗi: ${error.message}`;
+                    segmentResultList.innerHTML = `<p class="text-red-400">Lỗi: ${error.message}. Vui lòng thử lại.</p>`;
                     console.error('Lỗi khi tạo phân đoạn:', error);
                 }
             });
@@ -288,3 +259,4 @@
     </script>
 </body>
 </html>
+

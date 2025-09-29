@@ -206,6 +206,69 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Segment Creation Column -->
+            <div id="segment-form-container" class="hidden w-[450px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-6">Tạo phân đoạn chi tiết</h2>
+                <form id="segment-form" class="space-y-4">
+                    <div>
+                        <label for="segment-input-prompt" class="block text-sm font-medium text-gray-300">Thông tin Prompts đầu vào</label>
+                        <textarea id="segment-input-prompt" rows="5" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500" placeholder="Dán prompt cần làm chi tiết vào đây..."></textarea>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="segment-output-type" class="block text-sm font-medium text-gray-300">Loại đầu ra</label>
+                            <select id="segment-output-type" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <option value="all">Mô tả & Prompts chi tiết</option>
+                                <option value="description">Chỉ mô tả chi tiết</option>
+                                <option value="prompts">Chỉ Prompts cho AI Image</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="segment-style" class="block text-sm font-medium text-gray-300">Phong cách</label>
+                            <select id="segment-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <option value="">AI tự sáng tạo</option>
+                                <option>Tả thực (Photorealistic)</option>
+                                <option>Điện ảnh (Cinematic)</option>
+                                <option>Tranh sơn dầu (Oil Painting)</option>
+                                <option>Hoạt hình 3D (3D Animation)</option>
+                                <option>Anime</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="segment-camera-angle" class="block text-sm font-medium text-gray-300">Góc máy</label>
+                             <select id="segment-camera-angle" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <option value="">AI tự chọn</option>
+                                <option>Toàn cảnh (Wide shot)</option>
+                                <option>Trung cảnh (Medium shot)</option>
+                                <option>Cận cảnh (Close-up shot)</option>
+                                <option>Góc máy từ trên xuống (High-angle shot)</option>
+                                <option>Góc máy từ dưới lên (Low-angle shot)</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label for="segment-setting" class="block text-sm font-medium text-gray-300">Bối cảnh</label>
+                            <select id="segment-setting" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
+                                <option value="">Không xác định</option>
+                                <option>Trong nhà (Interior)</option>
+                                <option>Ngoài trời - Thành phố (Exterior - City)</option>
+                                <option>Ngoài trời - Thiên nhiên (Exterior - Nature)</option>
+                                <option>Không gian vũ trụ (Outer Space)</option>
+                                <option>Kỳ ảo (Fantasy)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md min-w-[80px] flex justify-center items-center">
+                            <span class="btn-text">Tạo</span>
+                            <span class="loader hidden ml-2"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
             
              <!-- Script Result Column -->
             <div id="script-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
@@ -237,6 +300,24 @@
                              <button type="button" id="save-voice-to-voice-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào VO xanh</button>
                              <button type="button" data-target="script-result-voice-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
                              <button type="button" data-target="script-result-voice-content" data-title="voice_part" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segment Result Column -->
+            <div id="segment-result-container" class="hidden flex-grow bg-gray-800 p-6 rounded-lg max-w-2xl flex-shrink-0 flex flex-col">
+                <h2 class="text-2xl font-bold mb-4">Kết quả Phân đoạn</h2>
+                <div class="space-y-4 flex-grow flex flex-col">
+                    <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-center">
+                            <label for="segment-result-content" class="block text-sm font-medium text-gray-300">Nội dung chi tiết</label>
+                            <span id="segment-word-count" class="text-xs text-gray-400">0 từ</span>
+                        </div>
+                        <textarea id="segment-result-content" readonly class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md flex-grow"></textarea>
+                        <div class="flex justify-end space-x-2 pt-2">
+                             <button type="button" data-target="segment-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                             <button type="button" data-target="segment-result-content" data-title="segment_detail" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
                         </div>
                     </div>
                 </div>
@@ -425,7 +506,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             // --- UI Elements ---
             const createScriptBtn = document.getElementById('create-script-btn');
+            const createSegmentBtn = document.getElementById('create-segment-btn');
             const scriptFormContainer = document.getElementById('script-form-container');
+            const segmentFormContainer = document.getElementById('segment-form-container');
             const apiKeyBtn = document.getElementById('api-key-btn');
             const apiKeyContainer = document.getElementById('api-key-container');
             
@@ -441,6 +524,7 @@
             
             // Result Containers
             const scriptResultContainer = document.getElementById('script-result-container');
+            const segmentResultContainer = document.getElementById('segment-result-container');
             
             const scriptForm = document.getElementById('script-form');
             const scriptInputPrompt = document.getElementById('script-input-prompt');
@@ -457,6 +541,11 @@
             const scriptResultVoiceContent = document.getElementById('script-result-voice-content');
             const promptWordCount = document.getElementById('prompt-word-count');
             const voiceWordCount = document.getElementById('voice-word-count');
+
+            // Segment Elements
+            const segmentForm = document.getElementById('segment-form');
+            const segmentResultContent = document.getElementById('segment-result-content');
+            const segmentWordCount = document.getElementById('segment-word-count');
 
             // API Key Elements
             const apiKeyForm = document.getElementById('api-key-form');
@@ -520,6 +609,8 @@
             function hideAllContainers() {
                 scriptFormContainer.classList.add('hidden');
                 scriptResultContainer.classList.add('hidden');
+                segmentFormContainer.classList.add('hidden');
+                segmentResultContainer.classList.add('hidden');
             }
 
             function hideAllModals() {
@@ -669,6 +760,14 @@
                 populateAllInputDropdowns();
                 scriptDurationCustom.classList.add('hidden');
                 scriptFormContainer.classList.remove('hidden');
+            });
+
+            createSegmentBtn.addEventListener('click', () => {
+                hideAllContainers();
+                hideAllModals();
+                segmentForm.reset();
+                segmentResultContainer.classList.add('hidden');
+                segmentFormContainer.classList.remove('hidden');
             });
 
             scriptDuration.addEventListener('change', (e) => {
@@ -884,6 +983,8 @@
 
             scriptResultPromptContent.addEventListener('input', () => updateWordCount(scriptResultPromptContent, promptWordCount));
             scriptResultVoiceContent.addEventListener('input', () => updateWordCount(scriptResultVoiceContent, voiceWordCount));
+            segmentResultContent.addEventListener('input', () => updateWordCount(segmentResultContent, segmentWordCount));
+
 
             // --- Main Script Form Submission ---
             scriptForm.addEventListener('submit', async (e) => {
@@ -911,7 +1012,6 @@
                     return;
                 }
                 
-                // Keep the form container visible, but hide previous results
                 scriptResultContainer.classList.add('hidden');
                 
                 try {
@@ -987,6 +1087,57 @@
                 } catch (error) {
                     console.error('Lỗi trong quá trình tạo:', error);
                     alert(`Đã xảy ra lỗi nghiêm trọng: ${error.message}`);
+                }
+            });
+            
+            // --- Segment Form Submission ---
+             segmentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const inputPrompt = document.getElementById('segment-input-prompt').value;
+                const outputType = document.getElementById('segment-output-type').value;
+                const style = document.getElementById('segment-style').value;
+                const cameraAngle = document.getElementById('segment-camera-angle').value;
+                const setting = document.getElementById('segment-setting').value;
+        
+
+                if (!inputPrompt.trim()) {
+                    alert('Vui lòng nhập thông tin Prompts đầu vào.');
+                    return;
+                }
+                 apiKey = localStorage.getItem('apiKey') || '';
+                if (!apiKey) {
+                    alert('Vui lòng nhập API Key trong phần Cài đặt.');
+                    apiKeyBtn.click();
+                    return;
+                }
+
+                // Construct the AI prompt
+                let finalPrompt = `Bạn là một đạo diễn hình ảnh và chuyên gia viết prompt. Dựa trên thông tin dưới đây, hãy tạo ra nội dung chi tiết.
+                
+                **Prompt gốc:**
+                ---
+                ${inputPrompt}
+                ---
+
+                **Yêu cầu:**
+                - **Loại đầu ra:** ${outputType}
+                - **Phong cách:** ${style || 'Tự do sáng tạo'}
+                - **Góc máy:** ${cameraAngle || 'Tự do sáng tạo'}
+                - **Bối cảnh:** ${setting || 'Tự do sáng tạo'}
+                
+                Hãy viết một cách chi tiết và gợi hình. Nếu yêu cầu tạo prompt, hãy tạo các prompt phức tạp, giàu chi tiết phù hợp cho các mô hình AI tạo ảnh như Midjourney, Stable Diffusion.`;
+
+                try {
+                    segmentResultContent.value = "Đang xử lý...";
+                    segmentResultContainer.classList.remove('hidden'); // Show the result container
+                    const result = await generateAiContent(finalPrompt, submitButton);
+                    segmentResultContent.value = result;
+                    updateWordCount(segmentResultContent, segmentWordCount);
+                } catch (error) {
+                    segmentResultContent.value = `Lỗi: ${error.message}`;
+                    console.error('Lỗi khi tạo phân đoạn:', error);
                 }
             });
         });

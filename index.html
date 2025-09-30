@@ -122,6 +122,14 @@
                             <span class="text-sm font-bold">Se</span>
                             <span class="memory-count hidden"></span>
                         </button>
+                         <button data-type="scenes" title="Bộ nhớ Bối cảnh" class="memory-btn relative bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
+                            <span class="text-sm font-bold">BC</span>
+                            <span class="memory-count hidden"></span>
+                        </button>
+                         <button data-type="characters" title="Bộ nhớ Nhân vật" class="memory-btn relative bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
+                            <span class="text-sm font-bold">NV</span>
+                            <span class="memory-count hidden"></span>
+                        </button>
                         <button data-type="mainPrompts" title="Bộ nhớ Prompts" class="memory-btn relative bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12">
                             <span class="text-lg font-bold">P</span>
                             <span class="memory-count hidden"></span>
@@ -138,7 +146,7 @@
                     <div class="border-t border-gray-600 w-full pt-4 mt-2"></div>
                      <div class="flex flex-wrap gap-2">
                         <button id="api-key-btn" title="Cài đặt" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734 1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38-1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734-1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38-1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
                         </button>
                         <a href="/ancontents/thu-vien/" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" /></svg></a>
                         <a href="/ancontents/text-to-voice/" title="Tạo Voice (TTS)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></a>
@@ -219,6 +227,8 @@
             <!-- Result Window Wrappers -->
             <div id="script-window-wrapper" class="flex-1"></div>
             <div id="vo-window-wrapper" class="flex-1"></div>
+            <div id="characterPrompts-window-wrapper" class="flex-1"></div>
+            <div id="scenePrompts-window-wrapper" class="flex-1"></div>
         </main>
     </div>
     
@@ -335,6 +345,8 @@
             const mainWorkspace = document.getElementById('main-workspace');
             const scriptWindowWrapper = document.getElementById('script-window-wrapper');
             const voWindowWrapper = document.getElementById('vo-window-wrapper');
+            const characterPromptsWindowWrapper = document.getElementById('characterPrompts-window-wrapper');
+            const scenePromptsWindowWrapper = document.getElementById('scenePrompts-window-wrapper');
             const taskbar = document.getElementById('taskbar');
             const taskbarApps = document.getElementById('taskbar-apps');
 
@@ -390,6 +402,8 @@
                 // Saved Results
                 mainScripts: { title: 'Bộ nhớ Scripts', storageKey: 'memory_mainScripts' },
                 sections: { title: 'Bộ nhớ Sections', storageKey: 'memory_sections' },
+                scenes: { title: 'Bộ nhớ Bối cảnh', storageKey: 'memory_scenes' },
+                characters: { title: 'Bộ nhớ Nhân vật', storageKey: 'memory_characters' },
                 mainPrompts: { title: 'Bộ nhớ Prompts', storageKey: 'memory_mainPrompts' },
                 mainVoiceOvers: { title: 'Bộ nhớ Voice Off', storageKey: 'memory_mainVoiceOvers' },
                 trash: { title: 'Bộ nhớ Rác', storageKey: 'memory_trash' }
@@ -405,6 +419,8 @@
                 voiceOver: JSON.parse(localStorage.getItem(memoryConfig.voiceOver.storageKey)) || [],
                 mainScripts: JSON.parse(localStorage.getItem(memoryConfig.mainScripts.storageKey)) || [],
                 sections: JSON.parse(localStorage.getItem(memoryConfig.sections.storageKey)) || [],
+                scenes: JSON.parse(localStorage.getItem(memoryConfig.scenes.storageKey)) || [],
+                characters: JSON.parse(localStorage.getItem(memoryConfig.characters.storageKey)) || [],
                 mainPrompts: JSON.parse(localStorage.getItem(memoryConfig.mainPrompts.storageKey)) || [],
                 mainVoiceOvers: JSON.parse(localStorage.getItem(memoryConfig.mainVoiceOvers.storageKey)) || [],
                 trash: JSON.parse(localStorage.getItem(memoryConfig.trash.storageKey)) || [],
@@ -418,7 +434,9 @@
                 currentMemoryType: null,
                 windows: savedWindows || {
                     script: null,
-                    vo: null
+                    vo: null,
+                    characterPrompts: null,
+                    scenePrompts: null
                 }
             };
 
@@ -468,9 +486,25 @@
             }
             
             function formatScriptContent(content) {
-                if (typeof content === 'string') return content;
+                if (typeof content === 'string') {
+                    return content;
+                }
                 if (Array.isArray(content)) {
-                    return content.map(item => Object.entries(item).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n')).join('\n\n---\n\n');
+                    return content.map(item => {
+                        if (typeof item !== 'object' || item === null) {
+                            return String(item);
+                        }
+                        return Object.entries(item).map(([key, value]) => {
+                            const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                                const nestedLines = Object.entries(value)
+                                    .map(([nestedKey, nestedValue]) => `    - ${nestedKey}: ${nestedValue}`)
+                                    .join('\n');
+                                return `${formattedKey}:\n${nestedLines}`;
+                            }
+                            return `${formattedKey}: ${String(value)}`;
+                        }).join('\n');
+                    }).join('\n\n---\n\n');
                 }
                 if (typeof content === 'object' && content !== null) {
                     return JSON.stringify(content, null, 2);
@@ -480,8 +514,9 @@
 
             function saveUnsavedWindowsToTrash() {
                 let savedSomething = false;
-                Object.entries(state.windows).forEach(([type, win]) => {
-                    if (win && !win.saved) {
+                ['script', 'vo'].forEach(type => {
+                    const win = state.windows[type];
+                     if (win && !win.saved) {
                         const title = document.getElementById(`${type}-result-title`)?.value.trim();
                         const content = document.getElementById(`${type}-result-content`)?.value.trim();
                         if (title || content) {
@@ -523,17 +558,18 @@
             }
 
             function updateMemoryCounters() {
-                const typesToCount = ['mainScripts', 'sections', 'mainPrompts', 'mainVoiceOvers', 'trash'];
-                typesToCount.forEach(type => {
+                Object.keys(memoryConfig).forEach(type => {
                     const button = document.querySelector(`.memory-btn[data-type="${type}"]`);
                     if (button) {
                         const countEl = button.querySelector('.memory-count');
-                        const count = state[type]?.length || 0;
-                        if (count > 0) {
-                            countEl.textContent = count;
-                            countEl.classList.remove('hidden');
-                        } else {
-                            countEl.classList.add('hidden');
+                         if (countEl) {
+                            const count = state[type]?.length || 0;
+                            if (count > 0) {
+                                countEl.textContent = count;
+                                countEl.classList.remove('hidden');
+                            } else {
+                                countEl.classList.add('hidden');
+                            }
                         }
                     }
                 });
@@ -685,25 +721,35 @@
             
             // --- Main App Rendering ---
             function renderApp() {
-                // Render Script Window
                 if (state.windows.script) {
                     scriptWindowWrapper.innerHTML = createResultWindowHTML('script', state.windows.script);
                     scriptWindowWrapper.classList.toggle('hidden', state.windows.script.status === 'minimized');
                 } else {
                     scriptWindowWrapper.innerHTML = '';
-                    scriptWindowWrapper.classList.add('hidden');
                 }
 
-                // Render VO Window
                 if (state.windows.vo) {
                     voWindowWrapper.innerHTML = createResultWindowHTML('vo', state.windows.vo);
                     voWindowWrapper.classList.toggle('hidden', state.windows.vo.status === 'minimized');
                 } else {
                     voWindowWrapper.innerHTML = '';
-                    voWindowWrapper.classList.add('hidden');
+                }
+                
+                if (state.windows.characterPrompts) {
+                    characterPromptsWindowWrapper.innerHTML = createPromptListWindowHTML('characterPrompts', state.windows.characterPrompts);
+                     characterPromptsWindowWrapper.classList.toggle('hidden', state.windows.characterPrompts.status === 'minimized');
+                } else {
+                    characterPromptsWindowWrapper.innerHTML = '';
                 }
 
-                // Render Taskbar
+                if (state.windows.scenePrompts) {
+                    scenePromptsWindowWrapper.innerHTML = createPromptListWindowHTML('scenePrompts', state.windows.scenePrompts);
+                    scenePromptsWindowWrapper.classList.toggle('hidden', state.windows.scenePrompts.status === 'minimized');
+                } else {
+                    scenePromptsWindowWrapper.innerHTML = '';
+                }
+
+
                 taskbarApps.innerHTML = '';
                 Object.entries(state.windows).forEach(([type, win]) => {
                     if (win && win.status === 'minimized') {
@@ -960,45 +1006,36 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
 
                     const generatedContent = await generateAiContent(prompt, submitButton);
                     
-                    // Clean the AI response to extract only the JSON object
                     const jsonMatch = generatedContent.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) {
-                        throw new Error("Phản hồi từ AI không chứa đối tượng JSON hợp lệ.");
-                    }
-                    const cleanedContent = jsonMatch[0];
-                    const result = JSON.parse(cleanedContent);
+                    if (!jsonMatch) throw new Error("Phản hồi từ AI không chứa đối tượng JSON hợp lệ.");
                     
-                    let mainScriptContent = result.main_script || "AI không tạo được kịch bản chính.";
-                    let formattedMainScript = formatScriptContent(mainScriptContent);
-
-                    if (result.scene_prompts && Array.isArray(result.scene_prompts)) {
-                        let scenePromptsContent = "\n\n\n====================\nPROMPTS BỐI CẢNH\n====================\n\n";
-                        result.scene_prompts.forEach(p => {
-                            scenePromptsContent += `Bối cảnh: ${p.location || 'Không xác định'}\nPrompt: ${p.prompt || 'N/A'}\n\n---\n\n`;
-                        });
-                        formattedMainScript += scenePromptsContent;
-                    }
-
-                    if (result.character_prompts && Array.isArray(result.character_prompts)) {
-                        let charPromptsContent = "\n\n\n====================\nPROMPTS NHÂN VẬT\n====================\n\n";
-                        result.character_prompts.forEach(p => {
-                            charPromptsContent += `Nhân vật: ${p.name || 'Không xác định'}\nPrompt: ${p.prompt || 'N/A'}\n\n---\n\n`;
-                        });
-                        formattedMainScript += charPromptsContent;
-                    }
-
+                    const result = JSON.parse(jsonMatch[0]);
+                    
                     state.windows.script = {
                         title: newTitle,
-                        content: formattedMainScript,
-                        status: 'open',
-                        saved: false
+                        content: formatScriptContent(result.main_script || "AI không tạo được kịch bản chính."),
+                        status: 'open', saved: false
                     };
                     state.windows.vo = {
                         title: `VO cho: ${newTitle}`,
                         content: formatScriptContent(result.voice_over_script || "AI không tạo được phần VO riêng biệt."),
-                        status: 'open',
-                        saved: false
+                        status: 'open', saved: false
                     };
+
+                    if (generateScenePrompts && result.scene_prompts) {
+                         state.windows.scenePrompts = {
+                            title: 'Prompts Bối cảnh',
+                            items: result.scene_prompts,
+                            status: 'open'
+                        };
+                    }
+                     if (generateCharPrompts && result.character_prompts) {
+                         state.windows.characterPrompts = {
+                            title: 'Prompts Nhân vật',
+                            items: result.character_prompts,
+                            status: 'open'
+                        };
+                    }
                     
                     renderApp();
 
@@ -1053,6 +1090,45 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 </div>
                 `;
             }
+
+            function createPromptListWindowHTML(type, windowData) {
+                const { title, items } = windowData;
+                const memoryType = type === 'characterPrompts' ? 'characters' : 'scenes';
+                const nameLabel = type === 'characterPrompts' ? 'Nhân vật' : 'Bối cảnh';
+
+                let itemsHTML = items && items.length > 0
+                    ? items.map((item, index) => {
+                        const name = item.name || item.location || 'Không xác định';
+                        const prompt = item.prompt || 'N/A';
+                        return `
+                        <div class="bg-gray-900 p-3 rounded-lg border border-gray-700">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-semibold text-teal-400">${nameLabel}: ${name}</h4>
+                                <div class="flex space-x-2">
+                                    <button data-prompt-content="${prompt.replace(/"/g, '&quot;')}" class="copy-prompt-item-btn bg-green-600 hover:bg-green-700 text-white font-bold p-1 rounded text-xs">Copy</button>
+                                    <button data-type="${memoryType}" data-name="${name.replace(/"/g, '&quot;')}" data-prompt-content="${prompt.replace(/"/g, '&quot;')}" class="save-prompt-item-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-1 rounded text-xs">Lưu</button>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-300 bg-gray-800 p-2 rounded">${prompt}</p>
+                        </div>
+                    `}).join('')
+                    : '<p class="text-gray-400 text-center">Không có prompt nào được tạo.</p>';
+
+                return `
+                <div class="bg-gray-800 rounded-lg flex flex-col h-full shadow-2xl">
+                    <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-t-lg select-none">
+                        <span class="font-bold truncate px-2">${title}</span>
+                        <div class="flex space-x-2">
+                            <button data-window-type="${type}" class="minimize-btn h-6 w-6 flex items-center justify-center bg-yellow-500 hover:bg-yellow-400 rounded-full text-black font-bold text-lg leading-none pb-1">-</button>
+                            <button data-window-type="${type}" class="close-btn h-6 w-6 flex items-center justify-center bg-red-500 hover:bg-red-400 rounded-full text-white font-bold text-lg leading-none pb-1">×</button>
+                        </div>
+                    </div>
+                    <div class="p-4 flex-grow overflow-y-auto space-y-3">
+                       ${itemsHTML}
+                    </div>
+                </div>
+                `;
+            }
             
             // Centralized event listener for the whole app
             document.body.addEventListener('click', e => {
@@ -1062,7 +1138,7 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 const memoryBtn = targetElement.closest('.memory-btn');
 
                 if (button) {
-                    const { target, title, type, windowType } = button.dataset;
+                    const { target, title, type, windowType, promptContent, name } = button.dataset;
 
                     if(button.id === 'api-key-btn'){
                         saveUnsavedWindowsToTrash();
@@ -1074,6 +1150,11 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     }
                      if (button.id === 'create-script-btn') {
                         saveUnsavedWindowsToTrash();
+                        // Also clear the prompt windows
+                        state.windows.characterPrompts = null;
+                        state.windows.scenePrompts = null;
+                        renderApp();
+                        
                         scriptForm.reset();
                         populateAllInputDropdowns();
                         scriptDurationCustom.classList.add('hidden');
@@ -1088,20 +1169,22 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                         }
                     } else if (button.classList.contains('close-btn')) {
                         if (state.windows[windowType]) {
-                            const win = state.windows[windowType];
-                            if (!win.saved) {
-                                const title = document.getElementById(`${windowType}-result-title`)?.value.trim();
-                                const content = document.getElementById(`${windowType}-result-content`)?.value.trim();
-                                if (title || content) {
-                                    const now = new Date();
-                                    state.trash.push({
-                                        id: now.getTime() + (windowType === 'vo' ? 1 : 0),
-                                        title: `Tự động lưu (Đóng cửa sổ): ${title || 'Chưa có tiêu đề'}`,
-                                        content: content,
-                                        savedAt: now.toLocaleString('vi-VN')
-                                    });
-                                    saveDataToStorage('trash');
-                                    showToast('Nội dung chưa lưu đã được chuyển vào Rác.');
+                            // Don't save prompt list windows to trash
+                             if (windowType === 'script' || windowType === 'vo') {
+                                const win = state.windows[windowType];
+                                if (!win.saved) {
+                                    const titleText = document.getElementById(`${windowType}-result-title`)?.value.trim();
+                                    const content = document.getElementById(`${windowType}-result-content`)?.value.trim();
+                                    if (titleText || content) {
+                                        state.trash.push({
+                                            id: Date.now() + (windowType === 'vo' ? 1 : 0),
+                                            title: `Tự động lưu (Đóng cửa sổ): ${titleText || 'Chưa có tiêu đề'}`,
+                                            content: content,
+                                            savedAt: new Date().toLocaleString('vi-VN')
+                                        });
+                                        saveDataToStorage('trash');
+                                        showToast('Nội dung chưa lưu đã được chuyển vào Rác.');
+                                    }
                                 }
                             }
                             state.windows[windowType] = null;
@@ -1116,7 +1199,19 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                         const content = document.getElementById(target)?.value;
                         if (!content) return showToast('Không có nội dung để sao chép.', 'info');
                         navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép vào clipboard!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
-                    } else if (button.classList.contains('export-btn')) {
+                    } else if (button.classList.contains('copy-prompt-item-btn')) {
+                        if (!promptContent) return showToast('Không có nội dung để sao chép.', 'info');
+                        navigator.clipboard.writeText(promptContent).then(() => showToast('Đã sao chép prompt!', 'success'));
+                    } else if (button.classList.contains('save-prompt-item-btn')) {
+                        if (!name || !promptContent) return showToast('Thiếu dữ liệu để lưu.', 'error');
+                        state[type].push({ id: Date.now(), title: name, content: promptContent });
+                        saveDataToStorage(type);
+                        showToast(`Đã lưu "${name}" vào ${memoryConfig[type].title}!`, 'success');
+                        button.textContent = 'Đã lưu';
+                        button.disabled = true;
+                        button.classList.replace('bg-blue-600', 'bg-gray-500');
+                    }
+                    else if (button.classList.contains('export-btn')) {
                         const content = document.getElementById(target)?.value;
                         const titleText = document.getElementById(`${title}-result-title`)?.value;
                         if (!content) return showToast('Không có nội dung để xuất.', 'info');
@@ -1147,24 +1242,18 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     e.preventDefault();
                     saveUnsavedWindowsToTrash();
 
-                    // Clear potential transfer keys first to avoid accidental data carry-over
                     localStorage.removeItem('scriptToProcess');
                     localStorage.removeItem('promptStudioInput');
                     localStorage.removeItem('textToVoice');
 
-                    // Only set item if it's a dynamic link from within a result window
                     if (navLink.classList.contains('nav-link-dynamic')) {
                         if (navLink.href.includes('S2Se')) {
                             const content = document.getElementById('script-result-content')?.value;
-                            if (content) {
-                                localStorage.setItem('scriptToProcess', content);
-                            }
+                            if (content) localStorage.setItem('scriptToProcess', content);
                         }
-                        if (navLink.href.includes('Prompts-Studio')) {
+                        if (navLink.href.includes('Prompts-Studio')) { // Note: This might be the TTS link
                             const content = document.getElementById('vo-result-content')?.value;
-                            if (content) {
-                                localStorage.setItem('promptStudioInput', content);
-                            }
+                            if (content) localStorage.setItem('textToVoice', content);
                         }
                     }
                     
@@ -1172,7 +1261,6 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 }
             });
             
-            // Listen for changes in result textareas to update saved state
             document.body.addEventListener('input', e => {
                 const targetId = e.target.id;
                 if (targetId === 'script-result-content' || targetId === 'script-result-title') {
@@ -1193,15 +1281,13 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 }
             });
             
-
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             populateAllInputDropdowns();
-            renderApp(); // Initial render
+            renderApp(); 
             updateMemoryCounters();
         });
     </script>
 </body>
 </html>
-
 

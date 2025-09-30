@@ -134,7 +134,10 @@
             
             <div id="sections-result-container" class="flex-1 bg-gray-800 rounded-lg flex flex-col min-h-0 hidden p-6">
                 <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                    <h2 class="text-xl font-bold">Các Section được tạo</h2>
+                    <div class="flex items-center space-x-4">
+                        <h2 class="text-xl font-bold">Các Section được tạo</h2>
+                        <button id="save-all-sections-btn" title="Lưu tất cả vào bộ nhớ Se" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-md text-sm hidden">Lưu tất cả</button>
+                    </div>
                     <button id="close-results-btn" title="Đóng" class="text-gray-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -164,6 +167,7 @@
             const sectionsList = document.getElementById('sections-list');
             const s2seForm = document.getElementById('s2se-form');
             const closeResultsBtn = document.getElementById('close-results-btn');
+            const saveAllSectionsBtn = document.getElementById('save-all-sections-btn');
 
             // --- Modal Elements ---
             const apiKeyBtn = document.getElementById('api-key-btn');
@@ -212,8 +216,11 @@
                 sectionsList.innerHTML = '';
                 if (!Array.isArray(sectionsArray) || sectionsArray.length === 0) {
                     sectionsList.innerHTML = `<p class="text-gray-400">Không có section nào được tạo.</p>`;
+                    saveAllSectionsBtn.classList.add('hidden'); // Hide button if no sections
                     return;
                 }
+                
+                saveAllSectionsBtn.classList.remove('hidden'); // Show button if there are sections
 
                 sectionsArray.forEach((sectionObj, index) => {
                     const sectionEl = document.createElement('div');
@@ -375,6 +382,38 @@
                 saveS2SeState([], false); // Save closed state
             });
 
+            saveAllSectionsBtn.addEventListener('click', () => {
+                const savedStateJSON = localStorage.getItem('s2se_result_state');
+                if (!savedStateJSON) {
+                    showToast('Không có section nào để lưu.', 'error');
+                    return;
+                }
+
+                const savedState = JSON.parse(savedStateJSON);
+                const sectionsToSave = savedState.sections;
+
+                if (!sectionsToSave || sectionsToSave.length === 0) {
+                    showToast('Không có section nào để lưu.', 'error');
+                    return;
+                }
+
+                const existingSections = state.sections;
+                
+                const newSections = sectionsToSave.map((section, index) => {
+                    return {
+                        id: Date.now() + index,
+                        title: `Section ${existingSections.length + index + 1}`, 
+                        content: section.vi 
+                    };
+                });
+                
+                const updatedSections = [...existingSections, ...newSections];
+                state.sections = updatedSections; 
+                localStorage.setItem('memory_sections', JSON.stringify(updatedSections));
+                
+                showToast(`Đã lưu ${newSections.length} sections vào bộ nhớ Se!`, 'success');
+            });
+
             sectionsList.addEventListener('click', (e) => {
                 const copyBtn = e.target.closest('.copy-section-btn');
                 const studioLink = e.target.closest('.to-prompt-studio-btn');
@@ -388,7 +427,6 @@
 
                 if (studioLink) {
                     e.preventDefault();
-                    // Send the Vietnamese content by default
                     const sectionContent = studioLink.closest('.bg-gray-900').querySelectorAll('textarea')[0].value;
                     localStorage.setItem('promptStudioInput', sectionContent);
                     window.location.href = studioLink.href;
@@ -417,7 +455,7 @@
                 
                 sectionsResultContainer.classList.remove('hidden');
                 sectionsList.innerHTML = `<div class="flex justify-center items-center h-full"><div class="loader"></div></div>`;
-                saveS2SeState([], true); // Save visible state, but content is loading
+                saveS2SeState([], true); 
 
                 try {
                      const prompt = `Bạn là một biên tập viên kịch bản song ngữ chuyên nghiệp. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections). Với mỗi section, bạn phải cung cấp cả phiên bản tiếng Việt và phiên bản dịch sang tiếng Anh.
@@ -443,7 +481,7 @@
                     console.error('Lỗi trong quá trình tạo sections:', error);
                     showToast(`Lỗi: ${error.message}`, 'error');
                     sectionsList.innerHTML = `<p class="text-red-400">Đã xảy ra lỗi: ${error.message}</p>`;
-                    saveS2SeState([], true); // Still visible, but show error
+                    saveS2SeState([], true); 
                 }
             });
             
@@ -457,7 +495,4 @@
     </script>
 </body>
 </html>
-
-
-
 

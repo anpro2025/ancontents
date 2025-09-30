@@ -116,7 +116,7 @@
                 <div class="space-y-4">
                     <a href="https://anproduction2025.github.io/ancontents" class="btn-info text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">P2S</a>
                     <a href="https://anproduction2025.github.io/ancontents/S2Se" class="btn-primary text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">S2Se</a>
-                    <a href="https://anproduction2025.github.io/ancontents/prompts_studio.html" class="btn-secondary text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">Prompt Studio</a>
+                    <a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" class="btn-secondary text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">Prompt Studio</a>
                 </div>
             </div>
         </aside>
@@ -244,7 +244,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Random theme logic...
+            // Theme logic...
             const themes = [
                 { // Default Dark
                     '--bg-main': '#111827', '--bg-panel': '#1f2937', '--bg-input': '#374151', '--bg-item-hover': '#374151',
@@ -284,14 +284,13 @@
                 }
             ];
 
-            function applyRandomTheme() {
-                const randomIndex = Math.floor(Math.random() * themes.length);
-                const theme = themes[randomIndex];
+            function applyDefaultTheme() {
+                const theme = themes[0]; // Always use the first theme (Default Dark)
                 for (const [key, value] of Object.entries(theme)) {
                     document.documentElement.style.setProperty(key, value);
                 }
             }
-            applyRandomTheme();
+            applyDefaultTheme();
             
             // ... The rest of the script from the previous turn ...
             const generateBtn = document.getElementById('generate-btn');
@@ -473,3 +472,6 @@
     </script>
 </body>
 </html>
+
+
+

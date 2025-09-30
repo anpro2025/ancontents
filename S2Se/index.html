@@ -227,6 +227,37 @@
                 if(loader) loader.classList.toggle('hidden', !isLoading);
             }
             
+            function formatScriptContent(content) {
+                if (typeof content === 'string') {
+                    return content;
+                }
+                if (Array.isArray(content)) {
+                    return content.map(item => {
+                        if (typeof item !== 'object' || item === null) {
+                            return String(item);
+                        }
+                        return Object.entries(item).map(([key, value]) => {
+                            const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                                const nestedLines = Object.entries(value)
+                                    .map(([nestedKey, nestedValue]) => `    - ${nestedKey}: ${nestedValue}`)
+                                    .join('\n');
+                                return `${formattedKey}:\n${nestedLines}`;
+                            }
+                            return `${formattedKey}: ${String(value)}`;
+                        }).join('\n');
+                    }).join('\n\n---\n\n');
+                }
+                if (typeof content === 'object' && content !== null) {
+                    return Object.entries(content).map(([key, value]) => {
+                         const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                         return `${formattedKey}: ${String(value)}`;
+                    }).join('\n');
+                }
+                return String(content);
+            }
+
+
             async function generateAiContent(prompt, submitButton) {
                 setButtonLoading(submitButton, true);
                 if (!state.settings.apiKey) throw new Error('Vui lòng nhập API Key trong Cài đặt.');
@@ -266,7 +297,7 @@
                     const button = document.querySelector(`.memory-btn[data-type="${type}"]`);
                     if (button) {
                         const countEl = button.querySelector('.memory-count');
-                        if (countEl) { // FIX: Check if countEl exists
+                        if (countEl) {
                             const count = state[type]?.length || 0;
                             if (count > 0) {
                                 countEl.textContent = count;
@@ -342,7 +373,34 @@
                 sectionsArray.forEach((sectionObj, index) => {
                     const sectionEl = document.createElement('div');
                     sectionEl.className = 'bg-gray-900 rounded-lg p-4 border border-gray-700';
-                    sectionEl.innerHTML = `<div class="flex justify-between items-center mb-2"><h3 class="font-bold text-teal-400">SECTION ${index + 1}</h3><div class="flex space-x-2"><a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" data-section-content="${sectionObj.vi || ''}" class="to-prompt-studio-btn bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-2 rounded-md text-xs">Sang Prompt Studio</a></div></div><div class="space-y-3"><div><div class="flex justify-between items-center mb-1"><label class="text-xs font-semibold text-gray-400">TIẾNG VIỆT</label><button data-content="${sectionObj.vi || ''}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button></div><textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionObj.vi || 'N/A'}</textarea></div><div><div class="flex justify-between items-center mb-1"><label class="text-xs font-semibold text-gray-400">TIẾNG ANH</label><button data-content="${sectionObj.en || ''}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button></div><textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionObj.en || 'N/A'}</textarea></div></div>`;
+
+                    const sectionTextVi = formatScriptContent(sectionObj.vi || 'N/A');
+                    const sectionTextEn = formatScriptContent(sectionObj.en || 'N/A');
+                    const encodedSectionTextVi = sectionTextVi.replace(/"/g, '&quot;');
+
+                    sectionEl.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-teal-400">SECTION ${index + 1}</h3>
+                            <div class="flex space-x-2">
+                                <a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" data-section-content="${encodedSectionTextVi}" class="to-prompt-studio-btn bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-2 rounded-md text-xs">Sang Prompt Studio</a>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-semibold text-gray-400">TIẾNG VIỆT</label>
+                                    <button data-content="${encodedSectionTextVi}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
+                                </div>
+                                <textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionTextVi}</textarea>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-semibold text-gray-400">TIẾNG ANH</label>
+                                    <button data-content="${sectionTextEn.replace(/"/g, '&quot;')}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
+                                </div>
+                                <textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionTextEn}</textarea>
+                            </div>
+                        </div>`;
                     sectionsList.appendChild(sectionEl);
                 });
             }
@@ -491,7 +549,7 @@
                     const newItem = {
                         id: Date.now() + index,
                         title: `Section ${index + 1} - Từ kịch bản`,
-                        content: section.vi || ''
+                        content: formatScriptContent(section.vi || '')
                     };
                     state.sections.push(newItem);
                 });

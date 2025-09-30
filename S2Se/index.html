@@ -170,7 +170,7 @@
                 itemToDelete: null,
                 currentMemoryType: null,
             };
-            window.ANP_STATE = state; // Make state globally accessible for simplicity in this context
+            window.ANP_STATE = state;
 
             // --- UI Elements ---
             const sourceScriptContent = document.getElementById('source-script-content');
@@ -223,7 +223,7 @@
                 const btnText = button.querySelector('.btn-text');
                 const loader = button.querySelector('.loader');
                 button.disabled = isLoading;
-                if(btnText) btnText.style.display = isLoading ? 'none' : 'inline';
+                if(btnText) btnText.style.display = isLoading ? 'none' : 'inline-block';
                 if(loader) loader.classList.toggle('hidden', !isLoading);
             }
             
@@ -266,12 +266,14 @@
                     const button = document.querySelector(`.memory-btn[data-type="${type}"]`);
                     if (button) {
                         const countEl = button.querySelector('.memory-count');
-                        const count = state[type]?.length || 0;
-                        if (count > 0) {
-                            countEl.textContent = count;
-                            countEl.classList.remove('hidden');
-                        } else {
-                            countEl.classList.add('hidden');
+                        if (countEl) { // FIX: Check if countEl exists
+                            const count = state[type]?.length || 0;
+                            if (count > 0) {
+                                countEl.textContent = count;
+                                countEl.classList.remove('hidden');
+                            } else {
+                                countEl.classList.add('hidden');
+                            }
                         }
                     }
                 });
@@ -389,6 +391,33 @@
                 }
             });
             
+            memoryNewItemBtn.addEventListener('click', () => {
+                memoryEditorPanel.classList.remove('hidden');
+                memoryModalForm.reset();
+                memoryModalIdInput.value = '';
+            });
+            
+            memoryModalForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const type = state.currentMemoryType;
+                const id = memoryModalIdInput.value;
+                const title = memoryModalTitleInput.value.trim();
+                const content = memoryModalContentInput.value.trim();
+                if (!title || !content) return showToast('Tiêu đề và nội dung không được trống.', 'error');
+                if (id) {
+                    const index = state[type].findIndex(i => i.id == id);
+                    if (index > -1) state[type][index] = { ...state[type][index], title, content };
+                } else {
+                    const newItem = { id: Date.now(), title, content };
+                    state[type].push(newItem);
+                }
+                saveDataToStorage(type);
+                renderMemoryList();
+                memoryEditorPanel.classList.add('hidden');
+                showToast('Đã lưu!', 'success');
+            });
+
+
             confirmDeleteBtn.addEventListener('click', () => {
                 if (!state.itemToDelete) return;
                 const { id, type, isPurge, isDeleteAll } = state.itemToDelete;

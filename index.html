@@ -191,6 +191,21 @@
                             <label for="word-limit" class="block text-sm font-medium text-gray-300">Giới hạn số từ (Tùy chọn)</label>
                             <input type="number" id="word-limit" placeholder="Ví dụ: 500" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500">
                         </div>
+                        <!-- New Toggles -->
+                        <div class="flex items-center justify-between pt-2">
+                            <label for="character-prompt-toggle" class="text-sm font-medium text-gray-300">Tạo Prompt Nhân vật</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="character-prompt-toggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="scene-prompt-toggle" class="text-sm font-medium text-gray-300">Tạo Prompt Bối cảnh</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="scene-prompt-toggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
                     </div>
                     <div class="flex justify-end space-x-4 pt-4">
                         <button type="button" class="cancel-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md">Đóng</button>
@@ -897,13 +912,27 @@
                     const referenceScript = state.script.find(s => s.id == selectedScriptId);
                     const referenceVo = state.voiceOver.find(v => v.id == selectedVoId);
 
+                    const generateCharPrompts = document.getElementById('character-prompt-toggle').checked;
+                    const generateScenePrompts = document.getElementById('scene-prompt-toggle').checked;
+
                     let prompt;
                     let newTitle;
 
-                    if (hasCreativeInput) {
-                        prompt = `Bạn là một biên kịch chuyên nghiệp.
+                    let basePrompt = `Bạn là một biên kịch chuyên nghiệp.
 Nhiệm vụ: Viết một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt dựa trên các thông tin được cung cấp.
-Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
+Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa chính: "main_script" và "voice_over_script".`;
+
+                    if (generateCharPrompts) {
+                        basePrompt += `\nThêm một khóa "character_prompts" vào JSON. Giá trị của nó là một mảng các đối tượng, mỗi đối tượng chứa "name" (tên nhân vật) và "prompt" (một prompt mô tả chi tiết ngoại hình, trang phục, biểu cảm của nhân vật đó để tạo ảnh AI).`;
+                    }
+
+                    if (generateScenePrompts) {
+                        basePrompt += `\nThêm một khóa "scene_prompts" vào JSON. Giá trị của nó là một mảng các đối tượng, mỗi đối tượng chứa "location" (tên bối cảnh) và "prompt" (một prompt mô tả chi tiết bối cảnh đó, không có nhân vật, để tạo ảnh AI).`;
+                    }
+
+
+                    if (hasCreativeInput) {
+                        prompt = `${basePrompt}
 
 Sử dụng các thông tin sau:
 ${ideaValue ? `- Ý tưởng/Yêu cầu chính: ${ideaValue}\n` : ''}
@@ -916,9 +945,9 @@ ${wordLimit ? `- Giới hạn tổng số từ khoảng: ${wordLimit} từ` : ''
 Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
                         newTitle = `Kịch bản cho: ${(ideaValue || referenceScript?.title || 'dữ liệu vào').substring(0, 30)}...`;
                     } else {
-                        prompt = `Bạn là một biên kịch chuyên nghiệp.
+                        prompt = `${basePrompt}
+
 Nhiệm vụ: Hãy sáng tạo ngẫu nhiên một kịch bản phim và một kịch bản lồng tiếng (voice-over) riêng biệt.
-Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ, không có văn bản nào khác. Đối tượng JSON phải có hai khóa: "main_script" và "voice_over_script".
 
 Yêu cầu về kịch bản:
 ${styleValue ? `- Phong cách: ${styleValue}\n` : '- Phong cách: Hãy tự do sáng tạo một phong cách thú vị.\n'}
@@ -939,9 +968,28 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     const cleanedContent = jsonMatch[0];
                     const result = JSON.parse(cleanedContent);
                     
+                    let mainScriptContent = result.main_script || "AI không tạo được kịch bản chính.";
+                    let formattedMainScript = formatScriptContent(mainScriptContent);
+
+                    if (result.scene_prompts && Array.isArray(result.scene_prompts)) {
+                        let scenePromptsContent = "\n\n\n====================\nPROMPTS BỐI CẢNH\n====================\n\n";
+                        result.scene_prompts.forEach(p => {
+                            scenePromptsContent += `Bối cảnh: ${p.location || 'Không xác định'}\nPrompt: ${p.prompt || 'N/A'}\n\n---\n\n`;
+                        });
+                        formattedMainScript += scenePromptsContent;
+                    }
+
+                    if (result.character_prompts && Array.isArray(result.character_prompts)) {
+                        let charPromptsContent = "\n\n\n====================\nPROMPTS NHÂN VẬT\n====================\n\n";
+                        result.character_prompts.forEach(p => {
+                            charPromptsContent += `Nhân vật: ${p.name || 'Không xác định'}\nPrompt: ${p.prompt || 'N/A'}\n\n---\n\n`;
+                        });
+                        formattedMainScript += charPromptsContent;
+                    }
+
                     state.windows.script = {
                         title: newTitle,
-                        content: formatScriptContent(result.main_script || "AI không tạo được kịch bản chính."),
+                        content: formattedMainScript,
                         status: 'open',
                         saved: false
                     };
@@ -1155,4 +1203,5 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
+
 

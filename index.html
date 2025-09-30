@@ -1098,14 +1098,28 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 if (navLink) {
                     e.preventDefault();
                     saveUnsavedWindowsToTrash();
-                    if (navLink.href.includes('S2Se')) {
-                        const content = document.getElementById('script-result-content')?.value;
-                        localStorage.setItem('scriptToProcess', content || '');
+
+                    // Clear potential transfer keys first to avoid accidental data carry-over
+                    localStorage.removeItem('scriptToProcess');
+                    localStorage.removeItem('promptStudioInput');
+                    localStorage.removeItem('textToVoice');
+
+                    // Only set item if it's a dynamic link from within a result window
+                    if (navLink.classList.contains('nav-link-dynamic')) {
+                        if (navLink.href.includes('S2Se')) {
+                            const content = document.getElementById('script-result-content')?.value;
+                            if (content) {
+                                localStorage.setItem('scriptToProcess', content);
+                            }
+                        }
+                        if (navLink.href.includes('Prompts-Studio')) {
+                            const content = document.getElementById('vo-result-content')?.value;
+                            if (content) {
+                                localStorage.setItem('promptStudioInput', content);
+                            }
+                        }
                     }
-                    if (navLink.href.includes('text-to-voice')) {
-                        const content = document.getElementById('vo-result-content')?.value;
-                        localStorage.setItem('textToVoice', content || '');
-                    }
+                    
                     window.location.href = navLink.href;
                 }
             });
@@ -1141,3 +1155,4 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
+

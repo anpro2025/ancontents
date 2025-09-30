@@ -68,7 +68,9 @@
     <div class="flex space-x-8 flex-grow p-8 overflow-hidden">
         <aside id="sidebar" class="w-56 flex-shrink-0">
             <div class="flex flex-col space-y-4">
-                 <a href="/ancontents/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">Trang chủ P2S</a>
+                <a href="/ancontents/" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">P2S</a>
+                <a href="/ancontents/S2Se/" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">S2Se</a>
+                <a href="/ancontents/Prompts-Studio/" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">Prompt Studio</a>
                 <div class="border-t border-gray-600 pt-4"></div>
                 <div class="flex flex-col space-y-2 items-start">
                     <div class="flex flex-wrap gap-2">
@@ -255,6 +257,7 @@
             const sectionsResultContent = document.getElementById('sections-result-content');
             const s2seForm = document.getElementById('s2se-form');
             const closeResultsBtn = document.getElementById('close-results-btn');
+            const generatePromptsBtn = document.getElementById('generate-prompts-btn');
 
             // --- Settings Modal Elements ---
             const apiKeyBtn = document.getElementById('api-key-btn');
@@ -747,6 +750,20 @@
                 sectionsResultContainer.classList.add('hidden');
             });
 
+            generatePromptsBtn.addEventListener('click', () => {
+                const sectionsContent = sectionsResultContent.value.trim();
+                if (!sectionsContent) {
+                    showToast('Không có nội dung Sections để tạo Prompts.', 'error');
+                    return;
+                }
+                
+                // Save the content to localStorage to be picked up by the other page
+                localStorage.setItem('promptStudioInput', sectionsContent);
+                
+                // Redirect to the Prompt Studio page
+                window.location.href = '/ancontents/Prompts-Studio/';
+            });
+
             s2seForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitButton = e.target.querySelector('button[type="submit"]');
@@ -839,4 +856,5 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
+
 

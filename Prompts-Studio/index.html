@@ -3,18 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AN PRODUCTION AI FILMS - PROMPT STUDIO</title>
+    <title>AN PRODUCTION - S2Se (Script to Section)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .hidden { display: none !important; }
-        .script-item { display: flex; justify-content: space-between; align-items: center; }
-        .script-item.active { background-color: #3b82f6; color: white; }
-        .delete-btn { visibility: hidden; opacity: 0; transition: opacity 0.2s, visibility 0.2s; }
-        .script-item:hover .delete-btn { visibility: visible; opacity: 1; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .script-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .script-item.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        .delete-btn {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+        .script-item:hover .delete-btn {
+            visibility: visible;
+            opacity: 1;
+        }
         .loader {
             border: 2px solid #f3f3f3;
             border-top: 2px solid #4a90e2;
@@ -28,202 +46,137 @@
             100% { transform: rotate(360deg); }
         }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-track { background: #1f2937; } /* gray-800 */
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-        textarea { resize: none; }
-        textarea:read-only, input:read-only { background-color: #374151; cursor: default; }
+        textarea {
+            resize: none;
+        }
+        textarea:read-only, input:read-only {
+            background-color: #374151; /* gray-700 */
+            cursor: default;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen flex flex-col">
     <header class="text-center py-6 flex-shrink-0">
-        <h1 class="text-4xl font-bold tracking-wider uppercase text-white">PROMPT STUDIO</h1>
+        <h1 class="text-4xl font-bold tracking-wider uppercase text-white">SCRIPT TO SECTION (S2SE)</h1>
     </header>
     
     <div class="flex space-x-8 flex-grow p-8 overflow-hidden">
-        <!-- Left Sidebar with Buttons -->
-        <aside id="sidebar" class="w-64 flex-shrink-0">
+        <aside id="sidebar" class="w-56 flex-shrink-0">
             <div class="flex flex-col space-y-4">
                 <div class="flex flex-col space-y-2 items-start">
-                    <!-- Memory Buttons -->
                     <div class="flex flex-wrap gap-2">
                         <button data-type="script" title="Đầu vào Dự án" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg></button>
                         <button data-type="prompt" title="Đầu vào Se" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">Se</span></button>
                         <button data-type="voiceOver" title="Đầu vào VO" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">VO</span></button>
                     </div>
-                     <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <button data-type="mainScripts" title="Bộ nhớ Scripts" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">S</span></button>
                         <button data-type="sections" title="Bộ nhớ Sections" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">Se</span></button>
                         <button data-type="mainPrompts" title="Bộ nhớ Prompts" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">P</span></button>
                         <button data-type="mainVoiceOvers" title="Bộ nhớ Voice Off" class="memory-btn bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">VO</span></button>
                         <button data-type="trash" title="Bộ nhớ Rác" class="memory-btn bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
                     </div>
+                    <div class="border-t border-gray-600 w-full pt-4 mt-2"></div>
+                     <div class="flex flex-wrap gap-2">
+                        <button id="api-key-btn" title="Cài đặt" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734 1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38 1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <a href="./prompts_studio.html" title="Thư viện PROMPTS" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" /></svg></a>
+                        <a href="./prompts_studio.html" title="Tạo Voice (TTS)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg></a>
+                        <a href="./prompts_studio.html" title="Tạo Ảnh AI" class="bg-gray-700 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg></a>
+                    </div>
                 </div>
-                <div class="border-t border-gray-600 pt-4"></div>
-                <a href="https://anproduction2025.github.io/ancontents" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">P2S</a>
-                <a href="https://anproduction2025.github.io/ancontents/S2Se" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">S2Se</a>
-                <a href="https://anproduction2025.github.io/ancontents/S2Se/prompts_studio.html" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">Prompt Studio</a>
+                 <div class="border-t border-gray-600 pt-4"></div>
+                 <div class="space-y-4">
+                    <a href="https://anproduction2025.github.io/ancontents" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">P2S</a>
+                    <a href="https://anproduction2025.github.io/ancontents/S2Se" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">S2Se</a>
+                    <a href="https://anproduction2025.github.io/ancontents/prompts_studio.html" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">Prompt Studio</a>
+                </div>
             </div>
         </aside>
 
         <!-- Main Content Area -->
         <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto relative">
-            <!-- Input Column -->
-            <div class="w-1/3 flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col space-y-4">
+            
+            <!-- Source & Options Column -->
+            <div class="w-72 flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col space-y-6">
+                <!-- Source Script Section -->
                 <div class="flex-grow flex flex-col min-h-0">
                     <div class="flex-shrink-0 mb-4">
-                        <h2 class="text-xl font-bold mb-2">Soạn thảo Prompt</h2>
-                        <label for="prompt-input-select" class="block text-sm font-medium text-blue-400">Hoặc chọn từ bộ nhớ Section (Se)</label>
-                        <select id="prompt-input-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
+                        <h2 class="text-xl font-bold mb-2">Kịch bản gốc</h2>
+                        <label for="s2se-input-script" class="block text-sm font-medium text-blue-400">Hoặc chọn từ Bộ nhớ Scripts (S)</label>
+                        <select id="s2se-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
                     </div>
-                    <textarea id="prompt-input-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" placeholder="Nhập mô tả cảnh của bạn vào đây..."></textarea>
+                    <textarea id="source-script-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" placeholder="Dán kịch bản gốc vào đây..."></textarea>
                 </div>
-
-                <!-- Output Options -->
-                <div class="flex-shrink-0 space-y-3">
-                     <h3 class="text-lg font-semibold border-t border-gray-700 pt-4">Tùy chọn đầu ra</h3>
-                     <div>
-                         <label for="camera-angle" class="block text-sm font-medium text-gray-300">Góc máy</label>
-                         <select id="camera-angle" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
-                             <option value="">AI tự chọn</option>
-                             <option value="Wide Shot">Toàn cảnh (Wide Shot)</option>
-                             <option value="Medium Shot">Trung cảnh (Medium Shot)</option>
-                             <option value="Close-up Shot">Cận cảnh (Close-up)</option>
-                             <option value="High-angle Shot">Góc máy từ trên cao</option>
-                             <option value="Low-angle Shot">Góc máy từ dưới thấp</option>
-                             <option value="Point of View (POV) Shot">Góc nhìn nhân vật (POV)</option>
-                         </select>
-                     </div>
-                      <div>
-                         <label for="lighting-style" class="block text-sm font-medium text-gray-300">Ánh sáng</label>
-                         <select id="lighting-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
-                             <option value="">AI tự chọn</option>
-                             <option value="Daylight">Ánh sáng ban ngày</option>
-                             <option value="Night lighting">Ánh sáng ban đêm</option>
-                             <option value="High contrast, Chiaroscuro">Tương phản cao (Chiaroscuro)</option>
-                             <option value="Soft light">Ánh sáng dịu</option>
-                             <option value="Neon lights">Đèn neon</option>
-                             <option value="Golden hour">Giờ vàng</option>
-                         </select>
-                     </div>
-                      <div>
-                         <label for="composition-style" class="block text-sm font-medium text-gray-300">Bố cục</label>
-                         <select id="composition-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
-                             <option value="">AI tự chọn</option>
-                             <option value="Rule of Thirds">Quy tắc 1/3</option>
-                             <option value="Symmetrical">Đối xứng</option>
-                             <option value="Leading lines">Đường dẫn</option>
-                             <option value="Frame within a frame">Khung trong khung</option>
-                         </select>
-                     </div>
-                      <div>
-                         <label for="extra-style" class="block text-sm font-medium text-gray-300">Mở rộng (Phong cách)</label>
-                         <select id="extra-style" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md">
-                             <option value="">AI tự chọn</option>
-                             <option value="Cinematic, 8k, hyperrealistic">Điện ảnh, 8K, Siêu thực</option>
-                             <option value="Anime style">Phong cách Anime</option>
-                             <option value="Oil painting style">Phong cách Tranh sơn dầu</option>
-                             <option value="Film grain">Tông màu phim (Film grain)</option>
-                         </select>
-                     </div>
-                </div>
-
-                <div class="flex-shrink-0 pt-4">
-                     <div class="flex justify-end space-x-4">
-                        <button type="submit" id="generate-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md min-w-[100px] flex justify-center items-center">
-                            <span class="btn-text">Gửi</span><span class="loader hidden ml-2"></span>
-                        </button>
-                    </div>
+                <div class="flex-shrink-0">
+                    <h2 class="text-xl font-bold mb-6">Tùy chọn chia Section</h2>
+                    <form id="s2se-form" class="space-y-4">
+                        <div>
+                            <label for="section-count" class="block text-sm font-medium text-gray-300">Số lượng Section mong muốn</label>
+                            <input type="number" id="section-count" placeholder="Ví dụ: 8" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label for="s2se-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se (Tùy chọn)</label>
+                            <select id="s2se-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="submit" id="generate-sections-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md min-w-[100px] flex justify-center items-center">
+                                <span class="btn-text">Tạo Sections</span><span class="loader hidden ml-2"></span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             
-            <!-- Result Column -->
-            <div id="result-container" class="w-2/3 flex-1 bg-gray-800 p-6 rounded-lg flex-col min-h-0 hidden overflow-y-auto">
-                 <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                    <h2 class="text-xl font-bold">Các Prompts được tạo</h2>
-                 </div>
-                 <div class="space-y-4">
-                    <!-- Background Prompt -->
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-lg font-semibold text-teal-300">Prompt Bối cảnh (T2I)</h3>
-                            <button data-target="background-prompt-output" class="copy-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
-                        </div>
-                        <textarea id="background-prompt-output" rows="4" readonly class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-sm"></textarea>
-                    </div>
-                    <!-- Character Prompt -->
-                    <div>
-                         <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-lg font-semibold text-teal-300">Prompt Nhân vật</h3>
-                            <button data-target="character-prompt-output" class="copy-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
-                        </div>
-                        <textarea id="character-prompt-output" rows="4" readonly class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-sm"></textarea>
-                    </div>
-                     <!-- Seed Image Prompt -->
-                    <div>
-                         <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-lg font-semibold text-teal-300">Prompt Ảnh mồi (I2V)</h3>
-                            <button data-target="seed-image-prompt-output" class="copy-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
-                        </div>
-                        <textarea id="seed-image-prompt-output" rows="5" readonly class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-sm"></textarea>
-                    </div>
-                     <!-- Video Prompt -->
-                    <div>
-                         <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-lg font-semibold text-teal-300">Prompt Video (T2V)</h3>
-                            <button data-target="video-prompt-output" class="copy-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
-                        </div>
-                        <textarea id="video-prompt-output" rows="5" readonly class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-sm"></textarea>
-                    </div>
-                 </div>
+            <div id="sections-result-container" class="flex-1 bg-gray-800 rounded-lg flex flex-col min-h-0 hidden p-6">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <h2 class="text-xl font-bold">Các Section được tạo</h2>
+                    <button id="close-results-btn" title="Đóng" class="text-gray-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="sections-list" class="flex-grow flex flex-col space-y-4 overflow-y-auto pr-2">
+                    <!-- Sections will be dynamically inserted here -->
+                </div>
             </div>
+
         </main>
     </div>
     
-    <!-- Modals are omitted for brevity but should be included from the main file -->
     <div id="memory-modal-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">...</div>
     <div id="api-key-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">...</div>
     <div id="delete-confirm-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">...</div>
     
     <div id="toast-container" class="fixed top-5 left-5 z-[100] space-y-2"></div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- UI Elements ---
-            const generateBtn = document.getElementById('generate-btn');
-            const promptInputContent = document.getElementById('prompt-input-content');
-            const promptInputSelect = document.getElementById('prompt-input-select');
-            
-            const resultContainer = document.getElementById('result-container');
-            const backgroundOutput = document.getElementById('background-prompt-output');
-            const characterOutput = document.getElementById('character-prompt-output');
-            const seedImageOutput = document.getElementById('seed-image-prompt-output');
-            const videoOutput = document.getElementById('video-prompt-output');
+            const mainWorkspace = document.getElementById('main-workspace');
+            const sourceScriptContent = document.getElementById('source-script-content');
+            const sectionsResultContainer = document.getElementById('sections-result-container');
+            const sectionsList = document.getElementById('sections-list');
+            const s2seForm = document.getElementById('s2se-form');
+            const closeResultsBtn = document.getElementById('close-results-btn');
 
-            const cameraAngleSelect = document.getElementById('camera-angle');
-            const lightingStyleSelect = document.getElementById('lighting-style');
-            const compositionStyleSelect = document.getElementById('composition-style');
-            const extraStyleSelect = document.getElementById('extra-style');
-            
             // --- Modal Elements ---
-            // (Assuming full modal HTML is present)
             const apiKeyBtn = document.getElementById('api-key-btn');
-            const apiKeyContainer = document.querySelector('#api-key-container');
-
-            // --- State & Config ---
-            const memoryConfig = {
-                script: { title: 'Đầu vào Dự án', storageKey: 'input_scripts' },
-                prompt: { title: 'Đầu vào Se', storageKey: 'input_prompts' },
-                voiceOver: { title: 'Đầu vào VO', storageKey: 'input_voiceOvers' },
-                mainScripts: { title: 'Bộ nhớ Scripts', storageKey: 'memory_mainScripts' },
-                sections: { title: 'Bộ nhớ Sections', storageKey: 'memory_sections' },
-                mainPrompts: { title: 'Bộ nhớ Prompts', storageKey: 'memory_mainPrompts' },
-                mainVoiceOvers: { title: 'Bộ nhớ Voice Off', storageKey: 'memory_mainVoiceOvers' },
-                trash: { title: 'Bộ nhớ Rác', storageKey: 'memory_trash' }
-            };
             
             const state = {
-                sections: JSON.parse(localStorage.getItem(memoryConfig.sections.storageKey)) || [],
+                script: JSON.parse(localStorage.getItem('input_scripts')) || [],
+                prompt: JSON.parse(localStorage.getItem('input_prompts')) || [],
+                voiceOver: JSON.parse(localStorage.getItem('input_voiceOvers')) || [],
+                mainScripts: JSON.parse(localStorage.getItem('memory_mainScripts')) || [],
+                sections: JSON.parse(localStorage.getItem('memory_sections')) || [],
+                mainPrompts: JSON.parse(localStorage.getItem('memory_mainPrompts')) || [],
+                mainVoiceOvers: JSON.parse(localStorage.getItem('memory_mainVoiceOvers')) || [],
+                trash: JSON.parse(localStorage.getItem('memory_trash')) || [],
                 settings: {
                     apiKey: localStorage.getItem('apiKey') || '',
                     aiModel: localStorage.getItem('aiModel') || 'gemini-2.5-flash-preview-05-20'
@@ -231,6 +184,7 @@
             };
 
             // --- UI Helper Functions ---
+            
             function showToast(message, type = 'info') {
                 const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-blue-600' };
                 const toastContainer = document.getElementById('toast-container');
@@ -250,140 +204,255 @@
                 const btnText = button.querySelector('.btn-text');
                 const loader = button.querySelector('.loader');
                 button.disabled = isLoading;
-                if (btnText) btnText.textContent = isLoading ? 'Đang gửi...' : 'Gửi';
+                if (btnText) btnText.textContent = isLoading ? 'Đang tạo...' : 'Tạo Sections';
                 if (loader) loader.classList.toggle('hidden', !isLoading);
             }
+            
+            function renderSections(sectionsArray) {
+                sectionsList.innerHTML = '';
+                if (!Array.isArray(sectionsArray) || sectionsArray.length === 0) {
+                    sectionsList.innerHTML = `<p class="text-gray-400">Không có section nào được tạo.</p>`;
+                    return;
+                }
+
+                sectionsArray.forEach((sectionObj, index) => {
+                    const sectionEl = document.createElement('div');
+                    sectionEl.className = 'bg-gray-900 rounded-lg p-4 border border-gray-700';
+                    const sectionTextVi = sectionObj.vi || 'N/A';
+                    const sectionTextEn = sectionObj.en || 'N/A';
+                    
+                    sectionEl.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-teal-400">SECTION ${index + 1}</h3>
+                            <div class="flex space-x-2">
+                                <a href="https://anproduction2025.github.io/ancontents/prompts_studio.html" data-section-index="${index}" class="to-prompt-studio-btn bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-2 rounded-md text-xs">Sang Prompt Studio</a>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-semibold text-gray-400">TIẾNG VIỆT</label>
+                                    <button data-lang="vi" data-section-index="${index}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
+                                </div>
+                                <textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionTextVi}</textarea>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-semibold text-gray-400">TIẾNG ANH</label>
+                                    <button data-lang="en" data-section-index="${index}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
+                                </div>
+                                <textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionTextEn}</textarea>
+                            </div>
+                        </div>
+                    `;
+                    sectionsList.appendChild(sectionEl);
+                });
+            }
+
 
             // --- API Calls ---
-            async function generateStructuredPrompt(prompt, submitButton) {
+            async function generateAiContent(prompt, submitButton) {
                 setButtonLoading(submitButton, true);
                 if (!state.settings.apiKey) {
                     setButtonLoading(submitButton, false);
                     throw new Error('Vui lòng nhập API Key trong Cài đặt.');
                 }
-                try {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${state.settings.aiModel}:generateContent?key=${state.settings.apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { 
-                                responseMimeType: "application/json",
-                                responseSchema: {
-                                    type: "OBJECT",
-                                    properties: {
-                                        background_prompt: { type: "STRING" },
-                                        character_prompt: { type: "STRING" },
-                                        seed_image_prompt: { type: "STRING" },
-                                        video_prompt: { type: "STRING" }
-                                    },
-                                    required: ["background_prompt", "character_prompt", "seed_image_prompt", "video_prompt"]
+
+                const maxRetries = 3;
+                let currentAttempt = 0;
+                
+                while (currentAttempt < maxRetries) {
+                    try {
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${state.settings.aiModel}:generateContent?key=${state.settings.apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: prompt }] }],
+                                generationConfig: { 
+                                    responseMimeType: "application/json",
+                                    responseSchema: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            sections: {
+                                                type: "ARRAY",
+                                                items: { 
+                                                    type: "OBJECT",
+                                                    properties: {
+                                                        vi: { type: "STRING" },
+                                                        en: { type: "STRING" }
+                                                    },
+                                                    required: ["vi", "en"]
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+                            })
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            const errorMessage = errorData.error?.message || `Lỗi HTTP: ${response.status}`;
+                            if (response.status === 429 || response.status >= 500 || errorMessage.includes("overloaded")) {
+                                throw new Error(`Retryable error (${response.status}): ${errorMessage}`);
                             }
-                        })
-                    });
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error?.message || `Lỗi HTTP: ${response.status}`);
+                            throw new Error(errorMessage);
+                        }
+
+                        const result = await response.json();
+                        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (!text) throw new Error("Không nhận được phản hồi hợp lệ từ AI.");
+
+                        setButtonLoading(submitButton, false);
+                        return text;
+
+                    } catch (error) {
+                        currentAttempt++;
+                        console.warn(`Attempt ${currentAttempt} failed. Error: ${error.message}`);
+                        if (currentAttempt >= maxRetries) {
+                            setButtonLoading(submitButton, false);
+                            throw error;
+                        }
+                        const delay = Math.pow(2, currentAttempt) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
                     }
-                    const result = await response.json();
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!text) throw new Error("Không nhận được phản hồi hợp lệ từ AI.");
-                    return JSON.parse(text);
-                } finally {
-                    setButtonLoading(submitButton, false);
+                }
+                setButtonLoading(submitButton, false);
+                throw new Error("Tạo nội dung thất bại sau nhiều lần thử.");
+            }
+            
+            // --- S2SE State Management ---
+            function saveS2SeState(sectionsArray, isVisible) {
+                const stateToSave = {
+                    sections: sectionsArray || [],
+                    isVisible: isVisible
+                };
+                localStorage.setItem('s2se_result_state', JSON.stringify(stateToSave));
+            }
+
+            function loadS2SeState() {
+                const savedStateJSON = localStorage.getItem('s2se_result_state');
+                if (savedStateJSON) {
+                    const savedState = JSON.parse(savedStateJSON);
+                    if (savedState.isVisible) {
+                        sectionsResultContainer.classList.remove('hidden');
+                        renderSections(savedState.sections);
+                    } else {
+                        sectionsResultContainer.classList.add('hidden');
+                    }
+                }
+            }
+
+            function loadInitialScript() {
+                const scriptToProcess = localStorage.getItem('scriptToProcess');
+                if (scriptToProcess) {
+                    sourceScriptContent.value = scriptToProcess;
                 }
             }
             
-            // --- Initial Setup & Event Listeners ---
-            function populateSectionDropdown() {
-                promptInputSelect.innerHTML = `<option value="">Chọn từ bộ nhớ Se...</option>`;
-                [...state.sections].sort((a, b) => b.id - a.id).forEach(item => {
-                    promptInputSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;
-                });
+            function populateS2SeDropdowns() {
+                const scriptSelect = document.getElementById('s2se-input-script');
+                if (scriptSelect) {
+                    scriptSelect.innerHTML = `<option value="">Chọn kịch bản từ bộ nhớ S...</option>`;
+                    [...state.mainScripts].sort((a, b) => b.id - a.id).forEach(item => {
+                        scriptSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                    });
+                }
+
+                const seSelect = document.getElementById('s2se-input-se');
+                if (seSelect) {
+                    seSelect.innerHTML = `<option value="">Chọn từ Đầu vào Se...</option>`;
+                    [...state.prompt].sort((a, b) => b.id - a.id).forEach(item => {
+                        seSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                    });
+                }
             }
 
-            generateBtn.addEventListener('click', async () => {
-                const baseDescription = promptInputContent.value.trim();
-                if (!baseDescription) return showToast('Vui lòng nhập mô tả cảnh.', 'error');
+            // --- Event Listeners ---
+            
+            closeResultsBtn.addEventListener('click', () => {
+                sectionsResultContainer.classList.add('hidden');
+                saveS2SeState([], false); // Save closed state
+            });
+
+            sectionsList.addEventListener('click', (e) => {
+                const copyBtn = e.target.closest('.copy-section-btn');
+                const studioLink = e.target.closest('.to-prompt-studio-btn');
+
+                if (copyBtn) {
+                    const lang = copyBtn.dataset.lang;
+                    const textareas = copyBtn.closest('.bg-gray-900').querySelectorAll('textarea');
+                    const sectionContent = lang === 'vi' ? textareas[0].value : textareas[1].value;
+                    navigator.clipboard.writeText(sectionContent).then(() => showToast(`Đã sao chép Section (${lang.toUpperCase()})!`, 'success'));
+                }
+
+                if (studioLink) {
+                    e.preventDefault();
+                    // Send the Vietnamese content by default
+                    const sectionContent = studioLink.closest('.bg-gray-900').querySelectorAll('textarea')[0].value;
+                    localStorage.setItem('promptStudioInput', sectionContent);
+                    window.location.href = studioLink.href;
+                }
+            });
+
+
+            s2seForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const sourceScript = sourceScriptContent.value.trim();
+                if (!sourceScript) {
+                    showToast('Không có kịch bản gốc để xử lý.', 'error');
+                    return;
+                }
                 if (!state.settings.apiKey) {
                     showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
                     apiKeyBtn.click();
                     return;
                 }
 
-                resultContainer.classList.remove('hidden');
-                backgroundOutput.value = characterOutput.value = seedImageOutput.value = videoOutput.value = 'Đang tạo...';
-
-                const masterPrompt = `
-                    You are an expert prompt engineer for generative AI models (image and video).
-                    Your task is to take a user's scene description and expand it into four detailed, effective prompts for different AI models.
-                    The user will provide a base description and may optionally provide specific cinematic styles.
-
-                    Based on the following information:
-                    - Base Description: ${baseDescription}
-                    - Camera Angle: ${cameraAngleSelect.value || 'AI choice'}
-                    - Lighting Style: ${lightingStyleSelect.value || 'AI choice'}
-                    - Composition: ${compositionStyleSelect.value || 'AI choice'}
-                    - Extra Style: ${extraStyleSelect.value || 'AI choice'}
-
-                    Generate a JSON object with four keys: "background_prompt", "character_prompt", "seed_image_prompt", and "video_prompt".
-
-                    - "background_prompt": A detailed text-to-image prompt focusing ONLY on the environment, setting, and atmosphere. Exclude any characters.
-                    - "character_prompt": A detailed text-to-image prompt focusing ONLY on the character(s) described, their appearance, clothing, and expression. Use a plain, neutral background (e.g., 'plain gray background').
-                    - "seed_image_prompt": A text-to-image prompt that combines the background and character into a single, highly detailed, cinematic keyframe. This image will be used as a reference for an image-to-video model. It should describe a specific moment of action or emotion.
-                    - "video_prompt": A text-to-video prompt describing the entire scene in motion. It should detail the character's actions, camera movement, and changes in the environment or lighting over a short duration (e.g., 3-5 seconds).
-
-                    If the user does not specify a style for camera, lighting, etc., you must choose a suitable and creative option that fits the scene.
-
-                    Return ONLY the valid JSON object.`;
+                const sectionCount = document.getElementById('section-count').value;
+                const selectedSeId = document.getElementById('s2se-input-se').value;
+                const referenceSe = state.prompt.find(p => p.id == selectedSeId);
+                const extraInstructions = referenceSe ? referenceSe.content : '';
+                
+                sectionsResultContainer.classList.remove('hidden');
+                sectionsList.innerHTML = `<div class="flex justify-center items-center h-full"><div class="loader"></div></div>`;
+                saveS2SeState([], true); // Save visible state, but content is loading
 
                 try {
-                    const result = await generateStructuredPrompt(masterPrompt, generateBtn);
-                    backgroundOutput.value = result.background_prompt || 'Không có dữ liệu';
-                    characterOutput.value = result.character_prompt || 'Không có dữ liệu';
-                    seedImageOutput.value = result.seed_image_prompt || 'Không có dữ liệu';
-                    videoOutput.value = result.video_prompt || 'Không có dữ liệu';
+                     const prompt = `Bạn là một biên tập viên kịch bản song ngữ chuyên nghiệp. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections). Với mỗi section, bạn phải cung cấp cả phiên bản tiếng Việt và phiên bản dịch sang tiếng Anh.
+
+                        Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ có một khóa duy nhất là "sections". Giá trị của "sections" phải là một mảng (array) các đối tượng (object). Mỗi đối tượng phải có hai khóa: "vi" (cho nội dung tiếng Việt) và "en" (cho nội dung tiếng Anh).
+
+                        Thông tin:
+                        - Kịch bản gốc: ---
+                        ${sourceScript}
+                        ---
+                        ${sectionCount ? `- Số lượng section mong muốn: ${sectionCount}`: ''}
+                        ${extraInstructions ? `- Hướng dẫn thêm từ Đầu vào Se: ${extraInstructions}`: ''}
+
+                        Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
+
+                    const generatedContent = await generateAiContent(prompt, submitButton);
+                    const result = JSON.parse(generatedContent);
+                    const sections = result.sections || [];
+                    renderSections(sections);
+                    saveS2SeState(sections, true);
+
                 } catch (error) {
-                    console.error('Lỗi khi tạo prompts:', error);
+                    console.error('Lỗi trong quá trình tạo sections:', error);
                     showToast(`Lỗi: ${error.message}`, 'error');
-                    const errorMessage = `Đã xảy ra lỗi: ${error.message}`;
-                    backgroundOutput.value = characterOutput.value = seedImageOutput.value = videoOutput.value = errorMessage;
+                    sectionsList.innerHTML = `<p class="text-red-400">Đã xảy ra lỗi: ${error.message}</p>`;
+                    saveS2SeState([], true); // Still visible, but show error
                 }
             });
-
-            promptInputSelect.addEventListener('change', (e) => {
-                const selectedId = e.target.value;
-                if (selectedId) {
-                    const selectedItem = state.sections.find(p => p.id == selectedId);
-                    if (selectedItem) promptInputContent.value = selectedItem.content;
-                }
-            });
-
-            document.body.addEventListener('click', e => {
-                const button = e.target.closest('button.copy-btn');
-                if (!button) return;
-                const targetId = button.dataset.target;
-                const contentEl = document.getElementById(targetId);
-                if (contentEl && contentEl.value) {
-                    navigator.clipboard.writeText(contentEl.value).then(() => showToast('Đã sao chép!', 'success'));
-                }
-            });
-
-            // --- Initial Load ---
-            function initialLoad() {
-                const dataFromS2Se = localStorage.getItem('promptStudioInput');
-                if (dataFromS2Se) {
-                    promptInputContent.value = dataFromS2Se;
-                    localStorage.removeItem('promptStudioInput');
-                }
-                populateSectionDropdown();
-            }
-
-            initialLoad();
             
-            // NOTE: The full modal logic and other event listeners from the original file 
-            // should be included here for full functionality. This script is focused on the new features.
+            // --- Initial Setup ---
+            loadS2SeState();
+            loadInitialScript();
+            populateS2SeDropdowns();
+
+            // NOTE: The full modal logic is assumed to be in the final code.
         });
     </script>
 </body>

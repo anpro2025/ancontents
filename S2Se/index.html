@@ -215,18 +215,35 @@
                     return;
                 }
 
-                sectionsArray.forEach((sectionText, index) => {
+                sectionsArray.forEach((sectionObj, index) => {
                     const sectionEl = document.createElement('div');
                     sectionEl.className = 'bg-gray-900 rounded-lg p-4 border border-gray-700';
+                    const sectionTextVi = sectionObj.vi || 'N/A';
+                    const sectionTextEn = sectionObj.en || 'N/A';
+                    
                     sectionEl.innerHTML = `
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="font-bold text-teal-400">SECTION ${index + 1}</h3>
                             <div class="flex space-x-2">
-                                <button data-section-index="${index}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-2 rounded-md text-xs">Copy</button>
                                 <a href="./prompts_studio.html" data-section-index="${index}" class="to-prompt-studio-btn bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-2 rounded-md text-xs">Sang Prompt Studio</a>
                             </div>
                         </div>
-                        <textarea readonly class="w-full h-32 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionText}</textarea>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-semibold text-gray-400">TIẾNG VIỆT</label>
+                                    <button data-lang="vi" data-section-index="${index}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
+                                </div>
+                                <textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionTextVi}</textarea>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-semibold text-gray-400">TIẾNG ANH</label>
+                                    <button data-lang="en" data-section-index="${index}" class="copy-section-btn bg-gray-600 hover:bg-gray-500 text-white font-bold p-1 rounded-md text-xs">Copy</button>
+                                </div>
+                                <textarea readonly class="w-full h-28 bg-gray-800 border border-gray-600 rounded-md p-2 text-sm">${sectionTextEn}</textarea>
+                            </div>
+                        </div>
                     `;
                     sectionsList.appendChild(sectionEl);
                 });
@@ -258,7 +275,14 @@
                                         properties: {
                                             sections: {
                                                 type: "ARRAY",
-                                                items: { type: "STRING" }
+                                                items: { 
+                                                    type: "OBJECT",
+                                                    properties: {
+                                                        vi: { type: "STRING" },
+                                                        en: { type: "STRING" }
+                                                    },
+                                                    required: ["vi", "en"]
+                                                }
                                             }
                                         }
                                     }
@@ -356,13 +380,16 @@
                 const studioLink = e.target.closest('.to-prompt-studio-btn');
 
                 if (copyBtn) {
-                    const sectionContent = copyBtn.closest('.bg-gray-900').querySelector('textarea').value;
-                    navigator.clipboard.writeText(sectionContent).then(() => showToast('Đã sao chép Section!', 'success'));
+                    const lang = copyBtn.dataset.lang;
+                    const textareas = copyBtn.closest('.bg-gray-900').querySelectorAll('textarea');
+                    const sectionContent = lang === 'vi' ? textareas[0].value : textareas[1].value;
+                    navigator.clipboard.writeText(sectionContent).then(() => showToast(`Đã sao chép Section (${lang.toUpperCase()})!`, 'success'));
                 }
 
                 if (studioLink) {
                     e.preventDefault();
-                    const sectionContent = studioLink.closest('.bg-gray-900').querySelector('textarea').value;
+                    // Send the Vietnamese content by default
+                    const sectionContent = studioLink.closest('.bg-gray-900').querySelectorAll('textarea')[0].value;
                     localStorage.setItem('promptStudioInput', sectionContent);
                     window.location.href = studioLink.href;
                 }
@@ -393,8 +420,9 @@
                 saveS2SeState([], true); // Save visible state, but content is loading
 
                 try {
-                     const prompt = `Bạn là một biên tập viên kịch bản. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections).
-                        Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ có một khóa duy nhất là "sections". Giá trị của "sections" phải là một mảng (array) các chuỗi (string), mỗi chuỗi là một section của kịch bản.
+                     const prompt = `Bạn là một biên tập viên kịch bản song ngữ chuyên nghiệp. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections). Với mỗi section, bạn phải cung cấp cả phiên bản tiếng Việt và phiên bản dịch sang tiếng Anh.
+
+                        Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ có một khóa duy nhất là "sections". Giá trị của "sections" phải là một mảng (array) các đối tượng (object). Mỗi đối tượng phải có hai khóa: "vi" (cho nội dung tiếng Việt) và "en" (cho nội dung tiếng Anh).
 
                         Thông tin:
                         - Kịch bản gốc: ---

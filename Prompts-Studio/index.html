@@ -133,7 +133,7 @@
                     </div>
                     <div class="border-t border-main w-full pt-4 mt-2"></div>
                     <button id="api-key-btn" title="Cài đặt" class="btn-neutral text-white font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12 shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734 1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38-1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.996A1.532 1.532 0 013.17 8.51c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.948 2.286c-.836 1.372.734 2.942 1.996 1.57A1.532 1.532 0 018.51 16.83c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.372.836 2.942-.734-1.57-1.996A1.532 1.532 0 0116.83 11.49c1.56-.38-1.56-2.6 0-2.98a1.532 1.532 0 01-.948-2.286c.836-1.372-.734-2.942-1.996-1.57A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
                     </button>
                 </div>
                 <div class="border-t border-main pt-4"></div>
@@ -470,12 +470,15 @@
                     const button = document.querySelector(`.memory-btn[data-type="${type}"]`);
                     if (button) {
                         const countEl = button.querySelector('.memory-count');
-                        const count = state[type]?.length || 0;
-                        if (count > 0) {
-                            countEl.textContent = count;
-                            countEl.classList.remove('hidden');
-                        } else {
-                            countEl.classList.add('hidden');
+                        // FIX: Check if countEl exists before using it
+                        if (countEl) {
+                            const count = state[type]?.length || 0;
+                            if (count > 0) {
+                                countEl.textContent = count;
+                                countEl.classList.remove('hidden');
+                            } else {
+                                countEl.classList.add('hidden');
+                            }
                         }
                     }
                 });

@@ -85,6 +85,9 @@
         <!-- Left Sidebar with Buttons -->
         <aside id="sidebar" class="w-64 flex-shrink-0">
             <div class="flex flex-col space-y-4">
+                <button id="create-script-btn" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-300 text-lg w-full text-center mb-4">
+                    HOME PAGE
+                </button>
                 <div class="flex flex-col space-y-2 items-start">
                     <!-- Yellow Input Buttons -->
                     <div class="flex flex-wrap gap-2">
@@ -373,6 +376,7 @@
                 const toastContainer = document.getElementById('toast-container');
                 const toast = document.createElement('div');
                 toast.className = `text-white py-2 px-4 rounded-lg shadow-lg transform transition-all duration-300 -translate-x-full ${colors[type] || colors.info}`;
+                toast.textContent = message;
                 toastContainer.appendChild(toast);
                 setTimeout(() => toast.classList.remove('-translate-x-full'), 10);
                 setTimeout(() => {
@@ -856,7 +860,14 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     }
 
                     const generatedContent = await generateAiContent(prompt, submitButton);
-                    const result = JSON.parse(generatedContent);
+                    
+                    // Clean the AI response to extract only the JSON object
+                    const jsonMatch = generatedContent.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) {
+                        throw new Error("Phản hồi từ AI không chứa đối tượng JSON hợp lệ.");
+                    }
+                    const cleanedContent = jsonMatch[0];
+                    const result = JSON.parse(cleanedContent);
                     
                     state.windows.script = {
                         title: newTitle,
@@ -930,6 +941,7 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 const targetElement = e.target;
                 const button = targetElement.closest('button');
                 const navLink = targetElement.closest('a');
+                const memoryBtn = targetElement.closest('.memory-btn');
 
                 if (button) {
                     const { target, title, type, windowType } = button.dataset;
@@ -1008,6 +1020,10 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                         showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
                     }
                 }
+                
+                if (memoryBtn) {
+                     openMemoryModal(memoryBtn.dataset.type);
+                }
 
                 if (navLink) {
                     e.preventDefault();
@@ -1032,7 +1048,19 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                 } else if (targetId === 'vo-result-content' || targetId === 'vo-result-title') {
                     if (state.windows.vo) state.windows.vo.saved = false;
                 }
+
+                if (targetId === 'memory-modal-content-input') {
+                    updateWordCount(e.target, memoryWordCount);
+                }
+
+                const resultWindowTextarea = e.target.closest('textarea[id$="-result-content"]');
+                if (resultWindowTextarea) {
+                    const type = resultWindowTextarea.id.replace('-result-content', '');
+                    const wordCountEl = document.getElementById(`${type}-word-count`);
+                    updateWordCount(resultWindowTextarea, wordCountEl);
+                }
             });
+            
 
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
@@ -1042,6 +1070,7 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
+
 
 
 

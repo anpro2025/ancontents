@@ -85,12 +85,14 @@
         <!-- Left Sidebar with Buttons -->
         <aside id="sidebar" class="w-64 flex-shrink-0">
             <div class="flex flex-col space-y-4">
-                <button id="create-script-btn" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition duration-300 text-lg w-full text-center mb-4">
-                    HOME PAGE
-                </button>
                 <div class="flex flex-col space-y-2 items-start">
                     <!-- Yellow Input Buttons -->
                     <div class="flex flex-wrap gap-2">
+                        <a href="https://anproduction2025.github.io/ancontents" title="HOME PAGE" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </a>
                         <button data-type="script" title="Đầu vào Dự án" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg></button>
                         <button data-type="prompt" title="Đầu vào Se" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-lg font-bold">Se</span></button>
                         <button data-type="voiceOver" title="Đầu vào VO" class="memory-btn bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold p-3 rounded-full transition duration-300 flex items-center justify-center w-12 h-12"><span class="text-sm font-bold">VO</span></button>
@@ -114,9 +116,11 @@
                     </div>
                 </div>
                 <div class="border-t border-gray-600 pt-4"></div>
-                <a href="https://anproduction2025.github.io/ancontents" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">P2S</a>
-                <a href="https://anproduction2025.github.io/ancontents/S2Se" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">S2Se</a>
-                <a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">Prompt Studio</a>
+                <div class="space-y-4">
+                    <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">P2S</button>
+                    <a href="https://anproduction2025.github.io/ancontents/S2Se" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">S2Se</a>
+                    <a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left block">Prompt Studio</a>
+                </div>
             </div>
         </aside>
 
@@ -1070,6 +1074,8 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
+
+
 
 
 

@@ -576,14 +576,30 @@
             }
             
             // --- S2SE Specific Logic ---
+            function saveS2SeState(content, isVisible) {
+                localStorage.setItem('s2se_result_content', content || '');
+                localStorage.setItem('s2se_result_visible', isVisible ? 'true' : 'false');
+            }
+
+            function loadS2SeState() {
+                const savedContent = localStorage.getItem('s2se_result_content');
+                const isVisible = localStorage.getItem('s2se_result_visible') === 'true';
+
+                if (isVisible) { // Show container even if content is empty (e.g. while loading)
+                    sectionsResultContainer.classList.remove('hidden');
+                    sectionsResultContent.value = savedContent || '';
+                } else {
+                    sectionsResultContainer.classList.add('hidden');
+                }
+            }
+
+
             function loadInitialScript() {
                 const scriptToProcess = localStorage.getItem('scriptToProcess');
                 if (scriptToProcess) {
                     sourceScriptContent.value = scriptToProcess;
+                    // We don't remove it, so it can be re-used if the user comes back
                 }
-                sourceScriptContent.addEventListener('input', (e) => {
-                     localStorage.setItem('scriptToProcess', e.target.value);
-                });
             }
 
             // --- Event Listeners Setup ---
@@ -750,6 +766,7 @@
             // Gán sự kiện click cho nút đóng kết quả
             closeResultsBtn.addEventListener('click', () => {
                 sectionsResultContainer.classList.add('hidden');
+                saveS2SeState('', false); // Save closed state
             });
 
             generatePromptsBtn.addEventListener('click', () => {
@@ -787,6 +804,7 @@
                 
                 sectionsResultContainer.classList.remove('hidden');
                 sectionsResultContent.value = 'Đang tạo, vui lòng chờ...';
+                saveS2SeState('Đang tạo, vui lòng chờ...', true); // Save loading state
 
                 try {
                      const prompt = `Bạn là một biên tập viên kịch bản. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections).
@@ -803,12 +821,16 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
 
                     const generatedContent = await generateAiContent(prompt, submitButton);
                     const result = JSON.parse(generatedContent);
-                    sectionsResultContent.value = formatScriptContent(result.sections || ["AI không tạo được sections."]);
+                    const formattedContent = formatScriptContent(result.sections || ["AI không tạo được sections."]);
+                    sectionsResultContent.value = formattedContent;
+                    saveS2SeState(formattedContent, true); // Save successful result
 
                 } catch (error) {
                      console.error('Lỗi trong quá trình tạo sections:', error);
                     showToast(`Lỗi: ${error.message}`, 'error');
-                    sectionsResultContent.value = `Đã xảy ra lỗi: ${error.message}`;
+                    const errorMessage = `Đã xảy ra lỗi: ${error.message}`;
+                    sectionsResultContent.value = errorMessage;
+                    saveS2SeState(errorMessage, true); // Save error state
                 }
             });
             
@@ -829,9 +851,9 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     if (!content) return showToast('Không có nội dung để xuất.', 'info');
                     downloadAsTxt(titleText, content);
                 } else if (button.classList.contains('save-result-btn')) {
-                    const titleText = `Sections from "${(localStorage.getItem('scriptToProcess') || 'script').substring(0, 20)}..."`;
+                    const titleText = `Sections from "${(sourceScriptContent.value || 'script').substring(0, 20)}..."`;
                     const content = sectionsResultContent.value.trim();
-                    if (!titleText || !content) return showToast('Cần có nội dung để lưu.', 'error');
+                    if (!titleText || !content || content.startsWith('Đang tạo')) return showToast('Chưa có nội dung hợp lệ để lưu.', 'error');
                     
                     state[type].push({ id: Date.now(), title: titleText, content });
                     saveDataToStorage(type);
@@ -854,7 +876,9 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             populateS2SeDropdowns();
             loadInitialScript();
+            loadS2SeState();
         });
     </script>
 </body>
 </html>
+

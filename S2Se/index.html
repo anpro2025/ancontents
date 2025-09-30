@@ -555,27 +555,42 @@
                  deleteConfirmModal.classList.remove('hidden');
             });
 
-            s2seForm.addEventListener('submit', async (e) => {
+            s2seForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const submitButton = document.getElementById('generate-sections-btn');
                 const sourceScript = sourceScriptContent.value.trim();
                 if (!sourceScript) return showToast('Không có kịch bản gốc.', 'error');
-                if (!state.settings.apiKey) return showToast('Vui lòng nhập API Key.', 'error');
+                if (!state.settings.apiKey) {
+                    document.getElementById('api-key-btn').click();
+                    return showToast('Vui lòng nhập API Key.', 'error');
+                }
                 const sectionCount = document.getElementById('section-count').value;
                 const referenceSe = state.prompt.find(p => p.id == s2seInputSe.value);
                 const detailInstruction = detailToggle.checked ? `Quan trọng: Với mỗi section, hãy thêm vào các chi tiết mô tả sống động về bối cảnh, hành động, cảm xúc của nhân vật và gợi ý góc máy để làm cho phân cảnh trở nên phong phú hơn, sẵn sàng cho việc tạo prompt.` : '';
+                
+                const prompt = `Bạn là biên tập viên kịch bản song ngữ. Chia nhỏ kịch bản sau thành các phân cảnh (sections). Với mỗi section, cung cấp cả bản tiếng Việt và tiếng Anh. Định dạng đầu ra: một đối tượng JSON có khóa "sections", giá trị là một mảng các đối tượng, mỗi đối tượng có khóa "vi" và "en".\n\nKịch bản: ---\n${sourceScript}\n---\n${sectionCount ? `Số lượng section mong muốn: ${sectionCount}`: ''}\n${referenceSe ? `Hướng dẫn thêm: ${referenceSe.content}`: ''}\n${detailInstruction}`;
+
+                // Set flags for recovery
+                localStorage.setItem('s2se_task_running', 'true');
+                localStorage.setItem('s2se_task_prompt', prompt);
+
                 sectionsResultContainer.classList.remove('hidden');
                 sectionsList.innerHTML = `<div class="flex justify-center items-center h-full"><div class="loader"></div></div>`;
-                try {
-                    const prompt = `Bạn là biên tập viên kịch bản song ngữ. Chia nhỏ kịch bản sau thành các phân cảnh (sections). Với mỗi section, cung cấp cả bản tiếng Việt và tiếng Anh. Định dạng đầu ra: một đối tượng JSON có khóa "sections", giá trị là một mảng các đối tượng, mỗi đối tượng có khóa "vi" và "en".\n\nKịch bản: ---\n${sourceScript}\n---\n${sectionCount ? `Số lượng section mong muốn: ${sectionCount}`: ''}\n${referenceSe ? `Hướng dẫn thêm: ${referenceSe.content}`: ''}\n${detailInstruction}`;
-                    const generatedContent = await generateAiContent(prompt, submitButton);
-                    const result = JSON.parse(generatedContent);
-                    renderSections(result.sections || []);
-                    localStorage.setItem('s2se_last_result', JSON.stringify(result.sections || []));
-                } catch (error) {
-                    showToast(`Lỗi: ${error.message}`, 'error');
-                    sectionsList.innerHTML = `<p class="text-red-400">Lỗi: ${error.message}</p>`;
-                }
+                
+                generateAiContent(prompt, submitButton)
+                    .then(generatedContent => {
+                        const result = JSON.parse(generatedContent);
+                        renderSections(result.sections || []);
+                        localStorage.setItem('s2se_last_result', JSON.stringify(result.sections || []));
+                    })
+                    .catch(error => {
+                        showToast(`Lỗi: ${error.message}`, 'error');
+                        sectionsList.innerHTML = `<p class="text-red-400">Lỗi: ${error.message}</p>`;
+                    })
+                    .finally(() => {
+                        localStorage.removeItem('s2se_task_running');
+                        localStorage.removeItem('s2se_task_prompt');
+                    });
             });
 
             s2seInputScript.addEventListener('change', (e) => {
@@ -624,10 +639,38 @@
                     sourceScriptContent.value = scriptToProcess;
                     localStorage.removeItem('scriptToProcess');
                 }
+
+                if (localStorage.getItem('s2se_task_running') === 'true') {
+                    const savedPrompt = localStorage.getItem('s2se_task_prompt');
+                    if (savedPrompt) {
+                        showToast('Phát hiện tác vụ dang dở, đang tiếp tục...', 'info');
+                        const submitButton = document.getElementById('generate-sections-btn');
+                        sectionsResultContainer.classList.remove('hidden');
+                        sectionsList.innerHTML = `<div class="flex justify-center items-center h-full"><div class="loader"></div></div>`;
+                        
+                        setTimeout(() => {
+                            generateAiContent(savedPrompt, submitButton)
+                                .then(generatedContent => {
+                                    const result = JSON.parse(generatedContent);
+                                    renderSections(result.sections || []);
+                                    localStorage.setItem('s2se_last_result', JSON.stringify(result.sections || []));
+                                })
+                                .catch(error => {
+                                    showToast(`Lỗi khi tiếp tục tác vụ: ${error.message}`, 'error');
+                                    sectionsList.innerHTML = `<p class="text-red-400">Lỗi: ${error.message}</p>`;
+                                })
+                                .finally(() => {
+                                    localStorage.removeItem('s2se_task_running');
+                                    localStorage.removeItem('s2se_task_prompt');
+                                });
+                        }, 100);
+                    } else {
+                         localStorage.removeItem('s2se_task_running');
+                    }
+                }
             }
             initialLoad();
         });
     </script>
 </body>
 </html>
-

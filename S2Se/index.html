@@ -73,7 +73,7 @@
         <h1 class="text-4xl font-bold tracking-wider uppercase text-white">SCRIPT TO SECTION (S2SE)</h1>
     </header>
     
-    <div class="flex space-x-8 flex-grow p-8 overflow-hidden pb-20"> <!-- Added padding-bottom for taskbar -->
+    <div class="flex space-x-8 flex-grow p-8 overflow-hidden">
         <!-- Left Sidebar with Buttons -->
         <aside id="sidebar" class="w-64 flex-shrink-0">
             <div class="flex flex-col space-y-4">
@@ -101,13 +101,19 @@
         <!-- Main Content Area -->
         <main id="main-workspace" class="flex-grow flex space-x-8 overflow-x-auto relative">
             
-            <!-- Source Script Column -->
-            <div id="source-script-window-wrapper" class="workspace-column flex-1"></div>
-            
-            <!-- Generation and Result Column -->
-            <div class="workspace-column w-[400px] flex-shrink-0 flex flex-col space-y-8">
-                <!-- Generation Form -->
-                <div class="bg-gray-800 p-6 rounded-lg">
+            <!-- Source & Options Column -->
+            <div class="w-[450px] flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col space-y-6">
+                <!-- Source Script Section -->
+                <div class="flex-grow flex flex-col min-h-0">
+                    <div class="flex-shrink-0 mb-4">
+                        <h2 class="text-xl font-bold mb-2">Kịch bản gốc</h2>
+                        <label for="s2se-input-script" class="block text-sm font-medium text-blue-400">Hoặc chọn từ Bộ nhớ Scripts (S)</label>
+                        <select id="s2se-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
+                    </div>
+                    <textarea id="source-script-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3" placeholder="Dán kịch bản gốc vào đây..."></textarea>
+                </div>
+                <!-- Generation Form Section -->
+                <div class="flex-shrink-0">
                     <h2 class="text-xl font-bold mb-6">Tùy chọn chia Section</h2>
                     <form id="s2se-form" class="space-y-4">
                         <div>
@@ -125,14 +131,31 @@
                         </div>
                     </form>
                 </div>
-                <!-- Result Area -->
-                <div id="sections-window-wrapper" class="flex-1"></div>
+            </div>
+            
+            <!-- Result Column -->
+            <div id="sections-result-container" class="flex-1 bg-gray-800 p-6 rounded-lg flex-col min-h-0 hidden">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <h2 class="text-xl font-bold">Các Section được tạo</h2>
+                </div>
+                <div class="flex-grow flex flex-col min-h-0">
+                    <textarea id="sections-result-content" class="mt-1 block w-full bg-gray-900 border border-gray-700 rounded-md flex-grow p-3"></textarea>
+                </div>
+                 <div class="flex-shrink-0 bg-gray-800 pt-4 flex justify-between items-center rounded-b-lg">
+                    <div class="flex items-center">
+                        <button data-type="sections" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se</button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button data-target="sections-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
+                        <button data-target="sections-result-content" data-title="sections" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
+                    </div>
+                </div>
             </div>
 
         </main>
     </div>
     
-    <!-- Modals and Taskbar (Copied from index.html) -->
+    <!-- Modals (Copied from index.html) -->
     <div id="memory-modal-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-[95vw] h-[95vh] flex flex-col shadow-2xl">
             <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
@@ -226,20 +249,16 @@
     
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-5 left-5 z-[100] space-y-2"></div>
-    
-    <!-- Taskbar -->
-    <div id="taskbar" class="fixed bottom-0 left-0 right-0 h-12 bg-gray-800 border-t border-gray-700 flex items-center px-4 space-x-2 z-30">
-        <!-- Minimized windows will appear here -->
-    </div>
 
     <script>
         // --- SCRIPT FOR S2SE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
             // --- UI Elements ---
             const mainWorkspace = document.getElementById('main-workspace');
-            const sourceScriptWindowWrapper = document.getElementById('source-script-window-wrapper');
-            const sectionsWindowWrapper = document.getElementById('sections-window-wrapper');
-            const taskbar = document.getElementById('taskbar');
+            const sourceScriptContent = document.getElementById('source-script-content');
+            const sectionsResultContainer = document.getElementById('sections-result-container');
+            const sectionsResultContent = document.getElementById('sections-result-content');
+            const s2seForm = document.getElementById('s2se-form');
 
             // --- Settings Modal Elements ---
             const apiKeyBtn = document.getElementById('api-key-btn');
@@ -294,8 +313,6 @@
             };
             
             // --- State Management ---
-            const savedWindows = JSON.parse(localStorage.getItem('anProduction_windows_s2se'));
-
             const state = {
                 // All memories loaded from localStorage
                 script: JSON.parse(localStorage.getItem(memoryConfig.script.storageKey)) || [],
@@ -314,15 +331,6 @@
                 itemToDelete: null,
                 isEditingMemory: false,
                 currentMemoryType: null,
-                windows: savedWindows || {
-                    source: {
-                        title: "Kịch bản gốc",
-                        content: localStorage.getItem('scriptToProcess') || "Không có kịch bản nào được chuyển qua. Vui lòng quay lại và thử lại.",
-                        status: 'open',
-                        saved: true // Source is always considered "saved"
-                    },
-                    sections: null
-                }
             };
 
             // --- UI Helper Functions ---
@@ -356,6 +364,19 @@
                 countElement.textContent = `${wordCount} từ`;
             }
 
+            function downloadAsTxt(title, content) {
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const fileName = `${(title || 'untitled').toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '_').substring(0, 50)}.txt`;
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+            
             function formatScriptContent(content) {
                 if (typeof content === 'string') return content;
                 if (Array.isArray(content)) {
@@ -369,10 +390,6 @@
 
             function hideAllModals() {
                 document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
-            }
-
-            function saveWindowsState() {
-                localStorage.setItem('anProduction_windows_s2se', JSON.stringify(state.windows));
             }
 
             // --- Generic Memory Management ---
@@ -475,12 +492,21 @@
             }
             
             function populateS2SeDropdowns() {
-                const select = document.getElementById('s2se-input-se');
-                if (!select) return;
-                select.innerHTML = `<option value="">Chọn từ Đầu vào Se...</option>`;
-                [...state.prompt].sort((a, b) => b.id - a.id).forEach(item => {
-                    select.innerHTML += `<option value="${item.id}">${item.title}</option>`;
-                });
+                const scriptSelect = document.getElementById('s2se-input-script');
+                if (scriptSelect) {
+                    scriptSelect.innerHTML = `<option value="">Chọn kịch bản từ bộ nhớ S...</option>`;
+                    [...state.mainScripts].sort((a, b) => b.id - a.id).forEach(item => {
+                        scriptSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                    });
+                }
+
+                const seSelect = document.getElementById('s2se-input-se');
+                if (seSelect) {
+                    seSelect.innerHTML = `<option value="">Chọn từ Đầu vào Se...</option>`;
+                    [...state.prompt].sort((a, b) => b.id - a.id).forEach(item => {
+                        seSelect.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                    });
+                }
             }
 
             // --- API Calls ---
@@ -520,39 +546,15 @@
                 }
             }
             
-            // --- S2SE App Rendering ---
-            function renderApp() {
-                // Render Source Script Window
-                if (state.windows.source) {
-                    sourceScriptWindowWrapper.innerHTML = createS2SWindowHTML('source', state.windows.source);
-                    sourceScriptWindowWrapper.classList.toggle('hidden', state.windows.source.status === 'minimized');
-                } else {
-                    sourceScriptWindowWrapper.innerHTML = '';
-                    sourceScriptWindowWrapper.classList.add('hidden');
+            // --- S2SE Specific Logic ---
+            function loadInitialScript() {
+                const scriptToProcess = localStorage.getItem('scriptToProcess');
+                if (scriptToProcess) {
+                    sourceScriptContent.value = scriptToProcess;
                 }
-
-                // Render Sections Window
-                if (state.windows.sections) {
-                    sectionsWindowWrapper.innerHTML = createS2SWindowHTML('sections', state.windows.sections);
-                    sectionsWindowWrapper.classList.toggle('hidden', state.windows.sections.status === 'minimized');
-                } else {
-                    sectionsWindowWrapper.innerHTML = '';
-                    sectionsWindowWrapper.classList.add('hidden');
-                }
-
-                // Render Taskbar
-                taskbar.innerHTML = '';
-                Object.entries(state.windows).forEach(([type, win]) => {
-                    if (win && win.status === 'minimized') {
-                        const btn = document.createElement('button');
-                        btn.className = 'bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded-md truncate';
-                        btn.textContent = win.title;
-                        btn.dataset.windowType = type;
-                        taskbar.appendChild(btn);
-                    }
+                sourceScriptContent.addEventListener('input', (e) => {
+                     localStorage.setItem('scriptToProcess', e.target.value);
                 });
-
-                saveWindowsState();
             }
 
             // --- Event Listeners Setup ---
@@ -656,6 +658,7 @@
                 state.isEditingMemory = false;
                 updateMemoryEditorMode();
                 showToast('Đã lưu thành công!', 'success');
+                populateS2SeDropdowns();
             });
 
             memoryCopyBtn.addEventListener('click', () => {
@@ -706,40 +709,37 @@
                 state.itemToDelete = null;
                 deleteConfirmModal.classList.add('hidden');
                 showToast(isPurge ? 'Đã xóa vĩnh viễn.' : 'Đã chuyển vào thùng rác.', 'success');
+                populateS2SeDropdowns();
             });
             
             document.querySelectorAll('.close-modal-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => e.target.closest('.modal-overlay').classList.add('hidden'));
             });
 
-            mainWorkspace.addEventListener('submit', async (e) => {
+            s2seForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (e.target.id === 's2se-form') {
-                    const submitButton = e.target.querySelector('button[type="submit"]');
-                    const sourceScript = state.windows.source.content;
-                    if (!sourceScript || sourceScript.startsWith("Không có kịch bản")) {
-                        showToast('Không có kịch bản gốc để xử lý.', 'error');
-                        return;
-                    }
-                    if (!state.settings.apiKey) {
-                        showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
-                        apiKeyBtn.click();
-                        return;
-                    }
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const sourceScript = sourceScriptContent.value.trim();
+                if (!sourceScript || sourceScript.startsWith("Không có kịch bản")) {
+                    showToast('Không có kịch bản gốc để xử lý.', 'error');
+                    return;
+                }
+                if (!state.settings.apiKey) {
+                    showToast('Vui lòng nhập API Key trong Cài đặt.', 'error');
+                    apiKeyBtn.click();
+                    return;
+                }
 
-                    const sectionCount = document.getElementById('section-count').value;
-                    const selectedSeId = document.getElementById('s2se-input-se').value;
-                    const referenceSe = state.prompt.find(p => p.id == selectedSeId);
-                    const extraInstructions = referenceSe ? referenceSe.content : '';
-                    
-                    const loadingOverlay = document.createElement('div');
-                    loadingOverlay.id = 'loading-indicator';
-                    loadingOverlay.className = 'fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-75 z-50';
-                    loadingOverlay.innerHTML = `<div class="loader" style="width: 40px; height: 40px; border-width: 4px;"></div>`;
-                    document.body.appendChild(loadingOverlay);
+                const sectionCount = document.getElementById('section-count').value;
+                const selectedSeId = document.getElementById('s2se-input-se').value;
+                const referenceSe = state.prompt.find(p => p.id == selectedSeId);
+                const extraInstructions = referenceSe ? referenceSe.content : '';
+                
+                sectionsResultContainer.classList.remove('hidden');
+                sectionsResultContent.value = 'Đang tạo, vui lòng chờ...';
 
-                    try {
-                         const prompt = `Bạn là một biên tập viên kịch bản. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections).
+                try {
+                     const prompt = `Bạn là một biên tập viên kịch bản. Nhiệm vụ của bạn là chia nhỏ kịch bản gốc thành các phân cảnh (sections).
 Yêu cầu định dạng đầu ra: Chỉ trả về một đối tượng JSON hợp lệ có một khóa duy nhất là "sections". Giá trị của "sections" phải là một mảng (array) các chuỗi (string), mỗi chuỗi là một section của kịch bản.
 
 Thông tin:
@@ -751,138 +751,59 @@ ${extraInstructions ? `- Hướng dẫn thêm từ Đầu vào Se: ${extraInstru
 
 Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`;
 
-                        const generatedContent = await generateAiContent(prompt, submitButton);
-                        const result = JSON.parse(generatedContent);
+                    const generatedContent = await generateAiContent(prompt, submitButton);
+                    const result = JSON.parse(generatedContent);
+                    sectionsResultContent.value = formatScriptContent(result.sections || ["AI không tạo được sections."]);
 
-                        state.windows.sections = {
-                            title: `Các Section cho: ${state.windows.source.title.substring(0,20)}...`,
-                            content: formatScriptContent(result.sections || ["AI không tạo được sections."]),
-                            status: 'open',
-                            saved: false
-                        };
-                        renderApp();
-
-                    } catch (error) {
-                         console.error('Lỗi trong quá trình tạo sections:', error);
-                        showToast(`Lỗi: ${error.message}`, 'error');
-                        if (state.windows.sections) {
-                            state.windows.sections.content = `Đã xảy ra lỗi: ${error.message}`;
-                            renderApp();
-                        }
-                    } finally {
-                        document.getElementById('loading-indicator')?.remove();
-                    }
+                } catch (error) {
+                     console.error('Lỗi trong quá trình tạo sections:', error);
+                    showToast(`Lỗi: ${error.message}`, 'error');
+                    sectionsResultContent.value = `Đã xảy ra lỗi: ${error.message}`;
                 }
             });
-
-            function createS2SWindowHTML(type, windowData) {
-                const { title, content } = windowData;
-                const isSource = type === 'source';
-                let bottomBarHTML = '';
-
-                if (isSource) {
-                     bottomBarHTML = `
-                        <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-end items-center rounded-b-lg space-x-2">
-                             <button data-target="source-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                             <button data-target="source-result-content" data-title="source" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                        </div>`;
-                } else { // It's the sections window
-                    bottomBarHTML = `
-                        <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-b-lg">
-                            <div class="flex items-center">
-                                <button data-type="sections" class="save-result-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 text-sm rounded-md">Lưu vào Se</button>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button data-target="sections-result-content" class="copy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 text-sm rounded-md">Copy</button>
-                                <button data-target="sections-result-content" data-title="sections" class="export-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 text-sm rounded-md">Xuất</button>
-                            </div>
-                        </div>`;
-                }
-
-
-                return `
-                <div class="bg-gray-800 rounded-lg flex flex-col h-full shadow-2xl">
-                    <div class="flex-shrink-0 bg-gray-700 p-2 flex justify-between items-center rounded-t-lg select-none">
-                        <span class="font-bold truncate px-2">${title}</span>
-                        <div class="flex space-x-2">
-                            <button data-window-type="${type}" class="minimize-btn h-6 w-6 flex items-center justify-center bg-yellow-500 hover:bg-yellow-400 rounded-full text-black font-bold text-lg leading-none pb-1">-</button>
-                            ${!isSource ? `<button data-window-type="${type}" class="close-btn h-6 w-6 flex items-center justify-center bg-red-500 hover:bg-red-400 rounded-full text-white font-bold text-lg leading-none pb-1">×</button>` : ''}
-                        </div>
-                    </div>
-                    <div class="p-4 flex-grow flex flex-col min-h-0">
-                        <textarea id="${type}-result-content" class="block w-full h-full bg-gray-900 border border-gray-700 rounded-md p-3">${content}</textarea>
-                    </div>
-                    ${bottomBarHTML}
-                </div>`;
-            }
             
-            // Centralized event listener for the whole app
+            // Centralized event listener for result buttons
             document.body.addEventListener('click', e => {
-                const targetElement = e.target;
-                const button = targetElement.closest('button');
-                const navLink = targetElement.closest('a');
+                const button = e.target.closest('button');
+                if (!button) return;
 
-                if (button) {
-                    const { target, title, type, windowType } = button.dataset;
+                const { target, title, type } = button.dataset;
+
+                if (button.classList.contains('copy-btn')) {
+                    const content = document.getElementById(target)?.value;
+                    if (!content) return showToast('Không có nội dung để sao chép.', 'info');
+                    navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép vào clipboard!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
+                } else if (button.classList.contains('export-btn')) {
+                    const content = document.getElementById(target)?.value;
+                     const titleText = "Generated_Sections";
+                    if (!content) return showToast('Không có nội dung để xuất.', 'info');
+                    downloadAsTxt(titleText, content);
+                } else if (button.classList.contains('save-result-btn')) {
+                    const titleText = `Sections from "${(localStorage.getItem('scriptToProcess') || 'script').substring(0, 20)}..."`;
+                    const content = sectionsResultContent.value.trim();
+                    if (!titleText || !content) return showToast('Cần có nội dung để lưu.', 'error');
                     
-                    if (button.classList.contains('minimize-btn')) {
-                        if (state.windows[windowType]) {
-                            state.windows[windowType].status = 'minimized';
-                            renderApp();
-                        }
-                    } else if (button.classList.contains('close-btn')) {
-                        if (state.windows[windowType]) {
-                            state.windows[windowType] = null;
-                            renderApp();
-                        }
-                    } else if (button.closest('#taskbar')) {
-                         if (state.windows[windowType]) {
-                            state.windows[windowType].status = 'open';
-                            renderApp();
-                        }
-                    } else if (button.classList.contains('copy-btn')) {
-                        const content = document.getElementById(target)?.value;
-                        if (!content) return showToast('Không có nội dung để sao chép.', 'info');
-                        navigator.clipboard.writeText(content).then(() => showToast('Đã sao chép vào clipboard!', 'success')).catch(() => showToast('Sao chép thất bại!', 'error'));
-                    } else if (button.classList.contains('export-btn')) {
-                        const content = document.getElementById(target)?.value;
-                        const titleText = state.windows[title]?.title || 'sections';
-                        if (!content) return showToast('Không có nội dung để xuất.', 'info');
-                        downloadAsTxt(titleText, content);
-                    } else if (button.classList.contains('save-result-btn')) {
-                        const titleText = state.windows.sections?.title;
-                        const content = document.getElementById('sections-result-content')?.value.trim();
-                        if (!titleText || !content) return showToast('Cần có nội dung để lưu.', 'error');
-                        
-                        state[type].push({ id: Date.now(), title: titleText, content });
-                        saveDataToStorage(type);
-                        
-                        if(state.windows.sections) state.windows.sections.saved = true;
-
-                        showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
-                    }
-                }
-
-                if (navLink && navLink.href.includes('/ancontents/')) {
-                    e.preventDefault();
-                    window.location.href = navLink.href;
+                    state[type].push({ id: Date.now(), title: titleText, content });
+                    saveDataToStorage(type);
+                    showToast(`Đã lưu vào ${memoryConfig[type].title}!`, 'success');
                 }
             });
             
-            // Listen for changes in result textareas to update saved state
-            document.body.addEventListener('input', e => {
-                const targetId = e.target.id;
-                if (targetId === 'sections-result-content') {
-                    if (state.windows.sections) state.windows.sections.saved = false;
-                } else if (targetId === 'source-result-content') {
-                     if (state.windows.source) state.windows.source.content = e.target.value;
+            document.getElementById('s2se-input-script').addEventListener('change', (e) => {
+                const selectedId = e.target.value;
+                if (selectedId) {
+                    const selectedScript = state.mainScripts.find(s => s.id == selectedId);
+                    if (selectedScript) {
+                        sourceScriptContent.value = selectedScript.content;
+                        localStorage.setItem('scriptToProcess', selectedScript.content);
+                    }
                 }
             });
 
             // --- Initial Setup ---
             toggleApiKeyVisibilityBtn.innerHTML = eyeIconSVG;
             populateS2SeDropdowns();
-            renderApp(); // Initial render for S2Se page
+            loadInitialScript();
         });
     </script>
 </body>

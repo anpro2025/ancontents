@@ -112,8 +112,8 @@
                 </div>
                 <div class="border-t border-gray-600 pt-4"></div>
                 <button id="create-script-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left">P2S</button>
-                <a href="/ancontents/S2Se/" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">S2Se</a>
-                <a href="/ancontents/Prompts-Studio/" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">Prompt Studio</a>
+                <a href="https://anproduction2025.github.io/ancontents/S2Se" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">S2Se</a>
+                <a href="https://anproduction2025.github.io/ancontents/S2Se/prompts_studio.html" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg w-full text-left mt-4 inline-block">Prompt Studio</a>
             </div>
         </aside>
 
@@ -642,24 +642,9 @@
             }
 
             // --- Event Listeners Setup ---
-            createScriptBtn.addEventListener('click', () => {
-                saveUnsavedWindowsToTrash();
-                scriptForm.reset();
-                populateAllInputDropdowns();
-                scriptDurationCustom.classList.add('hidden');
-                showWorkspaceColumn(scriptFormContainer);
-            });
-
+            
             scriptDuration.addEventListener('change', (e) => {
                 scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
-            });
-            
-            apiKeyBtn.addEventListener('click', () => {
-                saveUnsavedWindowsToTrash();
-                hideAllModals();
-                hideMainPanels();
-                renderSettingsDisplay();
-                apiKeyContainer.classList.remove('hidden');
             });
             
             apiKeyForm.addEventListener('submit', (e) => {
@@ -676,10 +661,6 @@
                 apiKeyInput.type = isPassword ? 'text' : 'password';
                 toggleApiKeyVisibilityBtn.innerHTML = isPassword ? eyeOffIconSVG : eyeIconSVG;
             });
-
-            document.querySelectorAll('.memory-btn').forEach(btn => {
-                btn.addEventListener('click', () => openMemoryModal(btn.dataset.type));
-            });
             
             toggleListBtn.addEventListener('click', () => {
                 const isCollapsed = memoryListColumn.classList.contains('hidden');
@@ -695,7 +676,7 @@
                     toggleListBtn.title = "Mở rộng danh sách";
                     if(memoryEditorPanel.classList.contains('hidden')){
                         memoryEditorPanel.classList.remove('hidden');
-                        if (!memoryModalIdInput.value) clearMemoryForm();
+                        if (!memoryModalIdInput.value) memoryModalForm.reset();
                     }
                 }
             });
@@ -929,8 +910,8 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                             <div class="flex justify-between items-center pt-2 flex-shrink-0">
                                 <div>
                                     ${isScript 
-                                        ? `<a href="./S2Se/" class="nav-link-dynamic bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md">Chuyển sang S2Se</a>`
-                                        : `<a href="./text-to-voice/" class="nav-link-dynamic bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-3 text-sm rounded-md">Tạo Voice TTS</a>`
+                                        ? `<a href="./s2se_app.html" class="nav-link-dynamic bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 text-sm rounded-md">Chuyển sang S2Se</a>`
+                                        : `<a href="./prompts_studio.html" class="nav-link-dynamic bg-teal-600 hover:bg-teal-500 text-white font-bold py-1 px-3 text-sm rounded-md">Tạo Voice TTS</a>`
                                     }
                                 </div>
                                 <div class="flex space-x-2">
@@ -952,6 +933,23 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
 
                 if (button) {
                     const { target, title, type, windowType } = button.dataset;
+
+                    if(button.id === 'api-key-btn'){
+                        saveUnsavedWindowsToTrash();
+                        hideAllModals();
+                        hideMainPanels();
+                        renderSettingsDisplay();
+                        apiKeyContainer.classList.remove('hidden');
+                        return;
+                    }
+                     if (button.id === 'create-script-btn') {
+                        saveUnsavedWindowsToTrash();
+                        scriptForm.reset();
+                        populateAllInputDropdowns();
+                        scriptDurationCustom.classList.add('hidden');
+                        showWorkspaceColumn(scriptFormContainer);
+                        return;
+                    }
                     
                     if (button.classList.contains('minimize-btn')) {
                         if (state.windows[windowType]) {
@@ -1011,14 +1009,14 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
                     }
                 }
 
-                if (navLink && navLink.href.includes('/ancontents/')) {
+                if (navLink) {
                     e.preventDefault();
                     saveUnsavedWindowsToTrash();
-                    if (navLink.href.includes('/S2Se/')) {
+                    if (navLink.href.includes('S2Se')) {
                         const content = document.getElementById('script-result-content')?.value;
                         localStorage.setItem('scriptToProcess', content || '');
                     }
-                    if (navLink.href.includes('/text-to-voice/')) {
+                    if (navLink.href.includes('text-to-voice')) {
                         const content = document.getElementById('vo-result-content')?.value;
                         localStorage.setItem('textToVoice', content || '');
                     }
@@ -1044,3 +1042,4 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
+

@@ -265,7 +265,10 @@
                             <div class="border-t border-gray-700 pt-2 space-y-2">
                                 <div class="flex items-center justify-between">
                                     <label for="repeat-description-toggle" class="text-xs font-medium text-gray-300 leading-tight">Lặp lại 100% mô tả</label>
-                                    <input type="checkbox" id="repeat-description-toggle" class="ml-2">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="repeat-description-toggle" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-yellow-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                                    </label>
                                 </div>
                                 <div>
                                     <label for="character-repeat-select" class="block text-xs font-medium text-gray-300 leading-tight mb-1">Nhân vật</label>
@@ -463,6 +466,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 <!-- 10 bố cục khung hình -->
                 <div class="mb-2 bg-gray-700 rounded-lg p-2">
                     <h3 class="text-xs font-semibold text-green-400 mb-1">Bố cục ưu tiên</h3>
@@ -894,7 +898,7 @@
                     } else if (isPurge) { // For deleting all from a normal category
                         state[type] = [];
                     } else { // For moving all to trash
-                        state.trash.push(...state[type].map(item => ({...item, deletedAt: new Date().toLocaleString('vi-VN')})));
+                        state.trash.push(...state[type].map(item => ({...item, deletedAt: new Date().toLocaleString('vi-VN'})));
                         state[type] = [];
                         saveDataToStorage('trash');
                     }
@@ -945,12 +949,14 @@
                 const selectedSceneId = sceneSelect.value;
                 const repeatDescriptionToggle = document.getElementById('repeat-description-toggle').checked;
                 const cameraDesc = cameraDescription.value.trim();
+                const expanderToggle = document.getElementById('expander-toggle').checked;
+                const expanderInput = document.getElementById('expander-input').value.trim();
 
                 let characterInstruction = '';
                 if (repeatDescriptionToggle && selectedCharacterId) {
                     const character = state.characters.find(c => c.id == selectedCharacterId);
                     if (character) {
-                        characterInstruction = `QUAN TRỌNG VỀ NHÂN VẬT: Khi mô tả nhân vật "${character.title}", bạn PHẢI sử dụng chính xác 100% mô tả sau: "${character.content}".\\n`;
+                        characterInstruction = `QUAN TRỌNG VỀ NHÂN VẬT: Khi mô tả nhân vật "${character.title}", bạn PHẢI sử dụng chính xác 100% mô tả sau: "${character.content}".\n`;
                     }
                 }
 
@@ -958,16 +964,20 @@
                 if (repeatDescriptionToggle && selectedSceneId) {
                     const scene = state.scenes.find(s => s.id == selectedSceneId);
                     if (scene) {
-                        sceneInstruction = `QUAN TRỌNG VỀ BỐI CẢNH: Khi mô tả bối cảnh "${scene.title}", bạn PHẢI sử dụng chính xác 100% mô tả sau: "${scene.content}".\\n`;
+                        sceneInstruction = `QUAN TRỌNG VỀ BỐI CẢNH: Khi mô tả bối cảnh "${scene.title}", bạn PHẢI sử dụng chính xác 100% mô tả sau: "${scene.content}".\n`;
                     }
                 }
 
                 let cameraInstruction = '';
                 if (cameraDesc) {
-                    cameraInstruction = `HƯỚNG DẪN GÓC MÁY: ${cameraDesc}\\n`;
+                    cameraInstruction = `HƯỚNG DẪN GÓC MÁY: ${cameraDesc}\n`;
                 }
-                
-                const prompt = `Bạn là biên tập viên kịch bản song ngữ. Chia nhỏ kịch bản sau thành các phân cảnh (sections). Với mỗi section, cung cấp cả bản tiếng Việt và tiếng Anh. Định dạng đầu ra: một đối tượng JSON có khóa "sections", giá trị là một mảng các đối tượng, mỗi đối tượng có khóa "vi" và "en".\\n\\nKịch bản: ---\\n${sourceScript}\\n---\\n${sectionCount ? `Số lượng section mong muốn: ${sectionCount}`: ''}\\n${referenceSe ? `Hướng dẫn thêm: ${referenceSe.content}`: ''}\\n${detailInstruction}\\n${characterInstruction}\\n${sceneInstruction}\\n${cameraInstruction}`;
+                let expanderInstruction = '';
+                if (expanderToggle && expanderInput) {
+                    expanderInstruction = `EXPANDER: ${expanderInput}\n`;
+                }
+
+                const prompt = `Bạn là biên tập viên kịch bản song ngữ. Chia nhỏ kịch bản sau thành các phân cảnh (sections). Với mỗi section, cung cấp cả bản tiếng Việt và tiếng Anh. Định dạng đầu ra: một đối tượng JSON có khóa "sections", giá trị là một mảng các đối tượng, mỗi đối tượng có khóa "vi" và "en".\n\nKịch bản: ---\n${sourceScript}\n---\n${sectionCount ? `Số lượng section mong muốn: ${sectionCount}`: ''}\n${referenceSe ? `Hướng dẫn thêm: ${referenceSe.content}`: ''}\n${detailInstruction}\n${characterInstruction}\n${sceneInstruction}\n${cameraInstruction}\n${expanderInstruction}`;
 
                 inputPanel.classList.replace('w-2/3', 'w-2/5');
                 localStorage.setItem('s2se_task_running', 'true');

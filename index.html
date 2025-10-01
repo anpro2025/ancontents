@@ -191,9 +191,13 @@
 
             <div class="border-t border-gray-700 my-2"></div>
             
+            <!-- Nút đặt lại bộ nhớ -->
+            <div class="flex justify-center mb-2">
+                <button id="reset-memory-btn" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded-full text-sm w-full" title="Xóa toàn bộ bộ nhớ và làm mới giao diện">F5</button>
+            </div>
             <ul class="space-y-2">
                 <div class="sidebar-group-yellow">
-                    <li><button data-type="script" title="Đầu vào Dự án" class="memory-btn w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 text-black">S</span><span class="sidebar-text text-sm">Dự án</span></button></li>
+                    <li><button data-type="script" title="Đầu vào Ý tưởng" class="memory-btn w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 text-black">I</span><span class="sidebar-text text-sm">Ý tưởng</span></button></li>
                     <li><button data-type="prompt" title="Đầu vào Se" class="memory-btn w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 text-black">Se</span><span class="sidebar-text text-sm">Section</span></button></li>
                     <li><button data-type="voiceOver" title="Đầu vào VO" class="memory-btn w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 text-black">VO</span><span class="sidebar-text text-sm">Voice Over</span></button></li>
                     <li><button data-type="scenes" title="Bối cảnh" class="memory-btn relative w-full flex justify-center items-center p-2 space-x-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21V10m0 0a8.001 8.001 0 00-8-8h0a8.001 8.001 0 008 8zm0 0a8.001 8.001 0 018-8h0a8.001 8.001 0 01-8 8z" /></svg><span class="sidebar-text text-sm">Bối cảnh</span><span class="memory-count hidden ml-auto"></span></button></li>
@@ -204,7 +208,7 @@
 
             <ul class="space-y-2">
                 <div class="sidebar-group-blue">
-                    <li><button data-type="mainScripts" title="Bộ nhớ Scripts" class="memory-btn relative w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 sidebar-icon-blue">S</span><span class="sidebar-text text-sm">Scripts</span><span class="memory-count hidden ml-auto"></span></button></li>
+                    <li><button data-type="mainScripts" title="Bộ nhớ Scripts" class="memory-btn relative w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 sidebar-icon-blue">I</span><span class="sidebar-text text-sm">Scripts</span><span class="memory-count hidden ml-auto"></span></button></li>
                     <li><button data-type="sections" title="Bộ nhớ Sections" class="memory-btn relative w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 sidebar-icon-blue">Se</span><span class="sidebar-text text-sm">Sections</span><span class="memory-count hidden ml-auto"></span></button></li>
                     <li><button data-type="mainPrompts" title="Bộ nhớ Prompts" class="memory-btn relative w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 sidebar-icon-blue">P</span><span class="sidebar-text text-sm">Prompts</span><span class="memory-count hidden ml-auto"></span></button></li>
                     <li><button data-type="mainVoiceOvers" title="Bộ nhớ Voice Off" class="memory-btn relative w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 sidebar-icon-blue">VO</span><span class="sidebar-text text-sm">Voice Off</span><span class="memory-count hidden ml-auto"></span></button></li>
@@ -244,7 +248,7 @@
         <main class="flex-grow p-8 flex space-x-8 overflow-x-auto relative">
             <!-- Initial Input Column -->
             <div id="script-form-container" class="workspace-column hidden w-[400px] flex-shrink-0 bg-gray-800 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-6">Nhập đầu vào</h2>
+                <!-- Đã xóa tiêu đề Nhập đầu vào -->
                 <form id="script-form" class="space-y-4">
                     <div>
                         <label for="script-idea" class="block text-sm font-medium text-gray-300">Ý tưởng kịch bản / Tóm tắt (Tùy chọn)</label>
@@ -252,11 +256,11 @@
                     </div>
                     <div class="space-y-4">
                         <div>
-                            <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Đầu vào Dự án (Tham khảo)</label>
+                            <label for="script-input-script" class="block text-sm font-medium text-yellow-400">Chọn Ý Tưởng và Dự Án</label>
                             <select id="script-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
                         </div>
-                         <div>
-                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Đầu vào VO (Tham khảo)</label>
+                        <div>
+                            <label for="script-input-voice" class="block text-sm font-medium text-yellow-400">Chọn hướng dẫn Voice Off</label>
                             <select id="script-input-voice" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"></select>
                         </div>
                         <div>
@@ -319,7 +323,7 @@
             <h2 id="memory-modal-title" class="text-2xl font-bold mb-6 flex-shrink-0">Bộ nhớ</h2>
             <div class="flex space-x-6 flex-grow overflow-hidden">
                 <!-- List -->
-                <div id="memory-list-column" class="w-1/4 border-r border-gray-700 pr-6 flex flex-col">
+                <div id="memory-list-column" class="w-1/6 border-r border-gray-700 pr-2 flex flex-col">
                     <div class="flex-shrink-0 flex justify-between items-center mb-4">
                         <h3 class="font-bold text-lg">Danh sách</h3>
                         <div class="flex items-center space-x-2">
@@ -432,6 +436,8 @@
             const imageGeneratorWindowWrapper = document.getElementById('imageGenerator-window-wrapper');
             const taskbar = document.getElementById('taskbar');
             const taskbarApps = document.getElementById('taskbar-apps');
+            // --- Reset Memory Button ---
+            const resetMemoryBtn = document.getElementById('reset-memory-btn');
 
             const scriptForm = document.getElementById('script-form');
             const scriptDuration = document.getElementById('script-duration');
@@ -479,7 +485,7 @@
 
             const memoryConfig = {
                 // Inputs
-                script: { title: 'Đầu vào Dự án', storageKey: 'input_scripts' },
+                script: { title: 'Đầu vào Ý tưởng', storageKey: 'input_scripts' },
                 prompt: { title: 'Đầu vào Se', storageKey: 'input_prompts' },
                 voiceOver: { title: 'Đầu vào VO', storageKey: 'input_voiceOvers' },
                 // Saved Results
@@ -491,6 +497,18 @@
                 mainVoiceOvers: { title: 'Bộ nhớ Voice Off', storageKey: 'memory_mainVoiceOvers' },
                 trash: { title: 'Bộ nhớ Rác', storageKey: 'memory_trash' }
             };
+
+                // Hàm đặt lại bộ nhớ
+                function resetAllMemory() {
+                    Object.values(memoryConfig).forEach(cfg => {
+                        localStorage.removeItem(cfg.storageKey);
+                    });
+                    localStorage.removeItem('anProduction_windows');
+                    showToast('Đã đặt lại toàn bộ bộ nhớ. Trang sẽ được tải lại...', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1200);
+                }
             
             // --- State Management ---
             const savedWindows = JSON.parse(localStorage.getItem('anProduction_windows'));
@@ -773,7 +791,7 @@
                         select.innerHTML += `<option value="${item.id}">${item.title}</option>`;
                     });
                 };
-                populate('script-input-script', state.script, 'Chọn từ Đầu vào Dự án...');
+                populate('script-input-script', state.script, 'Chọn từ Đầu vào Ý tưởng...');
                 populate('script-input-voice', state.voiceOver, 'Chọn từ Đầu vào VO...');
             }
 
@@ -922,6 +940,13 @@
             }
 
             // --- Event Listeners Setup ---
+            if (resetMemoryBtn) {
+                resetMemoryBtn.addEventListener('click', () => {
+                    if (confirm('Bạn có chắc chắn muốn đặt lại toàn bộ bộ nhớ? Tất cả dữ liệu sẽ bị xóa và không thể khôi phục.')) {
+                        resetAllMemory();
+                    }
+                });
+            }
             
             scriptDuration.addEventListener('change', (e) => {
                 scriptDurationCustom.classList.toggle('hidden', e.target.value !== 'custom');
@@ -1087,7 +1112,7 @@
             scriptForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitButton = e.target.querySelector('button[type="submit"]');
-                saveUnsavedWindowsToTrash();
+                               saveUnsavedWindowsToTrash();
                 
                 const ideaValue = document.getElementById('script-idea').value.trim();
                 const selectedScriptId = document.getElementById('script-input-script').value;
@@ -1591,4 +1616,3 @@ Hãy đảm bảo bạn tuân thủ đúng định dạng JSON đã yêu cầu.`
     </script>
 </body>
 </html>
-

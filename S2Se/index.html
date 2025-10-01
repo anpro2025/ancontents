@@ -224,7 +224,7 @@
         <!-- Đã xóa thanh điều hướng ngang và icon -->
         <!-- Xóa luôn thanh ngang taskbar -->
         <!-- Đã xóa nút quay về trang chủ phía dưới dòng Script -->
-        <main class="flex-grow p-4 flex justify-start space-x-4 overflow-y-hidden relative">
+        <main class="flex-grow p-4 flex flex-row space-x-4 overflow-y-hidden relative">
             <div id="input-panel" class="w-1/6 flex-shrink-0 bg-gray-800 p-1 rounded-lg flex flex-col panel-shadow">
                 <!-- Script Header -->
                 <div class="flex-shrink-0 mb-1">
@@ -274,9 +274,7 @@
                                         <!-- Dữ liệu bối cảnh sẽ được thêm động từ bộ nhớ -->
                                     </select>
                                 </div>
-                            </div>
-                            <div class="border-t border-gray-700 pt-2 space-y-2">
-                                <!-- Đã xóa các trường bị lặp lại: Mô tả đồng nhất, Lặp lại 100% mô tả, Nhân vật, Bối cảnh, Mô tả góc máy (Tùy chọn) -->
+                                <!-- ...existing code... -->
                             </div>
                             <div class="flex justify-end space-x-4 pt-4">
                                 <button type="submit" id="generate-sections-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md min-w-[100px] flex justify-center items-center">
@@ -299,7 +297,121 @@
                 </div>
                 <div id="sections-list" class="flex-grow flex flex-col space-y-4 overflow-y-auto pr-2"></div>
             </div>
-        </main>
+            <!-- Expander bên phải -->
+            <div id="expander-panel" class="w-1/4 flex-shrink-0 bg-gray-800 p-1 rounded-lg flex flex-col panel-shadow">
+                <div class="flex-shrink-0 mb-1">
+                    <h2 class="text-sm font-bold mb-1">Expander (Mở rộng)</h2>
+                    <label for="expander-input" class="block text-xs font-medium text-blue-400 leading-tight mb-1">Nhập Expander...</label>
+                    <input type="text" id="expander-input" class="block w-full px-1 py-1 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 text-xs" placeholder="Nhập Expander...">
+                </div>
+                <!-- Góc máy ưu tiên - nền riêng -->
+                <div class="mb-2 bg-gray-700 rounded-lg p-2">
+                    <h3 class="text-xs font-semibold text-green-400 mb-1">Góc máy ưu tiên</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Wide Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-wide" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Close-up</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-closeup" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Medium Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-medium" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Over-the-Shoulder</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-over-shoulder" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Tracking Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-tracking" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Dolly Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-dolly" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Crane Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-crane" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Aerial Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-aerial" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Point of View</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-pov" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-300 mr-2">Zoom Shot</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="angle-zoom" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chuyển động máy quay -->
+                <div class="mb-2">
+                    <h3 class="text-xs font-semibold text-gray-300 mb-1">10 chuyển động máy quay điện ảnh</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Pan</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-pan" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Tilt</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-tilt" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Dolly</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-dolly" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Zoom</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-zoom" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Crane</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-crane" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Handheld</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-handheld" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Steadicam</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-steadicam" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Tracking</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-tracking" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Aerial</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-aerial" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">POV</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="motion-pov" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xs font-semibold text-gray-300 mb-1">10 bố cục khung hình</h3>
+                <div class="grid grid-cols-1 gap-2">
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Rule of Thirds</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-thirds" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Centered</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-centered" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Symmetry</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-symmetry" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Golden Ratio</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-golden" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Leading Lines</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-leading" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Foreground Interest</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-foreground" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Depth</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-depth" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Negative Space</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-negative" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Frame within a Frame</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-frame" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                    <div class="flex items-center"><span class="text-xs text-gray-300 mr-2">Diagonal Composition</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="frame-diagonal" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div></label></div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Modals -->
@@ -751,6 +863,7 @@
                 if (!sourceScript) return showToast('Không có kịch bản gốc.', 'error');
                 if (!state.settings.apiKey) {
                     document.getElementById('api-key-btn').click();
+
                     return showToast('Vui lòng nhập API Key.', 'error');
                 }
                 const sectionCount = document.getElementById('section-count').value;

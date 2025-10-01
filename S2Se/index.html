@@ -144,7 +144,7 @@
                                 <input type="number" id="section-count" placeholder="Ví dụ: 8" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
                             </div>
                             <div>
-                                <label for="s2se-input-se" class="block text-sm font-medium text-yellow-400">Đầu vào Se (Tùy chọn)</label>
+                                <label for="s2se-input-se" class="block text-sm font-medium text-teal-400">Tham khảo Sections (Tùy chọn)</label>
                                 <select id="s2se-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
                             </div>
                             <div class="flex items-center justify-between pt-2">
@@ -720,16 +720,20 @@
                  const selectedId = e.target.value;
                  if(selectedId) {
                      const selectedScript = state.mainScripts.find(s => s.id == selectedId);
-                     if(selectedScript) sourceScriptContent.value = formatScriptContent(JSON.parse(selectedScript.content));
+                     if(selectedScript) {
+                        try {
+                            // Try to parse if it's a JSON string (e.g., from P2S)
+                            const contentObj = JSON.parse(selectedScript.content);
+                            sourceScriptContent.value = formatScriptContent(contentObj);
+                        } catch (error) {
+                            // If it's not a JSON string, just use the raw text content
+                            sourceScriptContent.value = selectedScript.content;
+                        }
+                     }
+                 } else {
+                    sourceScriptContent.value = '';
                  }
             });
-            
-                      const selectedSection = state.sections.find(s => s.id == selectedId);
-                     // You might want to do something with the selected section,
-                     // but for now, it's just selected in the dropdown.
-                 }
-            });
-
 
             closeResultsBtn.addEventListener('click', () => {
                 sectionsResultContainer.classList.add('hidden');
@@ -828,8 +832,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

@@ -158,25 +158,20 @@
                             <!-- Consistent Descriptions -->
                             <div class="border-t border-gray-700 pt-4 space-y-4">
                                 <h3 class="text-md font-semibold text-gray-300">Mô tả đồng nhất</h3>
+                                <div class="flex items-center justify-between">
+                                    <label for="repeat-description-toggle" class="text-sm font-medium text-gray-300">Lặp lại 100% mô tả</label>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="repeat-description-toggle" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                    </label>
+                                </div>
                                  <div>
                                     <label for="s2se-character-select" class="block text-sm font-medium text-gray-300 mb-1">Nhân vật</label>
-                                    <div class="flex items-center space-x-2">
-                                        <select id="s2se-character-select" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="character-toggle" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                                        </label>
-                                    </div>
+                                    <select id="s2se-character-select" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
                                  </div>
                                  <div>
                                     <label for="s2se-scene-select" class="block text-sm font-medium text-gray-300 mb-1">Bối cảnh</label>
-                                    <div class="flex items-center space-x-2">
-                                        <select id="s2se-scene-select" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="scene-toggle" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                                        </label>
-                                    </div>
+                                    <select id="s2se-scene-select" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
                                  </div>
                                  <div>
                                      <label for="s2se-camera-description" class="block text-sm font-medium text-gray-300">Mô tả góc máy (Tùy chọn)</label>
@@ -665,13 +660,12 @@
                 const detailInstruction = detailToggle.checked ? `Quan trọng: Với mỗi section, hãy thêm vào các chi tiết mô tả sống động về bối cảnh, hành động, cảm xúc của nhân vật và gợi ý góc máy để làm cho phân cảnh trở nên phong phú hơn, sẵn sàng cho việc tạo prompt.` : '';
 
                 const selectedCharacterId = characterSelect.value;
-                const characterToggle = document.getElementById('character-toggle').checked;
                 const selectedSceneId = sceneSelect.value;
-                const sceneToggle = document.getElementById('scene-toggle').checked;
+                const repeatDescriptionToggle = document.getElementById('repeat-description-toggle').checked;
                 const cameraDesc = cameraDescription.value.trim();
 
                 let characterInstruction = '';
-                if (characterToggle && selectedCharacterId) {
+                if (repeatDescriptionToggle && selectedCharacterId) {
                     const character = state.characters.find(c => c.id == selectedCharacterId);
                     if (character) {
                         characterInstruction = `QUAN TRỌNG VỀ NHÂN VẬT: Khi mô tả nhân vật "${character.title}", bạn PHẢI sử dụng chính xác 100% mô tả sau: "${character.content}".\\n`;
@@ -679,7 +673,7 @@
                 }
 
                 let sceneInstruction = '';
-                if (sceneToggle && selectedSceneId) {
+                if (repeatDescriptionToggle && selectedSceneId) {
                     const scene = state.scenes.find(s => s.id == selectedSceneId);
                     if (scene) {
                         sceneInstruction = `QUAN TRỌNG VỀ BỐI CẢNH: Khi mô tả bối cảnh "${scene.title}", bạn PHẢI sử dụng chính xác 100% mô tả sau: "${scene.content}".\\n`;
@@ -832,4 +826,5 @@
     </script>
 </body>
 </html>
+" is selected in the editor.
 

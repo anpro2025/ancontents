@@ -168,8 +168,13 @@
             
             <!-- Nút đặt lại bộ nhớ -->
             <div class="flex justify-center mb-2">
-                <button id="reset-memory-btn" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded-full text-sm w-auto" title="Làm mới giao diện">F5</button>
+                <button id="reload-page-btn" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded-full text-sm w-auto" title="Tải lại trang">F5</button>
             </div>
+            <script>
+                document.getElementById('reload-page-btn').onclick = function() {
+                    window.location.reload();
+                };
+            </script>
             <ul class="space-y-2">
                 <div class="sidebar-group-yellow">
                     <li><button data-type="script" title="Đầu vào Ý tưởng" class="memory-btn w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="text-sm font-bold w-5 text-center flex-shrink-0 text-black">I</span><span class="sidebar-text text-sm">Ý tưởng</span></button></li>
@@ -196,11 +201,11 @@
                  <div class="border-t border-gray-700 my-2"></div>
                  <!-- Cụm P2S, S2Se, Prompt Studio với nền xanh lá -->
                  <div class="sidebar-group-green">
-                    <li><a href="#" id="create-script-btn" title="Idea to Script" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="font-bold w-7 h-7 flex items-center justify-center sidebar-icon-green" style="font-size:0.95rem;">I2S</span><span class="sidebar-text text-sm">Idea to Script</span></a></li>
+                    <li><a href="https://anproduction2025.github.io/ancontents" id="create-script-btn" title="Idea to Script" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="font-bold w-7 h-7 flex items-center justify-center sidebar-icon-green" style="font-size:0.95rem;">I2S</span><span class="sidebar-text text-sm">Idea to Script</span></a></li>
                     <li><a href="https://anproduction2025.github.io/ancontents/S2Se" title="S2Se (Script to Section)" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="font-bold w-7 h-7 flex items-center justify-center sidebar-icon-green" style="font-size:0.95rem;">S2Se</span><span class="sidebar-text text-sm">S2Se</span></a></li>
-                    <li><a href="/ancontents/Prompts-Studio/" title="Prompt Studio" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="font-bold w-7 h-7 flex items-center justify-center sidebar-icon-green" style="font-size:0.95rem;">Ps</span><span class="sidebar-text text-sm">Prompt Studio</span></a></li>
-                 </div>
-                 <div class="border-t border-gray-700 my-2"></div>
+                    <li><a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" title="Prompt Studio" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full"><span class="font-bold w-7 h-7 flex items-center justify-center sidebar-icon-green" style="font-size:0.95rem;">Ps</span><span class="sidebar-text text-sm">Prompt Studio</span></a></li>
+                </div>
+                <div class="border-t border-gray-700 my-2"></div>
                  <!-- Các cụm còn lại -->
                  <li><a href="/ancontents/thu-vien/" title="Thư viện Prompts" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" /></svg><span class="sidebar-text text-sm">Thư viện Prompts</span></a></li>
                  <li><button id="open-image-studio-btn" title="Image Studio" class="w-full flex justify-center items-center p-2 space-x-2 rounded-full hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg><span class="sidebar-text text-sm">Image Studio</span></button></li>
@@ -217,90 +222,63 @@
         <header class="text-center py-4 flex-shrink-0">
             <h1 class="text-3xl font-bold tracking-wider uppercase text-white">SCRIPT TO SECTION (S2SE)</h1>
         </header>
-        
-        <nav class="bg-gray-800 border-y border-gray-700 py-2 flex-shrink-0">
-            <div class="flex justify-center items-center space-x-4">
-                <a href="https://anproduction2025.github.io/ancontents" class="p-3 rounded-full hover:bg-gray-700 transition-colors" title="P2S (Project to Script)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                </a>
-                <a href="https://anproduction2025.github.io/ancontents/S2Se" class="p-3 rounded-full bg-gray-700 transition-colors" title="S2Se (Script to Section)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                </a>
-                <a href="https://anproduction2025.github.io/ancontents/Prompts-Studio/" class="p-3 rounded-full hover:bg-gray-700 transition-colors" title="Prompt Studio">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                </a>
-                <a href="/ancontents/text-to-voice/" class="p-3 rounded-full hover:bg-gray-700 transition-colors" title="Tạo Voice (TTS)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                </a>
-                <a href="/ancontents/thu-vien/" class="p-3 rounded-full hover:bg-gray-700 transition-colors" title="Thư viện Prompts">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 005.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0014.5 16c1.255 0 2.443-.29 3.5.804v-10A7.968 7.968 0 0014.5 4z" /></svg>
-                </a>
-            </div>
-        </nav>
-        
-        <div id="taskbar" class="h-12 bg-gray-800 border-b border-gray-700 flex items-center justify-center px-4 z-30 flex-shrink-0">
-            <div id="taskbar-apps" class="flex items-center space-x-2">
-                 <!-- Minimized windows will appear here -->
-            </div>
-        </div>
-        
-        <main class="flex-grow p-4 flex justify-center space-x-4 overflow-y-hidden relative">
-            <div id="input-panel" class="w-2/3 flex-shrink-0 bg-gray-800 p-6 rounded-lg flex flex-col panel-shadow">
+        <!-- Đã xóa thanh điều hướng ngang và icon -->
+        <!-- Xóa luôn thanh ngang taskbar -->
+        <!-- Đã xóa nút quay về trang chủ phía dưới dòng Script -->
+        <main class="flex-grow p-4 flex justify-start space-x-4 overflow-y-hidden relative">
+            <div id="input-panel" class="w-1/6 flex-shrink-0 bg-gray-800 p-1 rounded-lg flex flex-col panel-shadow">
                 <!-- Script Header -->
-                <div class="flex-shrink-0 mb-4">
-                    <h2 class="text-xl font-bold mb-2">Kịch bản gốc</h2>
-                    <label for="s2se-input-script" class="block text-sm font-medium text-blue-400">Hoặc chọn từ Bộ nhớ Scripts (S)</label>
-                    <select id="s2se-input-script" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
+                <div class="flex-shrink-0 mb-1">
+                    <h2 class="text-sm font-bold mb-1 leading-tight">Kịch bản gốc</h2>
+                    <label for="s2se-input-script" class="block text-xs font-medium text-blue-400 leading-tight mb-1">Chọn từ Bộ nhớ Scripts...</label>
+                    <select id="s2se-input-script" class="mt-1 block w-full px-1 py-1 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 text-xs leading-tight" placeholder="Chọn từ Bộ nhớ Scripts..."></select>
                 </div>
-                
                 <!-- Script Textarea -->
-                <textarea id="source-script-content" class="block w-full flex-grow bg-gray-900 border border-gray-700 rounded-md p-3 mb-6" placeholder="Dán kịch bản gốc vào đây..."></textarea>
-                
+                <textarea id="source-script-content" class="block w-full flex-grow bg-gray-900 border border-gray-700 rounded-md p-1 mb-2 text-xs leading-tight" placeholder="Dán kịch bản gốc vào đây..."></textarea>
                 <!-- Options Section Wrapper (allows scrolling) -->
                 <div class="flex-shrink-0 flex flex-col min-h-0">
-                    <h2 class="text-xl font-bold mb-6 flex-shrink-0">Tùy chọn</h2>
+                    <h2 class="text-sm font-bold mb-2 leading-tight flex-shrink-0">Tùy chọn</h2>
                     <div class="overflow-y-auto pr-2">
-                         <form id="s2se-form" class="space-y-4">
+                         <form id="s2se-form" class="space-y-2">
                             <div>
-                                <label for="section-count" class="block text-sm font-medium text-gray-300">Số lượng Section mong muốn</label>
-                                <input type="number" id="section-count" placeholder="Ví dụ: 8" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500">
+                                <label for="section-count" class="block text-xs font-medium text-gray-300 leading-tight mb-1">Số lượng Section mong muốn</label>
+                                <input type="number" id="section-count" placeholder="Ví dụ: 8" class="mt-1 block w-full px-1 py-1 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 text-xs leading-tight">
                             </div>
                             <div>
-                                <label for="s2se-input-se" class="block text-sm font-medium text-teal-400">Tham khảo Sections (Tùy chọn)</label>
-                                <select id="s2se-input-se" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
+                                <label for="s2se-input-se" class="block text-xs font-medium text-teal-400 leading-tight mb-1">Tham khảo Sections (Tùy chọn)</label>
+                                <select id="s2se-input-se" class="mt-1 block w-full px-1 py-1 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 text-xs leading-tight" placeholder="Chọn từ Bộ nhớ Sections..."></select>
                             </div>
                             <div class="flex items-center justify-between pt-2">
-                                <label for="detail-toggle" class="text-sm font-medium text-gray-300">Làm chi tiết Sections</label>
+                                <label for="detail-toggle" class="text-xs font-medium text-gray-300 leading-tight">Làm chi tiết Sections</label>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="detail-toggle" class="sr-only peer">
                                     <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                                 </label>
                             </div>
-    
-                            <!-- Consistent Descriptions -->
-                            <div class="border-t border-gray-700 pt-4 space-y-4">
-                                <h3 class="text-md font-semibold text-gray-300">Mô tả đồng nhất</h3>
+                            <!-- Tùy chọn mở rộng cho Làm chi tiết Sections -->
+                            <div class="border-t border-gray-700 pt-2 space-y-2">
                                 <div class="flex items-center justify-between">
-                                    <label for="repeat-description-toggle" class="text-sm font-medium text-gray-300">Lặp lại 100% mô tả</label>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" id="repeat-description-toggle" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                                    </label>
+                                    <label for="repeat-description-toggle" class="text-xs font-medium text-gray-300 leading-tight">Lặp lại 100% mô tả</label>
+                                    <input type="checkbox" id="repeat-description-toggle" class="ml-2">
                                 </div>
-                                 <div>
-                                    <label for="s2se-character-select" class="block text-sm font-medium text-gray-300 mb-1">Nhân vật</label>
-                                    <select id="s2se-character-select" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
-                                 </div>
-                                 <div>
-                                    <label for="s2se-scene-select" class="block text-sm font-medium text-gray-300 mb-1">Bối cảnh</label>
-                                    <select id="s2se-scene-select" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></select>
-                                 </div>
-                                 <div>
-                                     <label for="s2se-camera-description" class="block text-sm font-medium text-gray-300">Mô tả góc máy (Tùy chọn)</label>
-                                     <textarea id="s2se-camera-description" rows="2" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500"></textarea>
-                                 </div>
+                                <div>
+                                    <label for="character-repeat-select" class="block text-xs font-medium text-gray-300 leading-tight mb-1">Nhân vật</label>
+                                    <select id="character-repeat-select" class="block w-full px-1 py-1 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 text-xs leading-tight">
+                                        <option value="">Chọn Nhân vật...</option>
+                                        <!-- Dữ liệu nhân vật sẽ được thêm động từ bộ nhớ -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="scene-repeat-select" class="block text-xs font-medium text-gray-300 leading-tight mb-1">Bối cảnh</label>
+                                    <select id="scene-repeat-select" class="block w-full px-1 py-1 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 text-xs leading-tight">
+                                        <option value="">Chọn Bối cảnh...</option>
+                                        <!-- Dữ liệu bối cảnh sẽ được thêm động từ bộ nhớ -->
+                                    </select>
+                                </div>
                             </div>
-    
+                            <div class="border-t border-gray-700 pt-2 space-y-2">
+                                <!-- Đã xóa các trường bị lặp lại: Mô tả đồng nhất, Lặp lại 100% mô tả, Nhân vật, Bối cảnh, Mô tả góc máy (Tùy chọn) -->
+                            </div>
                             <div class="flex justify-end space-x-4 pt-4">
                                 <button type="submit" id="generate-sections-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md min-w-[100px] flex justify-center items-center">
                                     <span class="btn-text">Tạo Sections</span><span class="loader hidden ml-2"></span>
@@ -327,7 +305,7 @@
     
     <!-- Modals -->
     <div id="memory-modal-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4"><div class="bg-gray-800 p-6 rounded-lg relative w-full max-w-[95vw] h-[95vh] flex flex-col shadow-2xl"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button><h2 id="memory-modal-title" class="text-2xl font-bold mb-6 flex-shrink-0">Bộ nhớ</h2><div class="flex space-x-6 flex-grow overflow-hidden"><div id="memory-list-column" class="w-1/4 border-r border-gray-700 pr-6 flex flex-col"><div class="flex-shrink-0 flex justify-between items-center mb-4"><h3 class="font-bold text-lg">Danh sách</h3><div class="flex items-center space-x-2"><button type="button" id="delete-all-memory-btn" title="Xóa tất cả" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold p-2 rounded-full transition duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button><button type="button" id="delete-all-trash-btn" title="Xóa tất cả trong rác" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold p-2 rounded-full transition duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button><button id="memory-new-item-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-full transition duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></button></div></div><div id="memory-modal-list" class="space-y-2 overflow-y-auto flex-grow"></div></div><div id="memory-editor-panel" class="w-3/4 hidden flex flex-col"><form id="memory-modal-form" class="space-y-4 flex flex-col flex-grow"><input type="hidden" id="memory-modal-id"><div class="flex-shrink-0"><label for="memory-modal-title-input" class="block text-sm font-medium text-gray-300">Tiêu đề</label><input type="text" id="memory-modal-title-input" placeholder="Nhập tiêu đề..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500"></div><div class="flex-grow flex flex-col min-h-0"><div class="flex justify-between items-center flex-shrink-0"><label for="memory-modal-content-input" class="block text-sm font-medium text-gray-300">Nội dung</label><span id="memory-word-count" class="text-xs text-gray-400">0 từ</span></div><textarea id="memory-modal-content-input" placeholder="Dán hoặc nhập nội dung..." required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 flex-grow"></textarea></div><div class="flex justify-end space-x-3 pt-2 flex-shrink-0"><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Lưu</button></div></form></div></div></div></div>
-    <div id="api-key-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4"><div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full relative shadow-2xl"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button><h2 class="text-2xl font-bold mb-6">Cài đặt</h2><form id="api-key-form" class="space-y-4"><div><label for="api-key-input" class="block text-sm font-medium text-gray-300">API Key của bạn <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a></label><div class="relative mt-1"><input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10"><button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white"></button></div></div><div><label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label><select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"><option value="gemini-2.5-flash-preview-05-20">Gemini 2.5 Flash</option><option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Mới nhất)</option><option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Mới nhất)</option><option value="gemini-1.0-pro">Gemini 1.0 Pro</option></select></div><div class="flex justify-end space-x-4 pt-4"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button></div></form></div></div>
+    <div id="api-key-container" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4"><div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full relative shadow-2xl"><button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12" /></svg></button><h2 class="text-2xl font-bold mb-6">Cài đặt</h2><form id="api-key-form" class="space-y-4"><div><label for="api-key-input" class="block text-sm font-medium text-gray-300">API Key của bạn <a href="https://aistudio.google.com/api-keys" target="_blank" class="text-blue-400 hover:underline text-xs ml-2">(Lấy API Key tại đây)</a></label><div class="relative mt-1"><input type="password" id="api-key-input" placeholder="Dán API Key của bạn vào đây..." class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 pr-10"><button type="button" id="toggle-api-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-white"></button></div></div><div><label for="ai-model-select" class="block text-sm font-medium text-gray-300">Model AI mặc định</label><select id="ai-model-select" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500"><option value="gemini-2.5-flash-preview-05-20">Gemini 2.5 Flash</option><option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Mới nhất)</option><option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Mới nhất)</option><option value="gemini-1.0-pro">Gemini 1.0 Pro</option></select></div><div class="flex justify-end space-x-4 pt-4"><button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-md">Lưu Cài đặt</button></div></form></div></div>
     <div id="delete-confirm-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[60] p-4"><div class="bg-gray-700 rounded-lg shadow-xl p-8 w-full max-w-md"><h2 class="text-xl font-bold mb-4">Xác nhận xóa</h2><p id="delete-confirm-message" class="text-gray-300 mb-6">Bạn có chắc chắn muốn xóa mục này không?</p><div class="flex justify-end space-x-4"><button type="button" id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Hủy</button><button type="button" id="confirm-delete-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-md">Xóa</button></div></div></div>
     <div id="toast-container" class="fixed top-5 left-5 z-[100] space-y-2"></div>
 
@@ -663,7 +641,7 @@
             });
 
             document.getElementById('api-key-btn').addEventListener('click', () => {
-                const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C3.732 4.943 7.523 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-7.523 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>`;
+                const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 8.517 16.635 7.412 14.722 6.708l-1.414-1.414A10.009 10.009 0 0010 3C7.523 3 5.268 4.943 2.458 10a11.97 11.97 0 003.876 3.655l-2.227-2.228a1 1 0 00-1.414-1.414L.293 8.293a1 1 0 000 1.414l2 2a1 1 0 001.414 0l1.293-1.293A8.003 8.003 0 0110 7a8 8 0 012.828.532l1.432-1.432A9.98 9.98 0 0010 5c-2.477 0-4.732 1.943-7.542 7 .57 1.1 1.254 2.063 2.07 2.912l-1.42-1.42a1 1 0 00-1.414-1.414L.293 15.707a1 1 0 001.414 1.414l14-14a1 1 0 00-1.414-1.414L3.707 2.293z" clip-rule="evenodd" /><path d="M10.707 10.293a1 1 0 10-1.414-1.414 1 1 0 001.414 1.414z" /></svg>`;
                 apiKeyInput.value = state.settings.apiKey;
                 aiModelSelect.value = state.settings.aiModel;
                 apiKeyInput.type = 'password';
@@ -871,6 +849,7 @@
                 showToast(`Đã lưu ${lastResult.length} sections vào bộ nhớ Sections!`, 'success');
             });
             
+
             sectionsList.addEventListener('click', e => {
                 const copyBtn = e.target.closest('.copy-section-btn');
                 const promptBtn = e.target.closest('.to-prompt-studio-btn');
@@ -913,6 +892,7 @@
                 if (localStorage.getItem('s2se_task_running') === 'true') {
                     const savedPrompt = localStorage.getItem('s2se_task_prompt');
                     if (savedPrompt) {
+                       
                         showToast('Phát hiện tác vụ dang dở, đang tiếp tục...', 'info');
                         const submitButton = document.getElementById('generate-sections-btn');
                         sectionsResultContainer.classList.remove('hidden');
@@ -938,6 +918,7 @@
                          localStorage.removeItem('s2se_task_running');
                     }
                 }
+ }
                 // Initial sidebar state
                 sidebar.classList.add('w-20');
                 sidebar.classList.remove('w-64');
@@ -948,5 +929,4 @@
     </script>
 </body>
 </html>
-" is selected in the editor.
 
